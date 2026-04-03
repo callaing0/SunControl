@@ -1,0 +1,12 @@
+package com.suncontrol.core.dto.asset;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class InverterCapSurplusDto extends InverterBaseDto {
+    // TODO :
+    /// 패널등록 Form 에서 인버터 설계용량
+    /// 수정내용만 추출, InverterBaseDto상속
+}
