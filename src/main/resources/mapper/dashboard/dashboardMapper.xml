@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.suncontrol.domain.dashboard.mapper.DashboardMapper">
+
+    <!-- 대시보드 요약 정보 조회 -->
+    <select id="selectDashboardSummary" resultType="com.suncontrol.domain.dashboard.dto.DashboardSummaryDto">
+        SELECT
+            p.id AS plantId,
+            COALESCE(pi.total_value, 0) AS currentPower,
+            COALESCE(dr_today.value_actual, 0) AS dailyAccumulation,
+            COALESCE(pi.efficiency, 0) AS efficiency,
+            p.name AS plantName,
+            p.address AS location,
+
+            <!--일출/일몰 시간-->
+            CASE
+                WHEN dw.sunrise IS NOT NULL AND dw.sunset IS NOT NULL
+                    THEN CONCAT(TIME_FORMAT(dw.sunrise, '%H:%i'), ' / ', TIME_FORMAT(dw.sunset, '%H:%i'))
+                ELSE '--'
+                END AS sunTime,
+
+            <!--금일 평균 일사량-->
+            COALESCE(rad_today.insolation, 0) AS insolation,
+
+            <!--온도 / 습도 -->
+            CASE
+                WHEN wl.temperature IS NOT NULL AND wl.humidity IS NOT NULL
+                    THEN CONCAT(ROUND(wl.temperature, 1), '°C / ', ROUND(wl.humidity, 0), '%')
+                ELSE '--'
+                END AS weatherStatus,
+            <!--예상 수익-->
+            COALESCE(dr_today.value_actual, 0) * 160 AS totalProfit,
+            <!--예상 발전량-->
+            COALESCE(dr_today.value_expected, 0) AS predGen,
+            <!--판매 단가-->
+            160 AS unitPrice,
+            <!--CO2 절감량-->
+            ROUND(COALESCE(dr_today.value_actual, 0) * 0.424, 2) AS co2Reduction,
+            <!--나무 환산-->
+            FLOOR((COALESCE(dr_today.value_actual, 0) * 0.424) / 6.6) AS treeCount
+
+        FROM plant p
+                 LEFT JOIN plant_info pi
+                           ON p.id = pi.plant_id
+                <!--최신 기상 정보-->
+                 LEFT JOIN daily_weather dw
+                           ON dw.district_code = p.district_code
+                               AND dw.base_date = CURDATE()
+                 LEFT JOIN (
+            SELECT w1.district_code, w1.temperature, w1.humidity
+            FROM weather_log w1
+                     INNER JOIN (
+                SELECT district_code, MAX(base_time) AS max_time
+                FROM weather_log
+                GROUP BY district_code
+            ) w2
+                                ON w1.district_code = w2.district_code
+                                    AND w1.base_time = w2.max_time
+        ) wl
+                           ON wl.district_code = p.district_code
+            <!--금일 평균 일사량-->
+                 LEFT JOIN (
+            SELECT plant_id, ROUND(AVG(ghi), 2) AS insolation
+            FROM radiation_log
+            WHERE DATE(base_time) = CURDATE()
+        GROUP BY plant_id
+            ) rad_today
+        ON rad_today.plant_id = p.id
+            <!--금일 발전량 / 예상 발전량-->
+            LEFT JOIN (
+            SELECT i.plant_id,
+            ROUND(SUM(dr.value_actual), 2) AS value_actual,
+            ROUND(SUM(dr.value_expected), 2) AS value_expected
+            FROM daily_report dr
+            INNER JOIN inverter i
+            ON dr.inverter_id = i.id
+            WHERE dr.base_date = CURDATE()
+            GROUP BY i.plant_id
+            ) dr_today
+            ON dr_today.plant_id = p.id
+        <!--로그인 사용자 기준 + 대표 발전소-->
+        WHERE p.member_id = #{memberId}
+          AND p.is_main = 1
+            LIMIT 1
+    </select>
+
+    <select id="selectInverters" resultType="com.suncontrol.domain.dashboard.dto.InverterDto">
+        SELECT
+            i.id AS inverterId,
+            i.serial AS serial,
+            i.status_code AS statusCode
+        FROM inverter i
+                 INNER JOIN plant p
+                            ON i.plant_id = p.id
+        WHERE p.member_id = #{memberId}
+        ORDER BY i.id ASC
+    </select>
+
+    <select id="selectHourlyPower" resultType="java.math.BigDecimal">
+        SELECT
+            COALESCE(SUM(hr.value_actual), 0) AS powerValue
+        FROM hourly_report hr
+                 INNER JOIN inverter i
+                            ON hr.inverter_id = i.id
+        WHERE i.plant_id = #{plantId}
+          AND DATE(hr.base_time) = CURDATE()
+          AND HOUR(hr.base_time) BETWEEN 6 AND 18
+        GROUP BY HOUR(hr.base_time)
+        ORDER BY HOUR(hr.base_time)
+    </select>
+
+    <select id="selectHourlyInsolation" resultType="java.math.BigDecimal">
+        SELECT
+            COALESCE(AVG(r.ghi), 0) AS insolationValue
+        FROM radiation_log r
+        WHERE r.plant_id = #{plantId}
+          AND DATE(r.base_time) = CURDATE()
+          AND HOUR(r.base_time) BETWEEN 6 AND 18
+        GROUP BY HOUR(r.base_time)
+        ORDER BY HOUR(r.base_time)
+    </select>
+
+</mapper>

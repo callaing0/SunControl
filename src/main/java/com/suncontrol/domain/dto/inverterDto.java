@@ -6,5 +6,5 @@ import lombok.Data;
 public class inverterDto {
     private Long inverterId;
     private String serial;
-    private Integer statusCode;
+    private Integer statusCode; //
 }
