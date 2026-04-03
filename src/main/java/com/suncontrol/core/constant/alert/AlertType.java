@@ -1,13 +1,13 @@
-package com.suncontrol.core.constant;
+package com.suncontrol.core.constant.alert;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AlertStatus {
+public enum AlertType {
     /**
      * TODO
-     * 알림의 조치상태에 관한 Enum
+     * 알림의 종류에 관한 Enum
      * */
 }

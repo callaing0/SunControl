@@ -1,14 +1,13 @@
-package com.suncontrol.core.constant;
+package com.suncontrol.core.constant.alert;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum InverterType {
-
+public enum AlertStatus {
     /**
      * TODO
-     * 인버터 종류에 대한 Enum
+     * 알림의 조치상태에 관한 Enum
      * */
 }

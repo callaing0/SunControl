@@ -1,4 +1,4 @@
-package com.suncontrol.core.constant;
+package com.suncontrol.core.constant.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
