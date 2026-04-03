@@ -1,4 +1,4 @@
-package com.suncontrol.core.entity;
+package com.suncontrol.core.entity.asset;
 
 import lombok.Getter;
 import lombok.Setter;
