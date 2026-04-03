@@ -15,6 +15,7 @@ public class Inverter {
     private BigDecimal ratedCapacity;
     private BigDecimal efficiency;
     private BigDecimal measuredCapacity;
+    private BigDecimal currentPower;
     private BigDecimal lastAccumEnergy;
     private String type;
     private int statusCode;
