@@ -3,6 +3,7 @@ package com.suncontrol.core.constant.asset;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -18,12 +19,13 @@ public enum PanelModel {
      * 패널 모델
      * */
 
-    DUMMY_A("DUMMY-A", 500),
-    DUMMY_B("DUMMY-B", 450),
-    DUMMY_C("DUMMY-C", 400);
+    DUMMY_A("DUMMY-A", 500, BigDecimal.valueOf(20.0)),
+    DUMMY_B("DUMMY-B", 450, BigDecimal.valueOf(20.0)),
+    DUMMY_C("DUMMY-C", 400, BigDecimal.valueOf(20.0));
 
     private final String name;
     private final int capacity;
+    private final BigDecimal efficiency;
 
     /// UI표시용 리스트
     public static final List<PanelModel> LIST =

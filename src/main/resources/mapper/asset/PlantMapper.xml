@@ -3,6 +3,23 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.core.repository.asset.PlantRepository">
-
+<mapper namespace="com.suncontrol.core.repository.asset.PlantRepository">
+    <insert id="save" parameterType="com.suncontrol.core.entity.asset.Plant">
+        INSERT INTO plant (member_id, name, address, latitude, longitude,
+            province_code, district_code, azimuth, tilt)
+        values (#{memberId}, #{name}, #{address}, #{latitude}, #{longitude},
+            #{province.code}, #{district.code}, #{azimuth}, #{tilt})
+    </insert>
+    <update id="resetMain">
+        UPDATE plant SET is_main = 0 WHERE member_id = #{memberId}
+    </update>
+    <update id="setMain">
+        UPDATE plant SET is_main = 1 WHERE id = #{id}
+    </update>
+    <select id="existsByIdAndMemberId" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM plant
+            WHERE id = #{id} AND member_id = #{memberId}
+        )
+    </select>
 </mapper>

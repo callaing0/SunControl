@@ -2,6 +2,8 @@ package com.suncontrol.core.entity.asset;
 
 import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
+import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
+import com.suncontrol.core.dto.asset.form.InverterSaveForm;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +30,19 @@ public class Inverter {
     private DeviceStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public Inverter(InverterSaveForm form) {
+        this.plantId = form.getPlantId();
+        this.ratedCapacity = form.getRatedCapacity();
+        /// 가상 필드용 메서드 활용
+        setType(form.getType());
+        this.efficiency = form.getEfficiency();
+        this.serial = form.getSerial();
+    }
+
+    public void setCapSurplus(InverterCapSurplusDto dto) {
+        this.measuredCapacity = this.measuredCapacity.add(dto.getMeasuredCapSurplus());
+    }
 
 /**
  * Mybatis Mapper 연동 및 DB 저장용 가상 필드
