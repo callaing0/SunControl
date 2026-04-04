@@ -42,6 +42,8 @@ public class InverterService {
     }
 
     public Map<Long, List<InverterGenerationDto>> findAllByPlant() {
-        return Collections.emptyMap(); //todo
+        return Collections.emptyMap();
+        //todo 발전데이터 생성을 위해 시스템에 등록된 모든 활성 인버터를
+        // 발전소 id 를 기준으로 한 Map에 저장하여 반환
     }
 }

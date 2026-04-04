@@ -16,9 +16,9 @@ public enum Weather {
     RAIN_SHOWERS(80, "폭우", 0.2),
     THUNDERSTORM(95, "뇌우", 0.1);
 
-    private final int wmo;
-    private final String description;
-    private final double efficiencyFactor; // 발전량 가중치
+    private final int wmo; // 국제표준 2자리숫자 코드
+    private final String description; // UI에 표시될 문자열
+    private final double efficiencyFactor; // 발전량 통계 분석을 위한 기상 가중치
 
     public static Weather fromCode(String code) {
         if (code == null || code.isBlank()) {
