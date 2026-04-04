@@ -8,7 +8,7 @@
         INSERT INTO inverter (plant_id, rated_capacity, type, efficiency, serial)
         VALUES (#{plantId}, #{ratedCapacity}, #{type}, #{efficiency}, #{serial})
     </insert>
-    <update id="updateCap" parameterType="com.suncontrol.core.dto.asset.InverterCapSurplusDto">
+    <update id="updateCap" parameterType="com.suncontrol.core.dto.asset.form.InverterCapSurplusDto">
         UPDATE inverter SET
         measured_cap = measured_cap + #{measuredCapSurplus}
         updated_at = NOW()

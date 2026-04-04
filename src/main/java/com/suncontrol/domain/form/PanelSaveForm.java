@@ -2,8 +2,8 @@ package com.suncontrol.domain.form;
 
 import com.suncontrol.core.constant.asset.PanelManufacturer;
 import com.suncontrol.core.constant.asset.PanelModel;
-import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
-import com.suncontrol.core.dto.asset.PanelSaveDto;
+import com.suncontrol.core.dto.asset.form.InverterCapSurplusDto;
+import com.suncontrol.core.dto.asset.form.PanelSaveDto;
 import com.suncontrol.core.dto.asset.component.InverterBaseDto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

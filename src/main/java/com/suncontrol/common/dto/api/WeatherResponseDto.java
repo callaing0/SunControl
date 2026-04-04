@@ -1,8 +1,7 @@
-package com.suncontrol.common.dto;
+package com.suncontrol.common.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.dto.asset.PlantWeatherApiDto;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
 import com.suncontrol.core.dto.log.RadiationLogDto;
@@ -11,11 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter

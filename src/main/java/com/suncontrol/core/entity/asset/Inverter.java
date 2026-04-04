@@ -2,7 +2,7 @@ package com.suncontrol.core.entity.asset;
 
 import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
-import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
+import com.suncontrol.core.dto.asset.form.InverterCapSurplusDto;
 import com.suncontrol.core.dto.asset.form.InverterSaveForm;
 import lombok.AccessLevel;
 import lombok.Getter;

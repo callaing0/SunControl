@@ -1,6 +1,5 @@
-package com.suncontrol.core.dto.asset;
+package com.suncontrol.core.dto.asset.form;
 
-import com.suncontrol.core.constant.asset.PanelManufacturer;
 import com.suncontrol.core.constant.asset.PanelModel;
 import lombok.Getter;
 import lombok.Setter;

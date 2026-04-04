@@ -1,4 +1,4 @@
-package com.suncontrol.common.dto;
+package com.suncontrol.common.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

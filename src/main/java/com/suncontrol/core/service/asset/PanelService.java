@@ -1,6 +1,6 @@
 package com.suncontrol.core.service.asset;
 
-import com.suncontrol.core.dto.asset.PanelSaveDto;
+import com.suncontrol.core.dto.asset.form.PanelSaveDto;
 import com.suncontrol.core.dto.asset.PanelVo;
 import com.suncontrol.core.repository.asset.PanelRepository;
 import lombok.RequiredArgsConstructor;

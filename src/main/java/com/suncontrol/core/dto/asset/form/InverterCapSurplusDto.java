@@ -1,4 +1,4 @@
-package com.suncontrol.core.dto.asset;
+package com.suncontrol.core.dto.asset.form;
 
 import com.suncontrol.core.dto.asset.component.InverterBaseDto;
 import lombok.Getter;
