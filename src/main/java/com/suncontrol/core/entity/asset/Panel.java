@@ -14,24 +14,20 @@ public class Panel {
     private Long id;
     private Long inverterId;
     private PanelModel model;
-    private PanelManufacturer panelManufacturer;
-//    private int capacity;
-    private BigDecimal efficiency;
     private int count;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    /// 뷰 객체용 가상 필드 메서드
+    /// TODO : PanelVo 구현시 해당 메서드는 PanelVo로 옮기고, model 필드와 함께 넘겨준다
     public void setModelName(String modelName) {
         this.model = PanelModel.getByName(modelName);
     }
     public String getModelName() {
         return this.model.getName();
     }
-    public void setManufacturer(String  manufacturer) {
-        this.panelManufacturer = PanelManufacturer.getByLabel(manufacturer);
-    }
     public String getManufacturer() {
-        return this.panelManufacturer.getLabel();
+        return this.model.getManufacturer().getLabel();
     }
     public int getCapacity() {
         return this.model.getCapacity();

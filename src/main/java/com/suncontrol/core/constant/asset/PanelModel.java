@@ -19,11 +19,12 @@ public enum PanelModel {
      * 패널 모델
      * */
 
-    DUMMY_A("DUMMY-A", 500, BigDecimal.valueOf(20.0)),
-    DUMMY_B("DUMMY-B", 450, BigDecimal.valueOf(20.0)),
-    DUMMY_C("DUMMY-C", 400, BigDecimal.valueOf(20.0));
+    DUMMY_A("DUMMY-A", PanelManufacturer.DUMMY_CORP, 500, BigDecimal.valueOf(20.0)),
+    DUMMY_B("DUMMY-B", PanelManufacturer.DUMMY_CORP, 450, BigDecimal.valueOf(20.0)),
+    DUMMY_C("DUMMY-C", PanelManufacturer.DUMMY_CORP, 400, BigDecimal.valueOf(20.0));
 
     private final String name;
+    private final PanelManufacturer manufacturer;
     private final int capacity;
     private final BigDecimal efficiency;
 

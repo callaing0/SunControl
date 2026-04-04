@@ -23,7 +23,7 @@ public class PanelSaveForm {
     private InverterBaseDto inverter;
     @NotBlank(message = "패널 모델을 입력해주세요")
     private String modelName;
-    @NotNull(message = "시스템에 등록된 패널이 아닙니다")
+    @NotBlank(message = "시스템에 등록된 패널 모델이 아닙니다")
     @Setter(AccessLevel.NONE)
     private PanelModel model;
     @NotBlank(message = "패널 제조사를 입력해주세요")
@@ -37,14 +37,24 @@ public class PanelSaveForm {
     @Min(value = 1)
     private int count;
 
+/// InverterCapSurplusDto 용 가상필드
     public void setPlantId(Long plantId) {
         this.inverter.setPlantId(plantId);
     }
-    public void setInverterId(Long inverterId) {
-        this.inverter.setInverterId(inverterId);
-    }
     public Long getPlantId() {
         return this.inverter.getPlantId();
+    }
+    public BigDecimal getMeasuredCapSurplus() {
+        /// 패널 용량 W 단위를 인버터 용량 kW 단위로 변환
+        return model != null ? BigDecimal
+                .valueOf(model.getCapacity())
+                .multiply(BigDecimal.valueOf(this.count))
+                .movePointLeft(3)
+                : null; /// 모델을 못찾으면 null로 반환
+    }
+/// InverterCapSurplusDto 및 PanelSaveDto 용 가상필드
+    public void setInverterId(Long inverterId) {
+        this.inverter.setInverterId(inverterId);
     }
     public Long getInverterId() {
         return this.inverter.getInverterId();
@@ -56,14 +66,6 @@ public class PanelSaveForm {
         return PanelManufacturer.getByLabel(manufacturer);
     }
 
-    public BigDecimal getMeasueredCapSurplus() {
-        /// 패널 용량 W 단위를 인버터 용량 kW 단위로 변환
-        return model != null ? BigDecimal
-                .valueOf(model.getCapacity())
-                .multiply(BigDecimal.valueOf(this.count))
-                .movePointLeft(3)
-                : null; /// 모델을 못찾으면 null로 반환
-    }
 
     /// 시스템에 등록된 모델명일 경우 자동으로 스펙 가져와서 반환하기
     public int getCapacity() {
@@ -81,20 +83,27 @@ public class PanelSaveForm {
     }
 
     /// PanelSaveForm 은 domain 패키지에 있으므로 core 패키지의 dto 생성자에 넣을 수 없다
+    /// 이 데이터 클래스 내부에서 panel 테이블과 inverter 테이블에
+    /// INSERT, UPDATE 할 핵심 내용을 두 dto로 분리 추출하도록 한다.
+
+    /// panel 테이블에 저장될 내용
     public PanelSaveDto getPanelSaveDto() {
+        /*
+         * TODO : 시스템에 등록되어 있지 않은 모델/제조사/용량/효율 을 감지하고
+         * TODO : '기존에 없던 새 패널 정보' 를 시스템에 추가 할 수 있어야 한다
+         */
         PanelSaveDto dto = new PanelSaveDto();
         dto.setInverterId(getInverterId());
         dto.setModel(model);
-        dto.setManufacturer(getManufacturer());
-        dto.setCapacity(getCapacity());
         dto.setCount(count);
         return dto;
     }
+    /// inverter 테이블에 업데이트 될 내용
     public InverterCapSurplusDto getInverterCapSurplusDto() {
         InverterCapSurplusDto dto = new InverterCapSurplusDto();
         dto.setPlantId(getPlantId());
         dto.setInverterId(getInverterId());
-        dto.setMeasuredCapSurplus(getMeasueredCapSurplus());
+        dto.setMeasuredCapSurplus(getMeasuredCapSurplus());
         return dto;
     }
 

@@ -12,7 +12,5 @@ public class PanelSaveDto {
     // TODO
     private Long inverterId;
     private PanelModel model;
-    private PanelManufacturer manufacturer;
-    private int capacity;
     private int count;
 }
