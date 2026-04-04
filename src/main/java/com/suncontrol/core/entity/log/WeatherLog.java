@@ -2,6 +2,7 @@ package com.suncontrol.core.entity.log;
 
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
+import com.suncontrol.core.dto.log.WeatherLogDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,5 +44,15 @@ public class WeatherLog {
     public String getDistrictCode() {
         return this.district != null ?
                 district.getCode() : null;
+    }
+
+    public WeatherLog(District district, WeatherLogDto dto) {
+        this.district = district;
+        this.baseTime = dto.getBaseTime();
+        this.temperature = dto.getTemperature();
+        this.cloudLow = dto.getCloudLow();
+        this.cloudMid = dto.getCloudMid();
+        this.cloudHigh = dto.getCloudHigh();
+        this.ghi = dto.getGhi();
     }
 }

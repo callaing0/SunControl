@@ -16,33 +16,48 @@ import java.time.LocalDate;
 @Setter
 public class WeatherRequestDto {
     /// 기상 API송신용 DTO
-    private BigDecimal latitude;
-    private BigDecimal longitude;
-    private String timezone;
-    private int tilt;
-    private int azimuth;
     @JsonProperty("start_date")
     private LocalDate startDate;
     @JsonProperty("end_date")
     private LocalDate endDate;
+    @JsonProperty("hourly")
     private String hourly;
+    @JsonProperty("daily")
     private String daily;
     @JsonIgnore
-    private District district;
-    @JsonIgnore
-    private Long plantId;
+    private PlantWeatherApiDto plant;
 
     public WeatherRequestDto(PlantWeatherApiDto dto, LocalDate start, LocalDate end) {
-        this.latitude = dto.getDistrict().getLatitude();
-        this.longitude = dto.getDistrict().getLongitude();
-        this.timezone = dto.getDistrict().getTimezone();
-        this.tilt = dto.getTilt();
-        this.azimuth = dto.getAzimuth();
+        if (dto == null) throw new IllegalArgumentException("발전소 정보없음");
         this.startDate = start;
         this.endDate = end;
-        this.district = dto.getDistrict();
-        this.plantId = dto.getId();
+        this.plant = dto;
         this.hourly = WeatherApiHourlyRequest.HOURLY_REQUEST; /// 시간 데이터 요청
         this.daily = WeatherApiDailyRequest.DAILY_REQUEST; /// 일간 데이터 요청
+    }
+
+    @JsonProperty("latitude")
+    public BigDecimal getLatitude() {
+        return plant.getDistrict().getLatitude();
+    }
+
+    @JsonProperty("longitude")
+    public BigDecimal getLongitude() {
+        return plant.getDistrict().getLongitude();
+    }
+
+    @JsonProperty("timezone")
+    public String getTimezone() {
+        return District.TIMEZONE;
+    }
+
+    @JsonProperty("tilt")
+    public int getTilt() {
+        return plant.getTilt();
+    }
+
+    @JsonProperty("azimuth")
+    public int getAzimuth() {
+        return plant.getAzimuth();
     }
 }

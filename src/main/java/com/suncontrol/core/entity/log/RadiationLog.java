@@ -1,5 +1,6 @@
 package com.suncontrol.core.entity.log;
 
+import com.suncontrol.core.dto.log.RadiationLogDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,4 +16,11 @@ public class RadiationLog {
     private double gtiInstance;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public RadiationLog(Long plantId, RadiationLogDto dto) {
+        this.plantId = plantId;
+        this.baseTime = dto.getBaseTime();
+        this.gti = dto.getGti();
+        this.gtiInstance = dto.getGtiInstance();
+    }
 }

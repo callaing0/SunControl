@@ -24,7 +24,8 @@ public enum District {
     private final String description; // 지역명
     private final BigDecimal latitude; // 위도
     private final BigDecimal longitude; // 경도
-    private final String timezone = "Asia/Tokyo"; // 기상조회용 시간대
+
+    public final static String TIMEZONE = "Asia/Tokyo"; // 기상조회용 시간대
 
     public String getRegionShortName() {
         return province.getShortDesc() + " " + description;

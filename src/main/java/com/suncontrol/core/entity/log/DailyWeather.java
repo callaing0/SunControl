@@ -2,6 +2,7 @@ package com.suncontrol.core.entity.log;
 
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
+import com.suncontrol.core.dto.log.DailyWeatherDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,13 +20,13 @@ public class DailyWeather {
     private double tempMin;
 
     @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
     private Weather weather;
     private String weatherCode;
 
     private LocalDateTime sunrise;
     private LocalDateTime sunset;
-    private double suhshineDuration;
+
+    private double sunshineDuration;
     private double daylightDuration;
     private double precSum;
     private double snowSum;
@@ -48,5 +49,21 @@ public class DailyWeather {
     public String getDistrictCode() {
         return this.district != null ?
                 district.getCode() : null;
+    }
+
+    public DailyWeather(District district, DailyWeatherDto dto) {
+        this.district = district;
+        this.baseDate = dto.getBaseDate();
+        this.tempMax = dto.getTempMax();
+        this.tempMin = dto.getTempMin();
+        this.weather = dto.getWeather();
+        this.weatherCode = dto.getWeatherCode();
+        this.sunrise = dto.getSunrise();
+        this.sunset = dto.getSunset();
+        this.sunshineDuration = dto.getSunshineDuration();
+        this.daylightDuration = dto.getDaylightDuration();
+        this.precSum = dto.getPrecSum();
+        this.snowSum = dto.getSnowSum();
+        this.radiationSum = dto.getRadiationSum();
     }
 }

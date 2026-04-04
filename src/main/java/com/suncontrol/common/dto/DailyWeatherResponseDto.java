@@ -17,7 +17,8 @@ public class DailyWeatherResponseDto {
     /// 기상 API 수신용 일별 데이터
 
     @JsonProperty("time")
-    private LocalDate baseDate;
+    @Getter(AccessLevel.NONE)
+    private LocalDateTime baseDate;
     @JsonProperty("temperature_2m_max")
     private double tempMax;
     @JsonProperty("temperature_2m_min")
@@ -60,6 +61,11 @@ public class DailyWeatherResponseDto {
                 weather == null ? null : weather.getWeatherCode() : this.weatherCode;
     }
 
+    /// DB 저장할 때 LocalDateTime 에서 반환하여 저장하기 위한 getter메서드
+    public LocalDate getBaseDate() {
+        return this.baseDate == null ? null : this.baseDate.toLocalDate();
+    }
+
     @JsonIgnore
     public Weather getWeather() {
         /// 마지막 Entity로 옮길 때 데이터 일치여부를 확인하고
@@ -76,11 +82,11 @@ public class DailyWeatherResponseDto {
         }
         return this.weather;
     }
-
     /// Entity 송신용 DailyWeatherDto "간이 생성자"
+    @JsonIgnore
     public DailyWeatherDto getDailyWeatherDto() {
         DailyWeatherDto dto = new DailyWeatherDto();
-        dto.setBaseDate(this.baseDate);
+        dto.setBaseDate(getBaseDate());
         dto.setTempMax(this.tempMax);
         dto.setTempMin(this.tempMin);
         dto.setWeatherCode(this.weatherCode);
