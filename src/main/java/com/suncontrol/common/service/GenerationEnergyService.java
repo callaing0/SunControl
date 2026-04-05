@@ -62,11 +62,13 @@ public class GenerationEnergyService {
                         .map(InverterGenerationDto::getCreatedAt)
                         .min(LocalDateTime::compareTo)
                         .orElse(LocalDateTime.now()));
+        /// 시작시간을 발전량 생성 기준으로 "평탄화" (당시 시각의 다음 시간대)
         start = TimeTruncater.truncateToNextTerm(start, termSeconds);
         /// 끝시간 : 시작시간 1달 후 또는 현재 중 적은 값
         LocalDateTime end = Stream.of(start.plusMonths(1), LocalDateTime.now())
                 .min(LocalDateTime::compareTo)
                 .orElse(LocalDateTime.now());
+        /// 끝시간을 발전량 생성 기준으로 "평탄화" (당시 시각의 이전 시간대)
         end = TimeTruncater.truncateToTerm(end, termSeconds);
     /// 재료준비 3 - 기준시각을 토대로 한 날씨정보
         Map<District, Map<LocalDateTime, WeatherLogDto>> weatherLogMap =
