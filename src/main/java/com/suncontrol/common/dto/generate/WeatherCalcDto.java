@@ -1,4 +1,4 @@
-package com.suncontrol.common.dto;
+package com.suncontrol.common.dto.generate;
 
 import com.suncontrol.core.constant.util.GenerationStrategy;
 import com.suncontrol.core.dto.log.DailyWeatherDto;

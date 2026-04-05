@@ -1,6 +1,8 @@
 package com.suncontrol.core.entity.log;
 
 import com.suncontrol.core.constant.common.Weather;
+import com.suncontrol.core.constant.util.GenerationStatus;
+import com.suncontrol.core.dto.log.GenerationResultDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +28,7 @@ public class GenerationLog {
     private Weather weather;
     private String weatherCode;
 
-    private String status;
+    private GenerationStatus generationStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -38,5 +40,25 @@ public class GenerationLog {
     public String getWeatherCode() { /// DB에 null이 저장되었을 경우를 대비한 방어로직
         return weatherCode == null ?
                 weather == null ? null : weather.getWeatherCode() : this.weatherCode;
+    }
+    public String getStatus() {
+        return generationStatus == null ?
+                null : generationStatus.getStatus();
+    }
+    public void setStatus(String status) {
+        this.generationStatus = GenerationStatus.fromStatus(status);
+    }
+
+    public GenerationLog(GenerationResultDto dto) {
+        this.inverterId = dto.getInverterId();
+        this.baseTime = dto.getBaseTime();
+        this.valueExpected = dto.getValueExpected();
+        this.valueActual = dto.getValueActual();
+        this.performanceRatio = dto.getPerformanceRatio();
+        this.expectedRatio = dto.getExpectedRatio();
+        this.capacityFactor = dto.getCapacityFactor();
+        this.accumEnergy = dto.getAccumEnergy();
+        this.weather = dto.getWeather();
+        this.generationStatus = GenerationStatus.PENDING;
     }
 }

@@ -3,7 +3,6 @@ package com.suncontrol.core.service.asset;
 import com.suncontrol.core.dto.asset.*;
 import com.suncontrol.core.dto.asset.form.InverterCapSurplusDto;
 import com.suncontrol.core.dto.asset.form.InverterSaveForm;
-import com.suncontrol.core.dto.log.InverterGenerationDto;
 import com.suncontrol.core.entity.asset.Inverter;
 import com.suncontrol.core.repository.asset.InverterRepository;
 import lombok.RequiredArgsConstructor;

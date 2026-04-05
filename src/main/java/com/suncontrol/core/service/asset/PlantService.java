@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -53,9 +55,9 @@ public class PlantService {
         return null;
     }
 
-    public Map<Long, District> findMapByDistrict () {
+    public Map<District, List<Long>> findMapByDistrict () {
         //todo
-        return null;
+        return Collections.emptyMap();
     }
 
     public List<PlantWeatherApiDto> findAllForWeatherApi () {

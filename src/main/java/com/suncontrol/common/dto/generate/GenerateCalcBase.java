@@ -1,5 +1,6 @@
-package com.suncontrol.common.dto;
+package com.suncontrol.common.dto.generate;
 
+import com.suncontrol.core.constant.common.Weather;
 import com.suncontrol.core.constant.util.GenerationStrategy;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
 import com.suncontrol.core.dto.log.RadiationLogDto;
@@ -7,15 +8,15 @@ import com.suncontrol.core.dto.log.WeatherLogDto;
 
 import java.time.LocalDateTime;
 
-/// 데이터 생성을 위해 필요한 날씨정보와 설비정보를 담는 읽기전용 객체
+/// 데이터 생성을 위해 필요한 날씨정보를 담는 읽기전용 객체
 public record GenerateCalcBase(
         double gti,
         double gtiInstance,
         double temperature,
         GenerationStrategy expStrategy,
         double sunriseHr,
-        double sunsetHr
-        /// todo InverterGenerationDto에서 필요한 정보를 읽기
+        double sunsetHr,
+        Weather weather
 ) {
     private static final double DEFAULT_ZERO = 0.0;
     private static final double DEFAULT_SUNRISE = 6.0;
@@ -25,7 +26,8 @@ public record GenerateCalcBase(
 
     public static GenerateCalcBase defaultValues() {
         return new GenerateCalcBase(DEFAULT_ZERO, DEFAULT_ZERO, DEFAULT_ZERO,
-                GenerationStrategy.VIRTUAL_EXP, DEFAULT_SUNRISE, DEFAULT_SUNSET);
+                GenerationStrategy.VIRTUAL_EXP, DEFAULT_SUNRISE, DEFAULT_SUNSET,
+                Weather.CLEAR_SKY);
     }
 
     public GenerateCalcBase(WeatherLogDto weather,
@@ -40,11 +42,12 @@ public record GenerateCalcBase(
                 daily != null && daily.getSunrise() != null ?
                         toHour(daily.getSunrise()) : DEFAULT_SUNRISE,
                 daily != null && daily.getSunset() != null ?
-                        toHour(daily.getSunset()) : DEFAULT_SUNSET
+                        toHour(daily.getSunset()) : DEFAULT_SUNSET,
+                weather != null ? weather.getWeather() : Weather.CLEAR_SKY
         );
     }
 
-    private static double toHour(LocalDateTime dateTime) {
+    public static double toHour(LocalDateTime dateTime) {
         return dateTime.getHour() +
                 (dateTime.getMinute() / MINUTES) +
                 (dateTime.getSecond() / SECONDS);
