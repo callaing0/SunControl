@@ -48,16 +48,49 @@ public class WeatherApiService {
         if(responses.isEmpty()) return;
         /// 응답객체 리스트를 각각의 리스트로 변환하여 저장
         weatherLogService.saveAll(
-                responses.stream().flatMap(
-                        res -> res.getWeatherLogs()
-                                .stream()).toList());
+                responses
+                        // List<WeatherResponseDto>를
+                        // Stream<T> 객체로 변환
+                        .stream()
+                        // WeatherResponseDto
+                        // 내부의 컬렉션 객체를
+                        // 바깥으로 꺼내기
+                        .flatMap(
+                                // WeatherResponseDto
+                                // 내부 메서드를 이용하기 위한
+                                // 익명함수
+                                res -> res
+                                        // WeatherLogDto 리스트를
+                                        // 반환한다
+                                        .getWeatherLogs()
+                                        // 변환이 용이하게
+                                        // Stream 객체로 바꾼다
+                                        .stream()
+                        )
+                        // 리스트로 바꾼다
+                        .toList()
+        );
+
         radiationLogService.saveAll(
-                responses.stream().flatMap(
-                        res -> res.getRadiationLogs()
-                                .stream()).toList());
+                responses
+                        .stream()
+                        .flatMap(
+                                res -> res
+                                        .getRadiationLogs()
+                                        .stream()
+                        )
+                        .toList()
+        );
+
         dailyWeatherService.saveAll(
-                responses.stream().flatMap(
-                        res -> res.getDailyWeathers()
-                                .stream()).toList());
+                responses
+                        .stream()
+                        .flatMap(
+                                res -> res
+                                        .getDailyWeathers()
+                                        .stream()
+                        )
+                        .toList()
+        );
     }
 }

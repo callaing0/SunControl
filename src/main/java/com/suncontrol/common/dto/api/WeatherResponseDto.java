@@ -37,8 +37,9 @@ public class WeatherResponseDto {
         /// 리스트로 변환하여 반환
         if(this.hourly == null) return Collections.emptyList();
         return hourly.stream()
-                .map(h ->
-                        h.getWeatherLogDto(this.plant.getDistrict()))
+                .map(h -> h
+                        .getWeatherLogDto(this.plant.getDistrict())
+                )
                 .toList();
     }
 
@@ -48,8 +49,9 @@ public class WeatherResponseDto {
         /// 리스트로 변환하여 반환
         if(this.hourly == null) return Collections.emptyList();
         return hourly.stream()
-                .map(h ->
-                        h.getRadiationLogDto(this.plant.getId()))
+                .map(h -> h
+                        .getRadiationLogDto(this.plant.getId())
+                )
                 .toList();
     }
 
@@ -57,8 +59,9 @@ public class WeatherResponseDto {
     public List<DailyWeatherDto> getDailyWeathers() {
         if(this.daily == null) return Collections.emptyList();
         return daily.stream()
-                .map(d ->
-                        d.getDailyWeatherDto(this.plant.getDistrict()))
+                .map(d -> d
+                        .getDailyWeatherDto(this.plant.getDistrict())
+                )
                 .toList();
     }
 }
