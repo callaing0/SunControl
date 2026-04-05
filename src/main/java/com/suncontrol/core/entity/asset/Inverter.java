@@ -2,9 +2,8 @@ package com.suncontrol.core.entity.asset;
 
 import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
-import com.suncontrol.core.dto.asset.form.InverterCapSurplusDto;
-import com.suncontrol.core.dto.asset.form.InverterSaveForm;
-import lombok.AccessLevel;
+import com.suncontrol.core.dto.asset.InverterDto;
+import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +17,6 @@ public class Inverter {
     private Long plantId;
     private String serial;
     private BigDecimal ratedCapacity;
-
-    @Setter(AccessLevel.NONE)
     private BigDecimal efficiency;
 
     private BigDecimal measuredCapacity;
@@ -31,13 +28,13 @@ public class Inverter {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Inverter(InverterSaveForm form) {
-        this.plantId = form.getPlantId();
-        this.ratedCapacity = form.getRatedCapacity();
+    public Inverter(InverterDto dto) {
+        this.plantId = dto.getPlantId();
+        this.ratedCapacity = dto.getRatedCapacity();
         /// 가상 필드용 메서드 활용
-        setType(form.getType());
-        this.efficiency = form.getEfficiency();
-        this.serial = form.getSerial();
+        this.inverterType = dto.getInverterType();
+        this.efficiency = dto.getEfficiency();
+        this.serial = dto.getSerial();
     }
 
     public void setCapSurplus(InverterCapSurplusDto dto) {

@@ -17,8 +17,8 @@ public class RadiationLog {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public RadiationLog(Long plantId, RadiationLogDto dto) {
-        this.plantId = plantId;
+    public RadiationLog(RadiationLogDto dto) {
+        this.plantId = dto.getPlantId();
         this.baseTime = dto.getBaseTime();
         this.gti = dto.getGti();
         this.gtiInstance = dto.getGtiInstance();

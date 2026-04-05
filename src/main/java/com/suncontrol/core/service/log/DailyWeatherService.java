@@ -17,7 +17,7 @@ public class DailyWeatherService {
     /// 일일 기상정보 도메인 서비스
     private final DailyWeatherRepository repository;
 
-    public void saveAll(Map<District, List<DailyWeatherDto>> dtoMap) {
+    public void saveAll(List<DailyWeatherDto> dtos) {
         /// todo
         /// 들어온 컬렉션 객체를 Entity List로 변환하여 저장
     }

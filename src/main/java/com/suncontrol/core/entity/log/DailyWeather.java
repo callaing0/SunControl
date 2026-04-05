@@ -51,8 +51,8 @@ public class DailyWeather {
                 district.getCode() : null;
     }
 
-    public DailyWeather(District district, DailyWeatherDto dto) {
-        this.district = district;
+    public DailyWeather(DailyWeatherDto dto) {
+        this.district = dto.getDistrict();
         this.baseDate = dto.getBaseDate();
         this.tempMax = dto.getTempMax();
         this.tempMin = dto.getTempMin();

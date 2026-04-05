@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -34,8 +35,10 @@ public class WeatherResponseDto {
     public List<WeatherLogDto> getWeatherLogs() {
         /// WeatherHourlyResponseDto의 getWeatherLogDto() 를 이용해
         /// 리스트로 변환하여 반환
+        if(this.hourly == null) return Collections.emptyList();
         return hourly.stream()
-                .map(WeatherHourlyResponseDto::getWeatherLogDto)
+                .map(h ->
+                        h.getWeatherLogDto(this.plant.getDistrict()))
                 .toList();
     }
 
@@ -43,15 +46,19 @@ public class WeatherResponseDto {
     public List<RadiationLogDto> getRadiationLogs() {
         /// WeatherHourlyResponseDto의 getRadiationLogDto() 를 이용해
         /// 리스트로 변환하여 반환
+        if(this.hourly == null) return Collections.emptyList();
         return hourly.stream()
-                .map(WeatherHourlyResponseDto::getRadiationLogDto)
+                .map(h ->
+                        h.getRadiationLogDto(this.plant.getId()))
                 .toList();
     }
 
     @JsonIgnore
     public List<DailyWeatherDto> getDailyWeathers() {
+        if(this.daily == null) return Collections.emptyList();
         return daily.stream()
-                .map(DailyWeatherResponseDto::getDailyWeatherDto)
+                .map(d ->
+                        d.getDailyWeatherDto(this.plant.getDistrict()))
                 .toList();
     }
 }

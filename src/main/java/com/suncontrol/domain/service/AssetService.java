@@ -1,7 +1,7 @@
 package com.suncontrol.domain.service;
 
-import com.suncontrol.core.dto.asset.form.InverterSaveForm;
-import com.suncontrol.core.dto.asset.form.PlantSaveForm;
+import com.suncontrol.domain.form.InverterSaveForm;
+import com.suncontrol.domain.form.PlantSaveForm;
 import com.suncontrol.core.service.asset.InverterService;
 import com.suncontrol.core.service.asset.PanelService;
 import com.suncontrol.core.service.asset.PlantService;
@@ -24,7 +24,7 @@ public class AssetService {
     public void savePlant(String userId, PlantSaveForm form) {
         /// TODO : memberService로 유효성 검사
 //        form.getMemberId();
-        plantService.save(form);
+        plantService.save(form.toDto());
         /// TODO : ResponseEntity용 메시지 작성
     }
 
@@ -32,7 +32,8 @@ public class AssetService {
     @Transactional
     public void saveInverter(String userId, InverterSaveForm form) {
         /// TODO : memberService로 유효성 검사
-        inverterService.save(form);
+        /// TODO : plantId 기준 올바른 소유주인지 검사
+        inverterService.save(form.toDto());
         /// TODO : ResponseEntity용 메시지 작성
     }
 
@@ -40,7 +41,8 @@ public class AssetService {
     @Transactional
     public void savePanel(String userId, PanelSaveForm form) {
         /// TODO : memberService로 유효성 검사
-        panelService.save(form.getPanelSaveDto());
+        /// TODO : plantId 기준 올바른 소유주인지 검사
+        panelService.save(form.getPanelDto());
         inverterService.updateCap(form.getInverterCapSurplusDto());
         /// TODO : ResponseEntity용 메시지 작성
     }

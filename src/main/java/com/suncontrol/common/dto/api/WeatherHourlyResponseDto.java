@@ -2,6 +2,7 @@ package com.suncontrol.common.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
 import com.suncontrol.core.dto.log.RadiationLogDto;
 import com.suncontrol.core.dto.log.WeatherLogDto;
@@ -71,8 +72,9 @@ public class WeatherHourlyResponseDto {
     }
 
     @JsonIgnore
-    public WeatherLogDto getWeatherLogDto() {
+    public WeatherLogDto getWeatherLogDto(District district) {
         return WeatherLogDto.builder()
+                .district(district)
                 .baseTime(baseTime)
                 .temperature(temperature)
                 .cloudLow(cloudLow)
@@ -85,8 +87,9 @@ public class WeatherHourlyResponseDto {
     }
 
     @JsonIgnore
-    public RadiationLogDto getRadiationLogDto() {
+    public RadiationLogDto getRadiationLogDto(Long plantId) {
         return RadiationLogDto.builder()
+                .plantId(plantId)
                 .baseTime(baseTime)
                 .gti(gti)
                 .gtiInstance(gtiInstance)

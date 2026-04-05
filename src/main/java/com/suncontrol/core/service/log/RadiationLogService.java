@@ -16,7 +16,7 @@ public class RadiationLogService {
     /// 일시량 기록 도메인 서비스
     private final RadiationLogRepository repository;
 
-    public void saveAll(Map<Long, List<RadiationLogDto>> dtoMap) {
+    public void saveAll(List<RadiationLogDto> dtos) {
         /// todo
     }
 

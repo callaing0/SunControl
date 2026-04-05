@@ -22,5 +22,6 @@ public class GenerationLogService {
     }
 
     public void saveAll(Map<Long, List<GenerationResultDto>> results) {
+
     }
 }

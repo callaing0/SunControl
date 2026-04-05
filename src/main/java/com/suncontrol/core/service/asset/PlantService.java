@@ -1,30 +1,24 @@
 package com.suncontrol.core.service.asset;
 
-import com.suncontrol.core.constant.common.District;
-import com.suncontrol.core.dto.asset.PlantDetailVo;
-import com.suncontrol.core.dto.asset.PlantInfoVo;
-import com.suncontrol.core.dto.asset.PlantVo;
-import com.suncontrol.core.dto.asset.PlantWeatherApiDto;
-import com.suncontrol.core.dto.asset.form.PlantSaveForm;
+import com.suncontrol.core.dto.asset.*;
 import com.suncontrol.core.entity.asset.Plant;
+import com.suncontrol.core.entity.view.PlantInfoView;
 import com.suncontrol.core.repository.asset.PlantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PlantService {
     private final PlantRepository repository;
 
-    public void save(PlantSaveForm form) {
+    public void save(PlantDto dto) {
         /// form을 Entity로 변환하여 저장
-        repository.save(new Plant(form));
+        repository.save(new Plant(dto));
     }
 
     @Transactional
@@ -40,28 +34,21 @@ public class PlantService {
         return repository.existsByIdAndMemberId(memberId, plantId);
     }
 
-    public List<PlantVo> findByMemberId(Long memberId) {
+    public List<PlantDto> findByMemberId(Long memberId) {
         //todo
         return null;
     }
 
-    public PlantInfoVo findInfo(Long id) {
-        //todo
+    public PlantInfoView getInfoView(Long id) {
+        /// todo
+        /// 도메인 서비스가 큰 덩어리 뷰 객체를 넘기면
+        /// 각 오케스트레이터가 알아서 필요한 만큼 잘라쓰는 구조
         return null;
     }
 
-    public PlantDetailVo findDetail(Long id) {
+    public List<PlantDto> findAllActive () {
         //todo
-        return null;
-    }
-
-    public Map<District, List<Long>> findMapByDistrict () {
-        //todo
-        return Collections.emptyMap();
-    }
-
-    public List<PlantWeatherApiDto> findAllForWeatherApi () {
-        //todo
-        return null;
+        return repository.findAllByIsDeletedFalse()
+                .stream().map(PlantDto::new).collect(Collectors.toList());
     }
 }

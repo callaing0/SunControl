@@ -1,8 +1,7 @@
 package com.suncontrol.core.service.asset;
 
 import com.suncontrol.core.dto.asset.*;
-import com.suncontrol.core.dto.asset.form.InverterCapSurplusDto;
-import com.suncontrol.core.dto.asset.form.InverterSaveForm;
+import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
 import com.suncontrol.core.entity.asset.Inverter;
 import com.suncontrol.core.repository.asset.InverterRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +16,8 @@ import java.util.Map;
 public class InverterService {
     private final InverterRepository repository;
 
-    public void save(InverterSaveForm form) {
-        repository.save(new Inverter(form));
+    public void save(InverterDto dto) {
+        repository.save(new Inverter(dto));
     }
 
     public void updateCap(InverterCapSurplusDto dto) {
@@ -33,11 +32,7 @@ public class InverterService {
         //todo
     }
 
-    public List<InverterInfoVo> findInfosByPlant(Long plantId) {
-        return null; //todo
-    }
-
-    public List<InverterDetailVo> findDetailsByPlant(Long plantId) {
+    public List<InverterDto> findAllByPlant(Long plantId) {
         return null; //todo
     }
 

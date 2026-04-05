@@ -1,7 +1,7 @@
-package com.suncontrol.core.dto.asset.form;
+package com.suncontrol.domain.form;
 
 import com.suncontrol.core.constant.asset.InverterType;
-import com.suncontrol.core.dto.asset.PlantVo;
+import com.suncontrol.core.dto.asset.InverterDto;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -39,10 +39,24 @@ public class InverterSaveForm {
         String prefix = (inverterType != null) ?
                 inverterType.getLabel() : "DUMMY";
         LocalDateTime now = LocalDateTime.now();
-        this.serial = String.format("%s-SN%d-%02d%02d",
+        this.serial = String.format("%s-SN%d-%02d-%06d",
                 prefix,
                 now.getYear(),
                 now.getMonthValue(),
-                (int)(Math.random() * 100));
+                now.getNano() % 1000000);
+    }
+
+    public InverterDto toDto() {
+        InverterType inverterType = InverterType.fromLabel(type);
+        BigDecimal finalEfficiency = efficiency != null ?
+                efficiency : inverterType != null ?
+                inverterType.getEfficiency() : BigDecimal.ZERO;
+        return InverterDto.builder()
+                .plantId(plantId)
+                .serial(serial)
+                .ratedCapacity(ratedCapacity)
+                .inverterType(inverterType)
+                .efficiency(finalEfficiency)
+                .build();
     }
 }

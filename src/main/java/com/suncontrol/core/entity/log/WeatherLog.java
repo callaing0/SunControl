@@ -46,8 +46,8 @@ public class WeatherLog {
                 district.getCode() : null;
     }
 
-    public WeatherLog(District district, WeatherLogDto dto) {
-        this.district = district;
+    public WeatherLog(WeatherLogDto dto) {
+        this.district = dto.getDistrict();
         this.baseTime = dto.getBaseTime();
         this.temperature = dto.getTemperature();
         this.cloudLow = dto.getCloudLow();

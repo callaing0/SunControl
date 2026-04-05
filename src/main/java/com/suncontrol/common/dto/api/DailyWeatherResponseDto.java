@@ -2,6 +2,7 @@ package com.suncontrol.common.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
 import lombok.AccessLevel;
@@ -84,8 +85,9 @@ public class DailyWeatherResponseDto {
     }
     /// Entity 송신용 DailyWeatherDto "간이 생성자"
     @JsonIgnore
-    public DailyWeatherDto getDailyWeatherDto() {
+    public DailyWeatherDto getDailyWeatherDto(District district) {
         DailyWeatherDto dto = new DailyWeatherDto();
+        dto.setDistrict(district);
         dto.setBaseDate(getBaseDate());
         dto.setTempMax(this.tempMax);
         dto.setTempMin(this.tempMin);

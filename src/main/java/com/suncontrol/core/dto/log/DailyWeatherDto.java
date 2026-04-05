@@ -20,6 +20,7 @@ public class DailyWeatherDto {
     /// Map<District, Map<LocalDate, DailyWeatherDto>> 로
     /// 발전 데이터 생성용 맵 객체를 형성한다
 
+    private District district;
     private LocalDate baseDate;
     private double tempMax;
     private double tempMin;
@@ -43,6 +44,7 @@ public class DailyWeatherDto {
     }
 
     public DailyWeatherDto(DailyWeather entity) {
+        this.district = entity.getDistrict();
         this.baseDate = entity.getBaseDate();
         this.tempMax = entity.getTempMax();
         this.tempMin = entity.getTempMin();

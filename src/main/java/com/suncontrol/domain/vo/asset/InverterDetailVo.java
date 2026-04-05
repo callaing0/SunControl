@@ -1,4 +1,4 @@
-package com.suncontrol.core.dto.asset;
+package com.suncontrol.domain.vo.asset;
 
 import lombok.Getter;
 import lombok.Setter;

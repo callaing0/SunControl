@@ -18,12 +18,9 @@ import java.util.stream.Stream;
 public class WeatherLogService {
     private final WeatherLogRepository repository;
 
-    public void saveAll(Map<District, List<WeatherLogDto>> dtoMap) {
-        /// 지역별 기상 API 기록 맵을 해체하여 엔티티 리스트로 만들기
-        List<WeatherLog> entities = dtoMap.entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream()
-                        .map(dto -> new WeatherLog(entry.getKey(), dto)
-                )).toList();
+    public void saveAll(List<WeatherLogDto> dtos) {
+        /// 지역별 기상 API 기록 리스트를 엔티티 리스트로 만들기
+        List<WeatherLog> entities = dtos.stream().map(WeatherLog::new).toList();
 
         /// 저장
         /// TODO : 건수가 많아지면 BATCH 이용하는 방향으로 전환해야 함

@@ -2,8 +2,9 @@ package com.suncontrol.core.entity.asset;
 
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Province;
-import com.suncontrol.core.dto.asset.form.PlantSaveForm;
+import com.suncontrol.core.dto.asset.PlantDto;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Plant {
     private Long id;
     private Long memberId;
@@ -27,15 +29,16 @@ public class Plant {
     private LocalDateTime createdAt;
 
     /// 발전소 DB 저장용 생성자
-    public Plant(PlantSaveForm form) {
-        this.memberId = form.getMemberId();
-        this.name = form.getName();
-        this.address = form.getAddress();
-        this.latitude = form.getLatitude();
-        this.longitude = form.getLongitude();
-        this.district = form.getDistrict();
-        this.azimuth = form.getAzimuth();
-        this.tilt = form.getTilt();
+    public Plant(PlantDto dto) {
+        this.memberId = dto.getMemberId();
+        this.name = dto.getName();
+        this.address = dto.getAddress();
+        this.latitude = dto.getLatitude();
+        this.longitude = dto.getLongitude();
+        this.district = dto.getDistrict();
+        this.province = dto.getProvince();
+        this.azimuth = dto.getAzimuth();
+        this.tilt = dto.getTilt();
     }
 
     /**

@@ -1,6 +1,7 @@
-package com.suncontrol.core.dto.asset.form;
+package com.suncontrol.domain.form;
 
 import com.suncontrol.core.constant.common.District;
+import com.suncontrol.core.dto.asset.PlantDto;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,8 +32,8 @@ public class PlantSaveForm {
     @DecimalMin(value = "-180.0")
     @DecimalMax(value = "180.0")
     private BigDecimal longitude;
-    @NotNull(message = "서비스 지역이 아닙니다")
-    private District district;
+    @NotBlank
+    private String districtCode;
 
     /// 사용자가 입력하지 않아도 기본 설정값이 있는 필드
     @Min(value = -90, message = "북동쪽 방향 선택은 불가능합니다.")
@@ -43,12 +44,26 @@ public class PlantSaveForm {
     private int tilt;
 
     /// 입력된 문자열로 지역코드 검증
-    public void setDistrictCode(String districtCode) {
-        this.district = District.fromCode(districtCode);
+    public District getDistrict() {
+        return District.fromCode(districtCode);
+    }
+    @AssertTrue(message = "서비스 지역이 아닙니다")
+    public boolean isDistrictValid() {
+        return getDistrictCode() != null;
     }
 
-    public String getDistrictCode() {
-        return this.district != null ?
-                district.getCode() : null;
+    public PlantDto toDto() {
+        PlantDto dto = new PlantDto();
+        dto.setMemberId(this.memberId);
+        dto.setName(this.name);
+        dto.setAddress(this.address);
+        dto.setLatitude(this.latitude);
+        dto.setLongitude(this.longitude);
+        dto.setDistrict(this.getDistrict());
+        dto.setProvince(this.getDistrict().getProvince());
+        dto.setAzimuth(this.azimuth);
+        dto.setTilt(this.tilt);
+
+        return dto;
     }
 }
