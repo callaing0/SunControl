@@ -156,8 +156,12 @@ public class GenerationEnergyService {
             lastAccumEnergy = calculateAccumEnergy(
                     lastAccumEnergy, dto.getValueActual(), termSecond);
 
-            resultList.add(new GenerationResultDto(
-                    inv.getId(), current, dto, lastAccumEnergy ,base.weather()));
+            GenerationResultDto result = new GenerationResultDto(
+                    inv.getId(), current, dto, lastAccumEnergy ,base.weather());
+            /// 테스트 데이터 출력
+            System.out.println(result);
+
+            resultList.add(result);
 
             current = TimeTruncater.truncateToNextTerm(current, termSecond);
         }
