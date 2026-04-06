@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,5 +46,12 @@ public class InverterService {
                 DeviceStatus.INVERTER_NORMAL.getCode(),
                 DeviceStatus.INVERTER_END.getCode())
                 .stream().map(InverterDto::new).toList();
+    }
+
+    public Map<Long, List<InverterDto>> getInverterMapByPlantId() {
+        /// 검색의 편의성을 위해 발전소 ID를 기준으로 매핑
+        return findAllActive()
+                .stream()
+                .collect(Collectors.groupingBy(InverterDto::getPlantId));
     }
 }

@@ -1,5 +1,6 @@
 package com.suncontrol.core.service.asset;
 
+import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.dto.asset.*;
 import com.suncontrol.core.entity.asset.Plant;
 import com.suncontrol.core.entity.view.PlantInfoView;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,5 +51,21 @@ public class PlantService {
     public List<PlantDto> findAllActive () {
         return repository.findAllByIsDeletedFalse()
                 .stream().map(PlantDto::new).collect(Collectors.toList());
+    }
+
+    public Map<District, List<Long>> getPlantMapByDistrict() {
+        /// 에너지 생성을 위한 살아있는 발전소 정보 가져오기
+        /// 다른 세부정보는 불필요정보이므로 지역에 따라 맵으로 카테고리화하고 id만 추출한다
+        return findAllActive()
+                .stream()
+                .collect(
+                        Collectors.groupingBy(
+                                PlantDto::getDistrict,
+                                Collectors.mapping(
+                                        PlantDto::getId,
+                                        Collectors.toList()
+                                )
+                        )
+                );
     }
 }

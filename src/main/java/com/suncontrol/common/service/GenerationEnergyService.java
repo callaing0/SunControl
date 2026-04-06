@@ -4,9 +4,7 @@ import com.suncontrol.common.dto.generate.GenerateCalcBase;
 import com.suncontrol.common.dto.generate.WeatherContext;
 import com.suncontrol.common.util.GenerateUtil;
 import com.suncontrol.core.constant.common.District;
-import com.suncontrol.core.dto.asset.InverterDto;
-import com.suncontrol.core.dto.asset.InverterGenerationDto;
-import com.suncontrol.core.dto.asset.PlantDto;
+import com.suncontrol.common.dto.generate.InverterGenerationDto;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
 import com.suncontrol.core.dto.log.GenerationResultDto;
 import com.suncontrol.core.dto.log.RadiationLogDto;
@@ -50,32 +48,24 @@ public class GenerationEnergyService {
 
     @Transactional
     public void generateEnergy(int termSeconds) {
-    /// 재료준비 1 - 자산정보
-        ///
-        Map<District, List<Long>> plantMap = plantService.findAllActive()
-                .stream()
-                .collect(
-                        Collectors.groupingBy(
-                                PlantDto::getDistrict,
-                                Collectors.mapping(
-                                        PlantDto::getId,
-                                        Collectors.toList()
-                                )
-                        )
-                );
+    // region 1. 재료준비 1 - 자산정보
+        /// 살아있는 발전소 정보 가져오기
+        Map<District, List<Long>> plantMap = plantService.getPlantMapByDistrict();
+        /// 살아있는 인버터 정보 가져와서 발전용 정보만 가진 객체로 변환
         Map<Long, List<InverterGenerationDto>> invertersMap =
-                inverterService.findAllActive()
-                        .stream()
+                inverterService.getInverterMapByPlantId()
+                        .entrySet().stream()
                         .collect(
-                                Collectors.groupingBy(
-                                        InverterDto::getPlantId,
-                                        Collectors.mapping(
-                                                InverterGenerationDto::new,
-                                                Collectors.toList()
-                                        )
+                                Collectors.toMap(
+                                        Map.Entry::getKey,
+                                        entry -> entry.getValue().stream()
+                                                .map(InverterGenerationDto::new)
+                                                .toList()
                                 )
                         );
-    /// 재료준비 2 - 시작시간 - 끝시간 지정
+    // endregion
+
+    // region 2. 재료준비 2 - 시작시간 - 끝시간 지정
         /// 시작시간 : 인버터 별 가장 최신 발전시각 중에서 "가장 오래된 시각"
         Map<Long, LocalDateTime> recentGenerated =
                 generationLogService.getLastGeneratedTimeByAllInverters();
@@ -94,19 +84,22 @@ public class GenerationEnergyService {
                 .orElse(LocalDateTime.now());
         /// 끝시간을 발전량 생성 기준으로 "평탄화" (당시 시각의 이전 시간대)
         end = TimeTruncater.truncateToTerm(end, termSeconds);
-    /// 재료준비 3 - 기준시각을 토대로 한 날씨정보
+    // endregion
+
+    // region 3. 재료준비 3 - 기준시각을 토대로 한 날씨정보
         Map<District, Map<LocalDateTime, WeatherLogDto>> weatherLogMap =
-                weatherLogService.findAllByDistrictAndTime(start, end);
+                weatherLogService.getMapByDistrictAndTime(start, end);
         Map<District, Map<LocalDate, DailyWeatherDto>> dailyWeatherMap =
-                dailyWeatherService.findAllByDistrictAndDate
+                dailyWeatherService.getMapByDistrictAndDate
                         (start.toLocalDate(), end.toLocalDate());
         Map<Long, Map<LocalDateTime, RadiationLogDto>> radiationLogMap =
-                radiationLogService.findAllByPlantAndTime(start, end);
+                radiationLogService.getMapByPlantIdAndTime(start, end);
+    // endregion
         /// 결과용 맵
         Map<Long, List<GenerationResultDto>> results = new HashMap<>();
 
         for(District district : District.LIST) {
-            /// 1차 : 지역 key로 가공재료 꺼내기
+            // region 4. 1차 : 지역 key로 가공재료 꺼내기
             /// 시간별 날씨, 일간 날씨, 발전소 리스트
             Map<LocalDateTime, WeatherLogDto> weatherLogInnerMap =
                     weatherLogMap.get(district) == null ?
@@ -116,9 +109,10 @@ public class GenerationEnergyService {
                             Collections.emptyMap() : dailyWeatherMap.get(district);
             List<Long> plants = plantMap.get(district) == null ?
                     Collections.emptyList() : plantMap.get(district);
+            // endregion
 
             for(Long plantId : plants) {
-                /// 2차 : 발전소 ID key 로 가공재료 꺼내기
+                // region 5. 2차 : 발전소 ID key 로 가공재료 꺼내기
                 /// 일사량 데이터, 인버터 리스트
                 Map<LocalDateTime, RadiationLogDto> radiationLogInnerMap =
                         radiationLogMap.get(plantId) == null ?
@@ -126,12 +120,13 @@ public class GenerationEnergyService {
                 List<InverterGenerationDto> inverters =
                         invertersMap.get(plantId) == null ?
                                 Collections.emptyList() : invertersMap.get(plantId);
+                // endregion
                 for(InverterGenerationDto inverter : inverters) {
                     /// 인버터 별 생성 시작시간 정하기
                     LocalDateTime inverterStart =
                             recentGenerated.get(inverter.getId()) == null ?
                             start : recentGenerated.get(inverter.getId());
-                    /// 세부 로직 호출
+                    // region 6. 세부 로직 호출
                 /// TODO : getResult 파라미터 추가 (날씨정보 묶음 & 인버터 스펙)
                     List<GenerationResultDto> result =
                             getResult(
@@ -141,6 +136,7 @@ public class GenerationEnergyService {
                                             radiationLogInnerMap,
                                             dailyWeatherInnerMap),
                                     termSeconds);
+                // endregion
                     results.put(inverter.getId(), result);
                 }
             }
