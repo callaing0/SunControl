@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 public class InverterUpdateDto extends InverterBaseDto {
     private DeviceStatus status;
     private BigDecimal lastAccumEnergy;
+    private BigDecimal currentPower;
 
     public int getStatusCode() {
         return status.getCode();

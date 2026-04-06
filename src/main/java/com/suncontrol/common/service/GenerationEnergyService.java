@@ -193,6 +193,7 @@ public class GenerationEnergyService {
                     lastAccumEnergy, dto.getValueActual(), termSecond);
             /// inverter를 최신상태로 업데이트
             inv = gContext.getInv();
+            inv.setCurrentPower(dto.getValueActual());
 
             GenerationResultDto result = new GenerationResultDto(
                     inv.getId(), current, dto, lastAccumEnergy ,base.weather());

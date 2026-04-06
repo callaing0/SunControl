@@ -8,6 +8,7 @@ import com.suncontrol.core.repository.asset.InverterRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ public class InverterService {
         //todo
     }
 
+    @Transactional
     public void updateAccumAndStatus(List<InverterUpdateDto> list) {
         int result = repository.updateLastAccumAndStatus(list);
         log.debug("{}건 저장",result);

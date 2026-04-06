@@ -26,12 +26,12 @@
         WHERE id = #{id} AND plant_id #{plantId}
     </update>
     <update id="updateLastAccumAndStatus">
-        UPDATE inverter SET
-        <foreach collection="list" item="item" separator=",">
-            last_accum_energy = #{item.lastAccumEnergy}
-            status_code = #{item.statusCode}
-            updated_at = NOW()
-            WHERE id = #{id}
+        <foreach collection="list" item="item" separator=";">
+            UPDATE inverter SET
+                last_accum_energy = #{item.lastAccumEnergy}
+                status_code = #{item.statusCode}
+                updated_at = NOW()
+            WHERE id = #{item.id}
         </foreach>
     </update>
 </mapper>

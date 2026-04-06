@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 public class InverterGenerationDto extends InverterBaseDto {
     @Setter
     private DeviceStatus status;
-    private final BigDecimal currentPower;
+    @Setter
+    private BigDecimal currentPower;
     private final BigDecimal efficiency;
     private final BigDecimal ratedCapacity;
     private final BigDecimal measuredCapacity;
@@ -50,6 +51,7 @@ public class InverterGenerationDto extends InverterBaseDto {
                 .plantId(getPlantId())
                 .status(status)
                 .lastAccumEnergy(lastAccumEnergy)
+                .currentPower(currentPower)
                 .build();
     }
 }
