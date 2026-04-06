@@ -5,6 +5,7 @@ import com.suncontrol.common.dto.generate.WeatherContext;
 import com.suncontrol.common.util.GenerateUtil;
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.dto.asset.InverterGenerationDto;
+import com.suncontrol.core.dto.asset.PlantDto;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
 import com.suncontrol.core.dto.log.GenerationResultDto;
 import com.suncontrol.core.dto.log.RadiationLogDto;
@@ -26,6 +27,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -48,7 +50,18 @@ public class GenerationEnergyService {
     @Transactional
     public void generateEnergy(int termSeconds) {
     /// 재료준비 1 - 자산정보
-        Map<District, List<Long>> plantMap = plantService.findMapByDistrict();
+        ///
+        Map<District, List<Long>> plantMap = plantService.findAllActive()
+                .stream()
+                .collect(
+                        Collectors.groupingBy(
+                                PlantDto::getDistrict,
+                                Collectors.mapping(
+                                        PlantDto::getId,
+                                        Collectors.toList()
+                                )
+                        )
+                );
         Map<Long, List<InverterGenerationDto>> invertersMap =
                 inverterService.findAllByPlant();
     /// 재료준비 2 - 시작시간 - 끝시간 지정
