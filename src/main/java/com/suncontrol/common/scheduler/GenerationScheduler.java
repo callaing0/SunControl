@@ -19,6 +19,7 @@ public class GenerationScheduler {
 
     @Scheduled(cron = "0 10/10 * * * *")
     private void realtimeBatch() {
+        log.info("Realtime batch start");
         collectWeatherInfo();
         collectGenerateData();
     }
