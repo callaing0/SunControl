@@ -34,7 +34,7 @@ public class DailyWeatherService {
         log.info("{}건의 일일 기상데이터 저장 완료", result);
     }
 
-    public Map<District, Map<LocalDate, DailyWeatherDto>> findAllByDistrictAndDate
+    public Map<District, Map<LocalDate, DailyWeatherDto>> getMapByDistrictAndDate
             (LocalDate start, LocalDate end) {
         /// DB 결과값이 없으면 빈 맵으로 반환
         return Collections.emptyMap();

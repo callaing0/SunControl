@@ -38,9 +38,6 @@ public class PanelSaveForm {
     private int count;
 
 /// InverterCapSurplusDto 용 가상필드
-    public void setPlantId(Long plantId) {
-        this.inverter.setPlantId(plantId);
-    }
     public Long getPlantId() {
         return this.inverter.getPlantId();
     }
@@ -53,10 +50,7 @@ public class PanelSaveForm {
                 : null; /// 모델을 못찾으면 null로 반환
     }
 /// InverterCapSurplusDto 및 PanelSaveDto 용 가상필드
-    public void setInverterId(Long inverterId) {
-        this.inverter.setInverterId(inverterId);
-    }
-    public Long getInverterId() {
+   public Long getInverterId() {
         return this.inverter.getInverterId();
     }
     public void setModel(String modelName) {
@@ -100,11 +94,11 @@ public class PanelSaveForm {
     }
     /// inverter 테이블에 업데이트 될 내용
     public InverterCapSurplusDto getInverterCapSurplusDto() {
-        InverterCapSurplusDto dto = new InverterCapSurplusDto();
-        dto.setPlantId(getPlantId());
-        dto.setInverterId(getInverterId());
-        dto.setMeasuredCapSurplus(getMeasuredCapSurplus());
-        return dto;
+        return InverterCapSurplusDto.builder()
+                .plantId(getPlantId())
+                .inverterId(getInverterId())
+                .measuredCapSurplus(getMeasuredCapSurplus())
+                .build();
     }
 
 }

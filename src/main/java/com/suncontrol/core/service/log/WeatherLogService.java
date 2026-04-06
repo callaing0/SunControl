@@ -33,7 +33,7 @@ public class WeatherLogService {
         log.info("{}건 저장 완료", result);
     }
 
-    public Map<District, Map<LocalDateTime, WeatherLogDto>> findAllByDistrictAndTime
+    public Map<District, Map<LocalDateTime, WeatherLogDto>> getMapByDistrictAndTime
             (LocalDateTime start, LocalDateTime end) {
         /// 결과가 없으면 빈 맵으로 반환
         return Collections.emptyMap();

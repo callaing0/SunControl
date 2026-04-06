@@ -2,7 +2,7 @@ package com.suncontrol.core.entity.log;
 
 import com.suncontrol.core.constant.common.Weather;
 import com.suncontrol.core.constant.util.GenerationStatus;
-import com.suncontrol.core.dto.log.GenerationResultDto;
+import com.suncontrol.core.dto.log.GenerationLogDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,7 +49,7 @@ public class GenerationLog {
         this.generationStatus = GenerationStatus.fromStatus(status);
     }
 
-    public GenerationLog(GenerationResultDto dto) {
+    public GenerationLog(GenerationLogDto dto) {
         this.inverterId = dto.getInverterId();
         this.baseTime = dto.getBaseTime();
         this.valueExpected = dto.getValueExpected();
@@ -59,6 +59,6 @@ public class GenerationLog {
         this.capacityFactor = dto.getCapacityFactor();
         this.accumEnergy = dto.getAccumEnergy();
         this.weather = dto.getWeather();
-        this.generationStatus = GenerationStatus.PENDING;
+        this.generationStatus = dto.getGenerationStatus();
     }
 }

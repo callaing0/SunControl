@@ -12,7 +12,7 @@
             district_code, base_time, temperature,
             cloud_low, cloud_mid, cloud_high, ghi
         ) VALUES
-        <foreach collection="list" item="item">
+        <foreach collection="list" item="item" separator=",">
             (#{item.districtCode}, #{item.baseTime}, #{item.temperature},
             #{item.cloudLow}, #{item.cloudMid}, #{item.cloudHigh}, #{item.ghi})
         </foreach>
