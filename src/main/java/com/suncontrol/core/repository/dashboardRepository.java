@@ -1,7 +1,7 @@
 package com.suncontrol.core.repository;
 
+import com.suncontrol.domain.dto.DashboardInverterDto;
 import com.suncontrol.domain.dto.dashboardSummaryDto;
-import com.suncontrol.core.dto.asset.InverterDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,7 +13,7 @@ public interface dashboardRepository {
 
     dashboardSummaryDto selectDashboardSummary(@Param("memberId") Long memberId);
 
-    List<InverterDto> selectInverters(@Param("memberId") Long memberId);
+    List<DashboardInverterDto> selectInverters(@Param("memberId") Long memberId);
 
     List<BigDecimal> selectHourlyPower(@Param("plantId") Long plantId);
 

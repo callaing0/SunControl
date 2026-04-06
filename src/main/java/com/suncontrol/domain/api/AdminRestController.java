@@ -35,7 +35,7 @@ public class AdminRestController {
         return ResponseEntity.ok(ResponseDto.of(true, "성공", null));
     }
     // 회원 계정 잠금 해제 처리
-    @PostMapping("/{id}/unlock")
+    @PostMapping("/members/{id}/unlock")
     public ResponseEntity<ResponseDto<Void>> unlockMember(@PathVariable Long id) {
         memberService.unlockMember(id);
         return ResponseEntity.ok(ResponseDto.of(true, "성공", null));
