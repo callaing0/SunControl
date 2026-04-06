@@ -5,7 +5,9 @@ import com.suncontrol.core.dto.log.WeatherLogDto;
 import com.suncontrol.core.entity.log.WeatherLog;
 import com.suncontrol.core.repository.log.WeatherLogRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -15,9 +17,11 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WeatherLogService {
     private final WeatherLogRepository repository;
 
+    @Transactional
     public void saveAll(List<WeatherLogDto> dtos) {
         /// 지역별 기상 API 기록 리스트를 엔티티 리스트로 만들기
         List<WeatherLog> entities = dtos.stream().map(WeatherLog::new).toList();
@@ -26,7 +30,7 @@ public class WeatherLogService {
         /// TODO : 건수가 많아지면 BATCH 이용하는 방향으로 전환해야 함
         int result = repository.saveAll(entities);
 
-        System.out.println(result + "건 저장 완료");
+        log.info("{}건 저장 완료", result);
     }
 
     public Map<District, Map<LocalDateTime, WeatherLogDto>> findAllByDistrictAndTime
