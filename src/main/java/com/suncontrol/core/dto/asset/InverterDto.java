@@ -2,11 +2,13 @@ package com.suncontrol.core.dto.asset;
 
 import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
+import com.suncontrol.core.entity.asset.Inverter;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -22,4 +24,19 @@ public class InverterDto {
     private BigDecimal lastAccumEnergy;
     private InverterType inverterType;
     private DeviceStatus status;
+    private LocalDateTime createdAt;
+
+    public InverterDto(Inverter inverter) {
+        this.id = inverter.getId();
+        this.plantId = inverter.getPlantId();
+        this.serial = inverter.getSerial();
+        this.ratedCapacity = inverter.getRatedCapacity();
+        this.efficiency = inverter.getEfficiency();
+        this.measuredCapacity = inverter.getMeasuredCapacity();
+        this.currentPower = inverter.getCurrentPower();
+        this.lastAccumEnergy = inverter.getLastAccumEnergy();
+        this.inverterType = inverter.getInverterType();
+        this.status = inverter.getStatus();
+        this.createdAt = inverter.getCreatedAt();
+    }
 }

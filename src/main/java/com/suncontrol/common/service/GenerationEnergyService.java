@@ -4,6 +4,7 @@ import com.suncontrol.common.dto.generate.GenerateCalcBase;
 import com.suncontrol.common.dto.generate.WeatherContext;
 import com.suncontrol.common.util.GenerateUtil;
 import com.suncontrol.core.constant.common.District;
+import com.suncontrol.core.dto.asset.InverterDto;
 import com.suncontrol.core.dto.asset.InverterGenerationDto;
 import com.suncontrol.core.dto.asset.PlantDto;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
@@ -63,7 +64,17 @@ public class GenerationEnergyService {
                         )
                 );
         Map<Long, List<InverterGenerationDto>> invertersMap =
-                inverterService.findAllByPlant();
+                inverterService.findAllActive()
+                        .stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        InverterDto::getPlantId,
+                                        Collectors.mapping(
+                                                InverterGenerationDto::new,
+                                                Collectors.toList()
+                                        )
+                                )
+                        );
     /// 재료준비 2 - 시작시간 - 끝시간 지정
         /// 시작시간 : 인버터 별 가장 최신 발전시각 중에서 "가장 오래된 시각"
         Map<Long, LocalDateTime> recentGenerated =

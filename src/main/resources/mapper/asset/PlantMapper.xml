@@ -22,4 +22,12 @@
             WHERE id = #{id} AND member_id = #{memberId}
         )
     </select>
+    <select id ="findAllByIsDeletedFalse"
+            resultType="com.suncontrol.core.entity.asset.Plant">
+        SELECT * FROM plant WHERE is_deleted = 0
+    </select>
+    <select id ="findAllByMemberIdAndIsDeletedFalse"
+            resultType="com.suncontrol.core.entity.asset.Plant">
+        SELECT * FROM plant WHERE is_deleted = 0 AND member_id = #{memberId}
+    </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.suncontrol.core.service.asset;
 
+import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.dto.asset.*;
 import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
 import com.suncontrol.core.entity.asset.Inverter;
@@ -36,9 +37,12 @@ public class InverterService {
         return null; //todo
     }
 
-    public Map<Long, List<InverterGenerationDto>> findAllByPlant() {
-        return Collections.emptyMap();
-        //todo 발전데이터 생성을 위해 시스템에 등록된 모든 활성 인버터를
-        // 발전소 id 를 기준으로 한 Map에 저장하여 반환
+    public List<InverterDto> findAllActive() {
+        /// 발전데이터 생성을 위해 시스템에 등록된 모든 활성 인버터를
+        /// InverterDto로 변환하여 반환
+        return repository.findAllByStatusCodeBetween(
+                DeviceStatus.INVERTER_NORMAL.getCode(),
+                DeviceStatus.INVERTER_END.getCode())
+                .stream().map(InverterDto::new).toList();
     }
 }

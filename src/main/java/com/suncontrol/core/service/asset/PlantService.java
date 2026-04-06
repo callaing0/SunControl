@@ -47,7 +47,6 @@ public class PlantService {
     }
 
     public List<PlantDto> findAllActive () {
-        //todo
         return repository.findAllByIsDeletedFalse()
                 .stream().map(PlantDto::new).collect(Collectors.toList());
     }
