@@ -1,4 +1,4 @@
-package com.suncontrol.domain.api;
+package com.suncontrol.domain.control;
 
 import com.suncontrol.product.vo.MyPageVo;
 import com.suncontrol.domain.service.MyPageService;

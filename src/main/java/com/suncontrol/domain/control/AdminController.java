@@ -1,4 +1,4 @@
-package com.suncontrol.domain.api;
+package com.suncontrol.domain.control;
 
 import com.suncontrol.domain.service.MemberService;
 import lombok.RequiredArgsConstructor;
