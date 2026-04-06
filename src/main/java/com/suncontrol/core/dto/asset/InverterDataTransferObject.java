@@ -4,17 +4,16 @@ import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
 import com.suncontrol.core.dto.asset.component.InverterBaseDto;
 import com.suncontrol.core.entity.asset.Inverter;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
-public class InverterDto extends InverterBaseDto {
+@SuperBuilder
+public class InverterDataTransferObject extends InverterBaseDto {
     private String serial;
     private BigDecimal ratedCapacity;
     private BigDecimal efficiency;
@@ -25,7 +24,7 @@ public class InverterDto extends InverterBaseDto {
     private DeviceStatus status;
     private LocalDateTime createdAt;
 
-    public InverterDto(Inverter inverter) {
+    public InverterDataTransferObject(Inverter inverter) {
         super(inverter.getId(), inverter.getPlantId());
         this.serial = inverter.getSerial();
         this.ratedCapacity = inverter.getRatedCapacity();

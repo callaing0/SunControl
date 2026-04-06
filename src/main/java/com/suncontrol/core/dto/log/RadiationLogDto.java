@@ -1,16 +1,14 @@
 package com.suncontrol.core.dto.log;
 
 import com.suncontrol.core.entity.log.RadiationLog;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 public class RadiationLogDto {
     /// Map<Long(plantId), RadLogDto> - 저장
     /// Map<Long,Map<L.D.T,RadLogDto>> - 데이터생성

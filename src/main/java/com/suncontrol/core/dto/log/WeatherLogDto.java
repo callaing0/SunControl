@@ -3,16 +3,14 @@ package com.suncontrol.core.dto.log;
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
 import com.suncontrol.core.entity.log.WeatherLog;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 public class WeatherLogDto {
 
     /// Map<DistrictCode,List<WeatherLogDto>>를 이용하여 DB저장

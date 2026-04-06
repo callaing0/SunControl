@@ -7,14 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.logging.ErrorManager;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class GenerationScheduler {
-    /// todo
+    /// todo 예측모델 구현
 //    private final ActualReportService actualReportService;
 //    private final PredictReportService predictReportService;
     private final WeatherApiService weatherApiService;
@@ -43,5 +40,6 @@ public class GenerationScheduler {
     private void collectGenerateData() {
         int TERM_SECOND = 600;
         generationEnergyService.generateEnergy(TERM_SECOND);
+        log.info("발전데이터 생성 완료");
     }
 }
