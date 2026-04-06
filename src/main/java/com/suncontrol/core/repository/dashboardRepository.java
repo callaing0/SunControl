@@ -1,7 +1,7 @@
-package com.suncontrol.domain.mapper;
+package com.suncontrol.core.repository;
 
-import com.suncontrol.domain.dto.dashboardSummaryDto
-import com.suncontrol.domain.dto.inverterDto
+import com.suncontrol.domain.dto.dashboardSummaryDto;
+import com.suncontrol.domain.dto.inverterDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Mapper
-public interface dashboardMapper {
+public interface dashboardRepository {
 
     dashboardSummaryDto selectDashboardSummary(@Param("memberId") Long memberId);
 
