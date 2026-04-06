@@ -1,7 +1,7 @@
 package com.suncontrol.domain.form;
 
 import com.suncontrol.core.constant.asset.InverterType;
-import com.suncontrol.core.dto.asset.InverterDto;
+import com.suncontrol.core.dto.asset.InverterDataTransferObject;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -46,12 +46,12 @@ public class InverterSaveForm {
                 now.getNano() % 1000000);
     }
 
-    public InverterDto toDto() {
+    public InverterDataTransferObject toDto() {
         InverterType inverterType = InverterType.fromLabel(type);
         BigDecimal finalEfficiency = efficiency != null ?
                 efficiency : inverterType != null ?
                 inverterType.getEfficiency() : BigDecimal.ZERO;
-        return InverterDto.builder()
+        return InverterDataTransferObject.builder()
                 .plantId(plantId)
                 .serial(serial)
                 .ratedCapacity(ratedCapacity)

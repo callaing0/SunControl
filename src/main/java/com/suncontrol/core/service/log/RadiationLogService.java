@@ -32,7 +32,7 @@ public class RadiationLogService {
         log.info("{}건 저장 완료", result);
     }
 
-    public Map<Long, Map<LocalDateTime, RadiationLogDto>> findAllByPlantAndTime
+    public Map<Long, Map<LocalDateTime, RadiationLogDto>> getMapByPlantIdAndTime
             (LocalDateTime start, LocalDateTime end) {
         /// DB가 비어있으면 null이 아닌 빈 맵으로 반환
         return Collections.emptyMap();

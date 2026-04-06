@@ -8,10 +8,15 @@
         INSERT INTO inverter (plant_id, rated_capacity, type, efficiency, serial)
         VALUES (#{plantId}, #{ratedCapacity}, #{type}, #{efficiency}, #{serial})
     </insert>
-    <update id="updateCap" parameterType="com.suncontrol.core.dto.asset.InverterCapSurplusDto">
+    <update id="updateCap"
+            parameterType="com.suncontrol.core.dto.asset.InverterCapSurplusDto">
         UPDATE inverter SET
         measured_cap = measured_cap + #{measuredCapSurplus}
         updated_at = NOW()
         WHERE id = #{id} AND plant_id #{plantId}
     </update>
+    <select id="findAllByStatusCodeBetween"
+            resultType="com.suncontrol.core.entity.asset.Inverter">
+        SELECT * FROM inverter WHERE status_code BETWEEN #{start} AND #{end}
+    </select>
 </mapper>
