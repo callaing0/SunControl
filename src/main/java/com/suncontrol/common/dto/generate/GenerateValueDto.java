@@ -20,21 +20,21 @@ public class GenerateValueDto {
 
     public BigDecimal getPerformanceRatio() {
         if(valueActual == null || valueActual.compareTo(BigDecimal.ZERO) == 0)
-            return null;
+            return BigDecimal.ZERO;
         return valueActual.divide(valueExpected, 5, RoundingMode.HALF_UP)
                 .movePointRight(2);
     }
 
     public BigDecimal getExpectedRatio() {
         if(capacity == null || capacity.compareTo(BigDecimal.ZERO) == 0)
-            return null;
+            return BigDecimal.ZERO;
         return valueExpected.divide(capacity, 5, RoundingMode.HALF_UP)
                 .movePointRight(2);
     }
 
     public BigDecimal getCapacityFactor() {
         if(capacity == null || capacity.compareTo(BigDecimal.ZERO) == 0)
-            return null;
+            return BigDecimal.ZERO;
         return valueActual.divide(capacity, 5, RoundingMode.HALF_UP)
                 .movePointRight(2);
     }

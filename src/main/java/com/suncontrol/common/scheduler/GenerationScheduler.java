@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -18,8 +20,9 @@ public class GenerationScheduler {
     private final GenerationEnergyService generationEnergyService;
 
     @Scheduled(cron = "0 10/10 * * * *")
+//    @Scheduled(fixedRate = 60000)
     private void realtimeBatch() {
-        log.info("Realtime batch start");
+        log.info("Realtime batch start at {}", LocalDateTime.now());
         collectWeatherInfo();
         collectGenerateData();
     }
@@ -40,6 +43,7 @@ public class GenerationScheduler {
 
     private void collectGenerateData() {
         int TERM_SECOND = 600;
+        log.info("generate energy data at {}", LocalDateTime.now());
         generationEnergyService.generateEnergy(TERM_SECOND);
         log.info("발전데이터 생성 완료");
     }

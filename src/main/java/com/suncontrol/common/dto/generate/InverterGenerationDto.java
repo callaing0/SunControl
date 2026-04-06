@@ -3,20 +3,24 @@ package com.suncontrol.common.dto.generate;
 import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
 import com.suncontrol.core.dto.asset.InverterDataTransferObject;
+import com.suncontrol.core.dto.asset.InverterUpdateDto;
 import com.suncontrol.core.dto.asset.component.InverterBaseDto;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
 public class InverterGenerationDto extends InverterBaseDto {
-    private final DeviceStatus status;
+    @Setter
+    private DeviceStatus status;
     private final BigDecimal currentPower;
     private final BigDecimal efficiency;
     private final BigDecimal ratedCapacity;
     private final BigDecimal measuredCapacity;
-    private final BigDecimal lastAccumEnergy;
+    @Setter
+    private BigDecimal lastAccumEnergy;
     private final InverterType inverterType;
     private final LocalDateTime createdAt;
 
@@ -38,5 +42,14 @@ public class InverterGenerationDto extends InverterBaseDto {
 
     public Long getPlantId() {
         return super.getPlantId();
+    }
+
+    public InverterUpdateDto getUpdateSet() {
+        return InverterUpdateDto.builder()
+                .inverterId(getInverterId())
+                .plantId(getPlantId())
+                .status(status)
+                .lastAccumEnergy(lastAccumEnergy)
+                .build();
     }
 }

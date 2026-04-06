@@ -1,10 +1,10 @@
 package com.suncontrol.core.repository.asset;
 
 import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
+import com.suncontrol.core.dto.asset.InverterUpdateDto;
 import com.suncontrol.core.entity.asset.Inverter;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -15,4 +15,6 @@ public interface InverterRepository {
     void updateCap(InverterCapSurplusDto dto);
 
     List<Inverter> findAllByStatusCodeBetween(@Param("start") int start,@Param("end") int end);
+
+    int updateLastAccumAndStatus(List<InverterUpdateDto> list);
 }

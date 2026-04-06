@@ -1,6 +1,7 @@
 package com.suncontrol.common.util;
 
 import com.suncontrol.common.dto.generate.GenerateCalcBase;
+import com.suncontrol.common.dto.generate.GenerateDataContext;
 import com.suncontrol.common.dto.generate.InverterGenerationDto;
 import com.suncontrol.common.dto.generate.GenerateValueDto;
 
@@ -9,11 +10,7 @@ import java.time.LocalDateTime;
 
 public abstract class AbstractExpectedUtil implements GenerateUtil{
     @Override
-    public abstract GenerateValueDto generateEnergy(
-            LocalDateTime baseTime,
-            InverterGenerationDto inv,
-            GenerateCalcBase base,
-            GenerateValueDto dto);
+    public abstract GenerateDataContext generateEnergy(GenerateDataContext context);
 
     protected boolean isNightTime(double currentHr,
                                 GenerateCalcBase base) {

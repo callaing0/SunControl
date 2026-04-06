@@ -4,6 +4,7 @@ import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class DailyWeather {
     private Long id;
     private District district;

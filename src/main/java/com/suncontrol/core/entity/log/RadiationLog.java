@@ -1,6 +1,7 @@
 package com.suncontrol.core.entity.log;
 
 import com.suncontrol.core.dto.log.RadiationLogDto;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class RadiationLog {
     private Long id;
     private Long plantId;
