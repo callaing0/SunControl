@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.suncontrol.core.repository.asset.InverterRepository">
+    <insert id="save" parameterType="com.suncontrol.core.entity.asset.Inverter">
+        INSERT INTO inverter (plant_id, rated_capacity, type, efficiency, serial)
+        VALUES (#{plantId}, #{ratedCapacity}, #{type}, #{efficiency}, #{serial})
+    </insert>
+    <update id="updateCap" parameterType="com.suncontrol.core.dto.asset.InverterCapSurplusDto">
+        UPDATE inverter SET
+        measured_cap = measured_cap + #{measuredCapSurplus}
+        updated_at = NOW()
+        WHERE id = #{id} AND plant_id #{plantId}
+    </update>
+</mapper>
