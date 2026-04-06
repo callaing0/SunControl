@@ -29,9 +29,9 @@ public class GenerationScheduler {
     private void collectWeatherInfo() {
         /// 매 N시 5분 마다 업데이트되는 기상정보 수집
         /// 정각보다는 약간 늦게 호출해서 최신정보를 수집하기 위함.
-        LocalDateTime now = LocalDateTime.now();
-        if(now.getMinute() > 10)
-            return;
+//        LocalDateTime now = LocalDateTime.now();
+//        if(now.getMinute() > 10)
+//            return; TODO : 진짜 일할시간인지 아닌지는 오케스트레이터가 결정할 문제
 
         try {
             weatherApiService.requestAndSaveWeather();

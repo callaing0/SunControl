@@ -10,7 +10,7 @@
         INSERT INTO radiation_log (
         plant_id, base_time, gti, gti_instance
         ) VALUES
-        <foreach collection="list" item="item">
+        <foreach collection="list" item="item" separator=",">
             (#{item.plantId}, #{item.baseTime}, #{item.gti}, #{item.gtiInstance})
         </foreach>
         ON DUPLICATE KEY UPDATE

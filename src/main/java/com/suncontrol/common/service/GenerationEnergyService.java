@@ -6,10 +6,11 @@ import com.suncontrol.common.util.GenerateUtil;
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.common.dto.generate.InverterGenerationDto;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
-import com.suncontrol.core.dto.log.GenerationResultDto;
+import com.suncontrol.common.dto.generate.GenerationResultDto;
+import com.suncontrol.core.dto.log.GenerationLogDto;
 import com.suncontrol.core.dto.log.RadiationLogDto;
 import com.suncontrol.core.dto.log.WeatherLogDto;
-import com.suncontrol.core.dto.log.component.GenerateValueDto;
+import com.suncontrol.common.dto.generate.GenerateValueDto;
 import com.suncontrol.core.service.asset.InverterService;
 import com.suncontrol.core.service.asset.PlantService;
 import com.suncontrol.core.service.log.DailyWeatherService;
@@ -18,6 +19,7 @@ import com.suncontrol.core.service.log.RadiationLogService;
 import com.suncontrol.core.service.log.WeatherLogService;
 import com.suncontrol.core.util.TimeTruncater;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GenerationEnergyService {
     ///  발전기록 raw data 생성 오케스트레이터
 
@@ -141,8 +144,13 @@ public class GenerationEnergyService {
                 }
             }
         }
-        /// 전체 결과 DB 저장
-        generationLogService.saveAll(results);
+        /// 전체 결과를 LogDto 리스트로 뜯어서 DB 저장
+        List<GenerationLogDto> resultLogs =
+                results.values().stream()
+                        .flatMap(List::stream)
+                        .map(GenerationResultDto::getGenerationLogDto)
+                        .toList();
+        generationLogService.saveAll(resultLogs);
     }
 
     public Map<Long, List<GenerationResultDto>> getPredict
@@ -172,6 +180,8 @@ public class GenerationEnergyService {
             GenerateValueDto dto = new GenerateValueDto();
             dto = expStrategy.generateEnergy(current, inv, base, dto);
             dto = actStrategy.generateEnergy(current, inv, base, dto);
+            /// 계산이 끝난 값은 capacity 기준으로 클리핑
+            dto.setCapacity(inv.getRatedCapacity(), inv.getMeasuredCapacity());
 
             lastAccumEnergy = calculateAccumEnergy(
                     lastAccumEnergy, dto.getValueActual(), termSecond);
@@ -179,7 +189,7 @@ public class GenerationEnergyService {
             GenerationResultDto result = new GenerationResultDto(
                     inv.getId(), current, dto, lastAccumEnergy ,base.weather());
             /// 테스트 데이터 출력
-            System.out.println(result);
+            log.info("Generation result: {}", result);
 
             resultList.add(result);
 

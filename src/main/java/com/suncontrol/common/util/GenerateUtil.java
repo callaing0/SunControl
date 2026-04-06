@@ -2,7 +2,7 @@ package com.suncontrol.common.util;
 
 import com.suncontrol.common.dto.generate.GenerateCalcBase;
 import com.suncontrol.common.dto.generate.InverterGenerationDto;
-import com.suncontrol.core.dto.log.component.GenerateValueDto;
+import com.suncontrol.common.dto.generate.GenerateValueDto;
 
 import java.time.LocalDateTime;
 

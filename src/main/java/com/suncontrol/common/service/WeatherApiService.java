@@ -40,7 +40,7 @@ public class WeatherApiService {
     }
 
     private List<WeatherResponseDto> getWeatherResponses(List<PlantWeatherApiDto> plants) {
-        // TODO
+        // TODO "진짜로 Open-Meteo 접속해서 데이터 가져오는 것"
         return Collections.emptyList();
     }
 

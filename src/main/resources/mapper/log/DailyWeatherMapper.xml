@@ -11,7 +11,7 @@
         district, base_date, temp_max, temp_min, weather_code, sunrise, sunset,
         sunshine_duration, daylight_duration, prec_sum, snow_sum, radiation_sum
         ) VALUES
-        <foreach collection="list" item="item">
+        <foreach collection="list" item="item" separator=",">
             (#{item.district}, #{item.baseDate}, #{item.tempMax}, #{item.tempMin},
             #{item.weatherCode}, #{item.sunrise}, #{item.sunset},
             #{item.sunshineDuration}, #{item.daylightDuration},
