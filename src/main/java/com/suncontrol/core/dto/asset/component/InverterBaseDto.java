@@ -1,14 +1,12 @@
 package com.suncontrol.core.dto.asset.component;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
+@RequiredArgsConstructor
 public class InverterBaseDto {
-    private Long inverterId;
-    private Long plantId;
+    private final Long inverterId;
+    private final Long plantId;
 
     public Long getId() {
         return this.inverterId;
