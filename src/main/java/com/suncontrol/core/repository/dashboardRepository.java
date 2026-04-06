@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Mapper
-public interface dashboardMapper {
+public interface dashboardRepository{
     //현재출력, 금일발전량, 효율, 발전소 정보, 기상 정보, 수익 예측, 환경 기여도
     dashboardSummaryDto selectDashboardSummary(@Param("memberId") Long memberId);
     //인버터 이름, 시리얼, 상태
