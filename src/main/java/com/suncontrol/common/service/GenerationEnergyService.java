@@ -1,16 +1,13 @@
 package com.suncontrol.common.service;
 
-import com.suncontrol.common.dto.generate.GenerateCalcBase;
-import com.suncontrol.common.dto.generate.WeatherContext;
+import com.suncontrol.common.dto.generate.*;
 import com.suncontrol.common.util.GenerateUtil;
 import com.suncontrol.core.constant.common.District;
-import com.suncontrol.common.dto.generate.InverterGenerationDto;
+import com.suncontrol.core.dto.asset.InverterUpdateDto;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
-import com.suncontrol.common.dto.generate.GenerationResultDto;
 import com.suncontrol.core.dto.log.GenerationLogDto;
 import com.suncontrol.core.dto.log.RadiationLogDto;
 import com.suncontrol.core.dto.log.WeatherLogDto;
-import com.suncontrol.common.dto.generate.GenerateValueDto;
 import com.suncontrol.core.service.asset.InverterService;
 import com.suncontrol.core.service.asset.PlantService;
 import com.suncontrol.core.service.log.DailyWeatherService;
@@ -100,7 +97,10 @@ public class GenerationEnergyService {
     // endregion
         /// 결과용 맵
         Map<Long, List<GenerationResultDto>> results = new HashMap<>();
+        List<InverterUpdateDto> inverterUpdateList = new ArrayList<>();
 
+        log.info("collect datas at  {}", LocalDateTime.now());
+        log.info("collect data from {} to {}", start, end);
         for(District district : District.LIST) {
             // region 4. 1차 : 지역 key로 가공재료 꺼내기
             /// 시간별 날씨, 일간 날씨, 발전소 리스트
@@ -131,7 +131,7 @@ public class GenerationEnergyService {
                             start : recentGenerated.get(inverter.getId());
                     // region 6. 세부 로직 호출
                 /// TODO : getResult 파라미터 추가 (날씨정보 묶음 & 인버터 스펙)
-                    List<GenerationResultDto> result =
+                    GenerationResultSet result =
                             getResult(
                                     inverterStart, end, inverter,
                                     new WeatherContext(
@@ -140,10 +140,12 @@ public class GenerationEnergyService {
                                             dailyWeatherInnerMap),
                                     termSeconds);
                 // endregion
-                    results.put(inverter.getId(), result);
+                    results.put(inverter.getId(), result.getResults());
+                    inverterUpdateList.add(result.getInverter().getUpdateSet());
                 }
             }
         }
+        log.info("calculated datas at {}", LocalDateTime.now());
         /// 전체 결과를 LogDto 리스트로 뜯어서 DB 저장
         List<GenerationLogDto> resultLogs =
                 results.values().stream()
@@ -151,6 +153,7 @@ public class GenerationEnergyService {
                         .map(GenerationResultDto::getGenerationLogDto)
                         .toList();
         generationLogService.saveAll(resultLogs);
+        inverterService.updateAccumAndStatus(inverterUpdateList);
     }
 
     public Map<Long, List<GenerationResultDto>> getPredict
@@ -158,7 +161,7 @@ public class GenerationEnergyService {
         return Collections.emptyMap();
     }
 
-    private List<GenerationResultDto> getResult
+    private GenerationResultSet getResult
             (LocalDateTime start, LocalDateTime end, InverterGenerationDto inv,
              WeatherContext context, int termSecond) {
         List<GenerationResultDto> resultList = new ArrayList<>();
@@ -177,25 +180,33 @@ public class GenerationEnergyService {
                     inv.getInverterType().getStrategy().getLabel());
 
             /// 전문 계산로직으로 연산 처리
+            GenerateDataContext gContext = new GenerateDataContext(
+                    current, inv, base, new GenerateValueDto()
+            );
             GenerateValueDto dto = new GenerateValueDto();
-            dto = expStrategy.generateEnergy(current, inv, base, dto);
-            dto = actStrategy.generateEnergy(current, inv, base, dto);
+            gContext = expStrategy.generateEnergy(gContext);
+            gContext = actStrategy.generateEnergy(gContext);
             /// 계산이 끝난 값은 capacity 기준으로 클리핑
-            dto.setCapacity(inv.getRatedCapacity(), inv.getMeasuredCapacity());
+            gContext.getDto().setCapacity(inv.getRatedCapacity(), inv.getMeasuredCapacity());
 
             lastAccumEnergy = calculateAccumEnergy(
                     lastAccumEnergy, dto.getValueActual(), termSecond);
+            /// inverter를 최신상태로 업데이트
+            inv = gContext.getInv();
+            inv.setCurrentPower(dto.getValueActual());
 
             GenerationResultDto result = new GenerationResultDto(
                     inv.getId(), current, dto, lastAccumEnergy ,base.weather());
             /// 테스트 데이터 출력
-            log.info("Generation result: {}", result);
+            log.debug("Generation result: {}", result);
 
             resultList.add(result);
 
             current = TimeTruncater.truncateToNextTerm(current, termSecond);
         }
-        return resultList;
+        /// 최종 누적발전량 업데이트
+        inv.setLastAccumEnergy(lastAccumEnergy);
+        return new GenerationResultSet(resultList, inv);
     }
 
     private static final BigDecimal SECONDS_PER_HOUR = BigDecimal.valueOf(3600);

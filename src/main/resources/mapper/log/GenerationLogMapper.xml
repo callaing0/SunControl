@@ -12,7 +12,7 @@
         accum_energy, weather_code, status
         )
         VALUES
-        <foreach collection="List" item="item" separator=",">
+        <foreach collection="list" item="item" separator=",">
              (
             #{item.inverterId}, #{item.baseTime},
             #{item.valueExpected}, #{item.valueActual},

@@ -4,6 +4,7 @@ import com.suncontrol.core.constant.common.Weather;
 import com.suncontrol.core.constant.util.GenerationStatus;
 import com.suncontrol.core.dto.log.GenerationLogDto;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class GenerationLog {
     private Long id;
     private Long inverterId;

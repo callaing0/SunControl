@@ -4,6 +4,16 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.suncontrol.core.repository.asset.InverterRepository">
+    <resultMap id="InverterMap" type="Inverter">
+        <result column="status_code" property="status"
+                typeHandler="com.suncontrol.core.handler.DeviceStatusTypeHandler"
+                javaType="com.suncontrol.core.constant.asset.DeviceStatus"
+        />
+    </resultMap>
+    <select id="findAllByStatusCodeBetween"
+            resultMap="InverterMap">
+        SELECT * FROM inverter WHERE status_code BETWEEN #{start} AND #{end}
+    </select>
     <insert id="save" parameterType="com.suncontrol.core.entity.asset.Inverter">
         INSERT INTO inverter (plant_id, rated_capacity, type, efficiency, serial)
         VALUES (#{plantId}, #{ratedCapacity}, #{type}, #{efficiency}, #{serial})
@@ -15,8 +25,13 @@
         updated_at = NOW()
         WHERE id = #{id} AND plant_id #{plantId}
     </update>
-    <select id="findAllByStatusCodeBetween"
-            resultType="com.suncontrol.core.entity.asset.Inverter">
-        SELECT * FROM inverter WHERE status_code BETWEEN #{start} AND #{end}
-    </select>
+    <update id="updateLastAccumAndStatus">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE inverter SET
+                last_accum_energy = #{item.lastAccumEnergy}
+                status_code = #{item.statusCode}
+                updated_at = NOW()
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
 </mapper>

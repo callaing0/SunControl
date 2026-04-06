@@ -4,14 +4,15 @@ import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
 import com.suncontrol.core.dto.asset.InverterDataTransferObject;
 import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Inverter {
     private Long id;
     private Long plantId;
@@ -24,7 +25,14 @@ public class Inverter {
     private BigDecimal currentPower;
     private BigDecimal lastAccumEnergy;
     private InverterType inverterType;
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private int statusCode;
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private DeviceStatus status;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -49,11 +57,13 @@ public class Inverter {
     }
 
     public void setEfficiency(BigDecimal efficiency) {
-        if(this.efficiency != null) {
+        if(efficiency != null) {
             this.efficiency = efficiency;
-            return;
+        } else if (this.inverterType != null) {
+            this.efficiency = this.inverterType.getEfficiency();
+        } else {
+            this.efficiency = BigDecimal.valueOf(100);
         }
-        this.efficiency = this.inverterType.getEfficiency();
     }
 
     public String getType() {
@@ -62,12 +72,26 @@ public class Inverter {
     }
 
 
-    public void setStatusCode(int statusCode) {
+    public void setStatusCode(Integer statusCode) {
         this.status = DeviceStatus.fromCode(statusCode);
+        this.statusCode = statusCode;
     }
 
     public Integer getStatusCode() {
         return this.status != null ?
-                this.status.getCode() : null;
+                this.status.getCode() : this.statusCode;
+    }
+
+    public void setStatus(Integer statusCode) {
+        this.status = DeviceStatus.fromCode(statusCode);
+    }
+
+    public void setStatus(DeviceStatus status) {
+        this.status = status;
+    }
+
+    public DeviceStatus getStatus() {
+        return this.status != null ?
+                this.status : DeviceStatus.fromCode(statusCode);
     }
 }

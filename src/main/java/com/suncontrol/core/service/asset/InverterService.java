@@ -6,7 +6,9 @@ import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
 import com.suncontrol.core.entity.asset.Inverter;
 import com.suncontrol.core.repository.asset.InverterRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InverterService {
     private final InverterRepository repository;
 
@@ -29,8 +32,10 @@ public class InverterService {
         //todo
     }
 
-    public void updateAccum(InverterUpdateEnergyDto dto) {
-        //todo
+    @Transactional
+    public void updateAccumAndStatus(List<InverterUpdateDto> list) {
+        int result = repository.updateLastAccumAndStatus(list);
+        log.debug("{}건 저장",result);
     }
 
     public List<InverterDataTransferObject> findAllByPlant(Long plantId) {
