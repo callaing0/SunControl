@@ -1,4 +1,4 @@
-package com.suncontrol.control;
+package com.suncontrol.domain.control;
 
 import com.suncontrol.domain.service.dashboardService;
 import lombok.RequiredArgsConstructor;
