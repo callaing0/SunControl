@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.suncontrol.core.repository.log.WeatherLogRepository">
+
+<!--  기상데이터 저장  -->
+<!--  TODO : 건수가 많아지면 BATCH로 전환해야 함  -->
+    <insert id="saveAll" parameterType="com.suncontrol.core.entity.log.WeatherLog">
+        INSERT INTO weather_log (
+            district_code, base_time, temperature,
+            cloud_low, cloud_mid, cloud_high, ghi
+        ) VALUES
+        <foreach collection="list" item="item">
+            (#{item.districtCode}, #{item.baseTime}, #{item.temperature},
+            #{item.cloudLow}, #{item.cloudMid}, #{item.cloudHigh}, #{item.ghi})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            temperature = VALUES(temperature),
+            cloud_low = VALUES(cloud_low),
+            cloud_mid = VALUES(cloud_mid),
+            cloud_high = VALUES(cloud_high),
+            ghi = VALUES(ghi),
+            updated_at = NOW()
+    </insert>
+    <!-- TODO 계산로직용 조회 / 대시보드 출력용 조회 -->
+</mapper>
