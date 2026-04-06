@@ -15,9 +15,9 @@ public class MyPageService {
         // MyPageVo 생성
         MyPageVo myPageVo = new MyPageVo();
 
-        MemberDetailVo memberDetail = memberService.findUserDetailByUserId(userId);
+        MemberDetailVo memberDetail = new MemberDetailVo(memberService.findByUserId(userId));
 
-        if (memberDetail == null) {
+        if (memberDetail.getId() == null) {
             return null;
         }
 
