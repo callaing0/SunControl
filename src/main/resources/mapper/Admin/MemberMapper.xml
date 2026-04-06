@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.suncontrol.core.repository.MemberRepository">
+
+    <!-- Member Entity와 column 매핑-->
+    <resultMap id="memberMap" type="com.suncontrol.core.entity.Member">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="password" column="password"/>
+        <result property="role" column="role"/>
+        <result property="name" column="name"/>
+        <result property="affiliation" column="affiliation"/>
+        <result property="temporary" column="is_temporary"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 전체 회원 조회 -->
+    <select id="findAll" resultMap="memberMap">
+        SELECT * FROM member
+    </select>
+    <!-- 회원 id로 회원 조회 -->
+    <select id="findById" resultMap="memberMap">
+        SELECT * FROM member WHERE id = #{id}
+    </select>
+    <!-- 로그인 id로 회원 조회 -->
+    <select id="findByUserId" resultMap="memberMap">
+        SELECT * FROM member WHERE user_id = #{userId}
+    </select>
+    <!-- 신규 회원 저장 -->
+    <insert id="insertMember">
+        INSERT INTO member
+        (user_id, password, role, name, affiliation, is_temporary, status, created_at, updated_at)
+        VALUES
+        (#{userId}, #{password}, #{role}, #{name}, #{affiliation}, #{temporary}, #{status}, #{createdAt}, #{updatedAt})
+    </insert>
+    <!-- 회원 정보 수정 -->
+    <update id="updateMember">
+        UPDATE member
+        SET role = #{role},
+        status = #{status},
+        updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    <!-- 회원 상태 잠금 -->
+    <update id="lockMember">
+        UPDATE member SET status = 'LOCKED' WHERE id = #{id}
+    </update>
+    <!-- 회원 상태 잠금 해제 -->
+    <update id="unlockMember">
+        UPDATE member SET status = 'ACTIVE' WHERE id = #{id}
+    </update>
+    <!-- 회원 비밀번호 변경 -->
+    <update id="updatePassword">
+        UPDATE member SET password = #{password} WHERE id = #{id}
+    </update>
+    <!-- 최초 로그인 여부 변경 -->
+    <update id="updateFirstLogin">
+        UPDATE member SET is_temporary = #{isTemporary} WHERE id = #{id}
+    </update>
+
+</mapper>
