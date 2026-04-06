@@ -34,12 +34,12 @@ public class PlantService {
         return repository.existsByIdAndMemberId(memberId, plantId);
     }
 
-    public List<PlantDto> findByMemberId(Long memberId) {
+    public List<PlantDto> findAllByMemberId(Long memberId) {
         //todo
         return null;
     }
 
-    public PlantInfoView getInfoView(Long id) {
+    public PlantInfoView getInfoViewById(Long id) {
         /// todo
         /// 도메인 서비스가 큰 덩어리 뷰 객체를 넘기면
         /// 각 오케스트레이터가 알아서 필요한 만큼 잘라쓰는 구조
