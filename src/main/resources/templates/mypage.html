@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<div layout:fragment="content"
+     th:with="
+        member=${myPage != null ? myPage.member : null},
+        plant=${myPage != null ? myPage.plant : null},
+        inverters=${myPage != null ? myPage.inverters : null},
+        panels=${myPage != null ? myPage.panels : null},
+        hasPlant=${plant != null},
+        hasInverters=${inverters != null and !#lists.isEmpty(inverters)},
+        hasPanels=${panels != null and !#maps.isEmpty(panels)}
+     ">
+
+    <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 space-y-12 min-h-[82vh] flex flex-col">
+        <div class="px-2">
+            <h2 class="text-3xl font-black text-gray-800 tracking-tighter italic uppercase">마이페이지</h2>
+            <p class="text-sm text-gray-400 font-bold mt-1 tracking-tight">회원 정보 및 등록된 발전 설비 자산을 관리합니다.</p>
+        </div>
+
+        <section class="mt-4">
+            <div class="flex justify-between items-end mb-8 px-1">
+                <h2 class="text-xl font-black text-gray-800 tracking-tighter italic uppercase flex items-center">
+                    <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>계정 정보
+                </h2>
+                <button type="button"
+                        onclick="openModal('passwordModal')"
+                        class="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-3 rounded-2xl font-black text-xs shadow-lg shadow-yellow-400/20 transition-all active:scale-95 uppercase italic">
+                    비밀번호 변경
+                </button>
+            </div>
+
+            <div class="grid grid-cols-4 gap-6">
+                <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 relative shadow-sm transition-all hover:bg-white">
+                    <span class="text-[10px] text-gray-400 absolute top-4 left-6 font-black uppercase tracking-widest">사용자</span>
+                    <input type="text"
+                           th:value="${member != null ? member.name : 'Unknown User'}"
+                           class="w-full mt-4 px-1 text-gray-800 font-[900] outline-none bg-transparent"
+                           readonly>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 relative shadow-sm transition-all hover:bg-white">
+                    <span class="text-[10px] text-gray-400 absolute top-4 left-6 font-black uppercase tracking-widest">ID</span>
+                    <input type="text"
+                           th:value="${member != null ? member.userId : 'N/A'}"
+                           class="w-full mt-4 px-1 text-gray-800 font-[900] outline-none bg-transparent"
+                           readonly>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 relative shadow-sm transition-all hover:bg-white">
+                    <span class="text-[10px] text-gray-400 absolute top-4 left-6 font-black uppercase tracking-widest">소속</span>
+                    <input type="text"
+                           th:value="${member != null ? member.affiliation : '소속 없음'}"
+                           class="w-full mt-4 px-1 text-gray-800 font-[900] outline-none bg-transparent"
+                           readonly>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 relative shadow-sm transition-all hover:bg-white">
+                    <span class="text-[10px] text-gray-400 absolute top-4 left-6 font-black uppercase tracking-widest">권한</span>
+                    <input type="text"
+                           th:value="${member != null ? member.role : 'GUEST'}"
+                           class="w-full mt-4 px-1 text-blue-600 font-[900] outline-none bg-transparent"
+                           readonly>
+                </div>
+            </div>
+        </section>
+
+        <section class="border-t border-gray-50 pt-12">
+            <div class="flex justify-between items-center mb-6 px-1 italic uppercase">
+                <h2 class="text-xl font-black text-gray-800">01. 발전소</h2>
+                <button type="button"
+                        onclick="openModal('plantModal')"
+                        class="bg-gray-900 text-white px-6 py-3 rounded-2xl text-[11px] font-black shadow-lg hover:bg-black transition-all">
+                    + 발전소 등록
+                </button>
+            </div>
+
+            <div th:if="${hasPlant}" class="grid grid-cols-1 gap-4">
+                <div class="bg-white border border-gray-100 p-8 rounded-[35px] shadow-sm flex justify-between items-center hover:bg-gray-50/50 transition-all">
+                    <span class="font-black text-gray-800 text-lg italic uppercase"
+                          th:text="${plant.name != null ? plant.name : '발전소 이름'}">발전소 이름</span>
+                    <span class="text-sm text-gray-400 font-bold italic"
+                          th:text="${plant.address != null ? plant.address : '주소 정보 없음'}">주소 정보</span>
+                </div>
+            </div>
+
+            <div th:if="${!hasPlant}"
+                 class="bg-gray-50 rounded-[40px] border border-dashed border-gray-200 min-h-[150px] flex items-center justify-center">
+                <p class="text-gray-400 font-black italic uppercase tracking-tighter">등록된 발전소 정보가 없습니다.</p>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-2 gap-10">
+            <section th:classappend="${!hasPlant} ? 'opacity-40 pointer-events-none' : ''"
+                     class="border-t border-gray-50 pt-12 transition-all duration-300">
+                <div class="flex justify-between items-center mb-6 px-1 italic uppercase font-black text-gray-800">
+                    <h2 class="text-xl">02. 인버터</h2>
+                    <button type="button"
+                            th:disabled="${!hasPlant}"
+                            onclick="openModal('inverterModal')"
+                            class="bg-gray-900 text-white px-6 py-3 rounded-2xl text-[11px] font-black shadow-lg hover:bg-black disabled:bg-gray-300 disabled:cursor-not-allowed transition-all">
+                        + 인버터 등록
+                    </button>
+                </div>
+
+                <div th:if="${hasInverters}" class="space-y-3">
+                    <div th:each="inv : ${inverters}"
+                         class="p-5 bg-white border border-gray-100 rounded-2xl flex justify-between items-center hover:border-blue-300 transition-all">
+                        <span class="font-[900] text-gray-700 uppercase italic"
+                              th:text="${inv.name != null ? inv.name : '인버터'}">인버터 명칭</span>
+                    </div>
+                </div>
+
+                <div th:if="${!hasPlant or !hasInverters}"
+                     class="bg-gray-50 rounded-[35px] border border-dashed border-gray-200 min-h-[200px] flex flex-col items-center justify-center">
+                    <p th:if="${!hasPlant}" class="text-red-400 font-black italic uppercase tracking-tighter mb-2">발전소를 먼저 등록해주세요</p>
+                    <p th:unless="${!hasPlant}" class="text-gray-300 font-black italic uppercase tracking-tighter">인버터 내역 없음</p>
+                </div>
+            </section>
+
+            <section th:classappend="${!hasPlant} ? 'opacity-40 pointer-events-none' : ''"
+                     class="border-t border-gray-50 pt-12 transition-all duration-300">
+                <div class="flex justify-between items-center mb-6 px-1 italic uppercase font-black text-gray-800">
+                    <h2 class="text-xl">03. 패널</h2>
+                    <button type="button"
+                            th:disabled="${!hasPlant}"
+                            onclick="openModal('panelModal')"
+                            class="bg-gray-900 text-white px-6 py-3 rounded-2xl text-[11px] font-black shadow-lg hover:bg-black disabled:bg-gray-300 disabled:cursor-not-allowed transition-all">
+                        + 패널 등록
+                    </button>
+                </div>
+
+                <div th:if="${hasPanels}" class="space-y-3">
+                    <div th:each="panelEntry : ${panels}">
+                        <div th:if="${panelEntry.value != null and !#lists.isEmpty(panelEntry.value)}"
+                             th:each="pnl : ${panelEntry.value}"
+                             class="p-5 bg-white border border-gray-100 rounded-2xl flex justify-between items-center hover:border-yellow-300 transition-all mb-3">
+                            <span class="font-[900] text-gray-700 uppercase italic"
+                                  th:text="${pnl.name != null ? pnl.name : '패널'}">패널 명칭</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${!hasPlant or !hasPanels}"
+                     class="bg-gray-50 rounded-[35px] border border-dashed border-gray-200 min-h-[200px] flex flex-col items-center justify-center">
+                    <p th:if="${!hasPlant}" class="text-red-400 font-black italic uppercase tracking-tighter mb-2">발전소를 먼저 등록해주세요</p>
+                    <p th:unless="${!hasPlant}" class="text-gray-300 font-black italic uppercase tracking-tighter">패널 내역 없음</p>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script th:inline="javascript">
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+
+                    const addressInput = document.getElementById('address');
+                    const districtCodeInput = document.getElementById('districtCode');
+
+                    if (addressInput) addressInput.value = addr || '';
+                    if (districtCodeInput) districtCodeInput.value = data.bcode || data.hcode || '';
+                }
+            }).open();
+        }
+
+        const mypageModals = ['passwordModal', 'plantModal', 'panelModal', 'inverterModal'];
+
+        window.addEventListener('click', (e) => {
+            if (mypageModals.includes(e.target.id)) {
+                closeModal(e.target.id);
+            }
+        });
+    </script>
+</th:block>
+</html>
