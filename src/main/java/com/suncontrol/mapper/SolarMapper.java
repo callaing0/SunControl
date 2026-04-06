@@ -6,7 +6,8 @@ import org.apache.ibatis.annotations.Insert;
 
 @Mapper
 public interface SolarMapper {
-    @Insert("INSERT INTO alert_log (location, efficiency, message, status) " +
-            "VALUES (#{location}, #{efficiency}, #{message}, #{status})")
-    int insertAlertLog(AlertDTO alert);
+    // 발전 기록 및 알림 상태 저장
+    @Insert("INSERT INTO solar_monitoring (location, efficiency, status, message) " +
+            "VALUES (#{location}, #{efficiency}, #{status}, #{message})")
+    int insertSolarLog(AlertDTO data);
 }
