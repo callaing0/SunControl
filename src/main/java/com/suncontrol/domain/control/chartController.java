@@ -1,7 +1,7 @@
 package com.suncontrol.domain.control;
 
-import com.suncontrol.domain.dto.statsChartDto;
-import com.suncontrol.domain.service.statsService;
+import com.suncontrol.domain.dto.chartDto;
+import com.suncontrol.domain.service.chartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,19 +12,19 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-public class statsController {
+public class chartController {
 
-    private final statsService statsService;
+    private final chartService chartService;
 
     @GetMapping("/stats")
     public String stats(Model model) {
         Long memberId = 1L;
         String selectedDate = LocalDate.now().toString();
 
-        List<statsChartDto> generationTrend = statsService.getGenerationTrend(memberId, selectedDate);
-        List<statsChartDto> weatherEfficiency = statsService.getWeatherEfficiency(memberId, selectedDate);
+        List<chartDto> generationTrend = chartService.getGenerationTrend(memberId, selectedDate);
+        List<chartDto> weatherEfficiency = chartService.getWeatherEfficiency(memberId, selectedDate);
 
-        model.addAttribute("statsSummary", statsService.getStatsSummary(memberId, selectedDate));
+        model.addAttribute("statsSummary", chartService.getStatsSummary(memberId, selectedDate));
         model.addAttribute("generationTrend", generationTrend);
         model.addAttribute("weatherEfficiency", weatherEfficiency);
         model.addAttribute("selectedDate", selectedDate);

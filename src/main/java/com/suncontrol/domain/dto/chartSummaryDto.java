@@ -3,7 +3,7 @@ package com.suncontrol.domain.dto;
 import lombok.Data;
 
 @Data
-public class statsSummaryDto {
+public class chartSummaryDto {
     private String title;
     private String value;
 }

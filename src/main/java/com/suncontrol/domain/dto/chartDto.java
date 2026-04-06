@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class statsChartDto {
+public class chartDto {
     private String label;
     private BigDecimal value;
 }

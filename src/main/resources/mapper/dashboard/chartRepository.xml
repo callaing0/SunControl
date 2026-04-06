@@ -3,9 +3,15 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.suncontrol.domain.stats.mapper.StatsMapper">
+<!--
+    차트/통계 화면용 MyBatis Mapper XML
+-->
+<mapper namespace="com.suncontrol.core.repository.chartRepository">
 
-    <select id="selectStatsSummary" resultType="com.suncontrol.domain.stats.dto.StatsSummaryDto">
+    <!--
+        상단 요약 카드 데이터 조회
+    -->
+    <select id="selectStatsSummary" resultType="com.suncontrol.domain.dto.chartSummaryDto">
         SELECT '총 발전량' AS title,
                CONCAT(ROUND(COALESCE(SUM(dr.value_actual), 0), 2), ' kWh') AS value
         FROM daily_report dr
@@ -57,7 +63,10 @@
           AND DATE(al.occurred_at) = #{selectedDate}
     </select>
 
-    <select id="selectGenerationTrend" resultType="com.suncontrol.domain.stats.dto.StatsChartDto">
+    <!--
+        시간대별 발전량 추이 조회
+    -->
+    <select id="selectGenerationTrend" resultType="com.suncontrol.domain.dto.chartDto">
         SELECT
             DATE_FORMAT(hr.base_time, '%H시') AS label,
             ROUND(COALESCE(SUM(hr.value_actual), 0), 2) AS value
@@ -72,7 +81,10 @@
         ORDER BY HOUR(hr.base_time)
     </select>
 
-    <select id="selectWeatherEfficiency" resultType="com.suncontrol.domain.stats.dto.StatsChartDto">
+    <!--
+        기상 조건별 평균 효율 조회
+    -->
+    <select id="selectWeatherEfficiency" resultType="com.suncontrol.domain.dto.chartDto">
         SELECT
             CASE gl.weather_code
                 WHEN '01' THEN '맑음'
