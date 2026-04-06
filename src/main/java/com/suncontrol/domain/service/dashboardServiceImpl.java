@@ -2,7 +2,7 @@ package com.suncontrol.domain.service;
 
 import com.suncontrol.core.repository.dashboardRepository;
 import com.suncontrol.domain.dto.dashboardSummaryDto;
-import com.suncontrol.domain.dto.inverterDto;
+import com.suncontrol.core.dto.asset.InverterDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -76,7 +76,7 @@ public class dashboardServiceImpl implements dashboardService {
      * @return 인버터 리스트
      */
     @Override
-    public List<inverterDto> getInverters(Long memberId) {
+    public List<InverterDto> getInverters(Long memberId) {
         return dashboardRepository.selectInverters(memberId);
     }
 

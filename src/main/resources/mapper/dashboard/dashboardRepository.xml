@@ -88,7 +88,7 @@
     </select>
 
     <!--인버터 목록 조회-->
-    <select id="selectInverters" resultType="com.suncontrol.domain.dto.inverterDto">
+    <select id="selectInverters" resultType="com.suncontrol.core.dto.asset.InverterDto">
         SELECT
             i.id AS inverterId,
             i.serial AS serial,
