@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.suncontrol.core.repository.report.StationRepository">
+
+    <resultMap id="plantInfoViewMap" type="com.suncontrol.core.entity.view.PlantInfoView">
+        <id property="id" column="plant_id"/>
+        <result property="name" column="name"/>
+        <result property="address" column="address"/>
+        <result property="capacitySum" column="capacity_sum"/>
+        <result property="totalValue" column="total_value"/>
+        <result property="accumTotal" column="accum_total"/>
+        <result property="efficiency" column="efficiency"/>
+        <result property="statusCode" column="status_code"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <resultMap id="stationHourlyGenerationMap" type="com.suncontrol.domain.dto.StationHourlyGenerationDto">
+        <result property="hourLabel" column="hour_label"/>
+        <result property="totalGeneration" column="total_generation"/>
+    </resultMap>
+
+    <select id="findRegionListByMemberId" resultType="string">
+        SELECT DISTINCT p.address
+        FROM plant p
+        WHERE p.member_id = #{memberId}
+        AND p.address IS NOT NULL
+        <![CDATA[
+          AND TRIM(p.address) <> ''
+          ]]>
+        ORDER BY p.address ASC
+    </select>
+
+    <select id="findPlantInfoViewListByMemberIdAndRegion" resultMap="plantInfoViewMap">
+        SELECT
+        p.id AS plant_id,
+        p.name AS name,
+        p.address AS address,
+        COALESCE(pi.capacity_sum, 0) AS capacity_sum,
+        COALESCE(pi.total_value, 0) AS total_value,
+        COALESCE(pi.accum_total, 0) AS accum_total,
+        COALESCE(pi.efficiency, 0) AS efficiency,
+        COALESCE(pi.status_code, 0) AS status_code,
+        pi.updated_at AS updated_at
+        FROM plant p
+        LEFT JOIN plant_info pi ON pi.plant_id = p.id
+        WHERE p.member_id = #{memberId}
+        <if test='region != null and region != "" and region != "all"'>
+            <![CDATA[
+            AND p.address = #{region}
+            ]]>
+        </if>
+        ORDER BY p.created_at DESC, p.id DESC
+    </select>
+
+    <select id="findHourlyGenerationByMemberIdAndRegion" resultMap="stationHourlyGenerationMap">
+        SELECT
+        DATE_FORMAT(gl.base_time, '%H:00') AS hour_label,
+        COALESCE(SUM(gl.value_actual), 0) AS total_generation
+        FROM generation_log gl
+        INNER JOIN inverter i ON gl.inverter_id = i.id
+        INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.member_id = #{memberId}
+        AND DATE(gl.base_time) = CURDATE()
+        <if test='region != null and region != "" and region != "all"'>
+            <![CDATA[
+            AND p.address = #{region}
+            ]]>
+        </if>
+        GROUP BY DATE_FORMAT(gl.base_time, '%H:00')
+        ORDER BY hour_label ASC
+    </select>
+
+</mapper>

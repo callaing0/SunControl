@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.suncontrol.core.repository.dashboardRepository">
+<mapper namespace="com.suncontrol.core.repository.report.dashboardRepository">
 
     <!-- 대시보드 요약 정보 조회 -->
     <select id="selectDashboardSummary" resultType="com.suncontrol.domain.dto.dashboardSummaryDto">
@@ -90,7 +90,7 @@
         ORDER BY i.id ASC
     </select>
 
-    <!-- 시간별 발전량 조회 -->
+    <!-- 시간별 발전량 조회 (확인 필요)-->
     <select id="selectHourlyPower" resultType="java.math.BigDecimal">
         SELECT
             COALESCE(SUM(hr.value_actual), 0) AS powerValue
@@ -104,7 +104,7 @@
         ORDER BY HOUR(hr.base_time)
     </select>
 
-    <!-- 시간별 일사량 조회 -->
+    <!-- 시간별 일사량 조회 (확인 필요)-->
     <select id="selectHourlyInsolation" resultType="java.math.BigDecimal">
         SELECT
             COALESCE(AVG(r.ghi), 0) AS insolationValue

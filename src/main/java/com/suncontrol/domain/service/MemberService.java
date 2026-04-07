@@ -1,7 +1,7 @@
 package com.suncontrol.domain.service;
 
 import com.suncontrol.core.entity.Member;
-import com.suncontrol.core.repository.MemberRepository;
+import com.suncontrol.core.repository.report.MemberRepository;
 import com.suncontrol.domain.form.MemberCreateForm;
 import com.suncontrol.domain.form.MemberUpdateForm;
 import lombok.RequiredArgsConstructor;
