@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>SolarGuard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Pretendard', sans-serif; letter-spacing: -0.02em; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .modal-bg { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px); }
+        .toast-animate { animation: toast-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes toast-in {
+            from { opacity: 0; transform: translateY(20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+    <th:block layout:fragment="css"></th:block>
+</head>
+<body class="bg-[#f8fafc] min-h-screen flex">
+
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<main class="flex-1 ml-64 p-10 flex flex-col pb-20">
+    <div th:replace="~{fragments/Header :: header}"></div>
+
+    <div layout:fragment="content"></div>
+</main>
+
+<div id="toast-container" class="fixed bottom-10 right-10 z-[200] space-y-4"></div>
+<div id="modal-area">
+    <div th:replace="~{fragments/modals :: logoutModal}"></div>
+    <div th:replace="~{fragments/modals :: accountModal}"></div>
+    <div th:replace="~{fragments/modals :: confirmModal}"></div>
+    <div th:replace="~{fragments/modals :: plantModal}"></div>
+    <div th:replace="~{fragments/modals :: inverterModal}"></div>
+    <div th:replace="~{fragments/modals :: panelModal}"></div>
+    <div th:replace="~{fragments/modals :: passwordModal}"></div>
+</div>
+
+<script>
+    function showToast(message, isError = false) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        const icon = isError ? '❌' : '⚡';
+        const iconColor = isError ? 'text-red-500' : 'text-yellow-400';
+        toast.className = `bg-gray-900 text-white px-8 py-5 rounded-[25px] shadow-2xl flex items-center space-x-4 min-w-[320px] toast-animate border border-white/10`;
+        toast.innerHTML = `
+                <span class="text-xl ${iconColor}">${icon}</span>
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 italic">System Notification</span>
+                    <span class="text-sm font-black tracking-tighter">${message}</span>
+                </div>
+            `;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+    function openModal(id) {
+        const m = document.getElementById(id);
+        if(m) { m.classList.remove('hidden'); m.classList.add('flex'); document.body.style.overflow = 'hidden'; }
+    }
+    function closeModal(id) {
+        const m = document.getElementById(id);
+        if(m) { m.classList.remove('flex'); m.classList.add('hidden'); document.body.style.overflow = 'auto'; }
+    }
+</script>
+<th:block layout:fragment="script"></th:block>
+</body>
+</html>

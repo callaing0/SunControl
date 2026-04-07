@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>SolarGuard | Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<div layout:fragment="content">
+    <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 flex-1 flex flex-col min-h-[82vh]">
+        <div class="mb-10 px-2">
+            <h2 class="text-3xl font-black text-gray-800 tracking-tighter italic uppercase">발전 통계 분석</h2>
+            <p class="text-sm text-gray-400 font-bold mt-1 tracking-tight">기간별 발전량 추이 및 에너지 효율 트렌드를 심층 분석합니다.</p>
+        </div>
+
+        <div class="flex space-x-4 items-center px-2 mb-10">
+            <div class="bg-gray-50 p-1.5 rounded-2xl border border-gray-100 flex items-center shadow-sm transition-all">
+                <button class="px-10 py-3.5 bg-yellow-400 text-black rounded-xl font-[900] shadow-lg shadow-yellow-400/20 italic uppercase">일별</button>
+                <button class="px-10 py-3.5 text-gray-400 font-[900] hover:text-gray-600 transition-colors uppercase">월별</button>
+            </div>
+            <input type="date" th:value="${selectedDate}" class="bg-gray-50 px-8 py-3.5 rounded-2xl border border-gray-100 font-[900] text-gray-700 outline-none focus:ring-4 focus:ring-yellow-400/10 transition-all uppercase italic">
+            <button class="bg-gray-900 px-12 py-3.5 rounded-2xl text-white font-[900] hover:bg-black transition-all shadow-xl active:scale-95 uppercase italic">조회</button>
+        </div>
+
+        <div class="grid grid-cols-5 gap-6 mb-10">
+            <th:block th:if="${statsSummary != null and !#lists.isEmpty(statsSummary)}">
+                <div th:each="stat : ${statsSummary}"
+                     class="bg-white p-8 rounded-[40px] border border-gray-100 text-center shadow-sm hover:translate-y-[-6px] transition-all group cursor-default">
+                    <p class="text-gray-400 text-[10px] font-black mb-3 uppercase tracking-[0.2em] group-hover:text-yellow-500"
+                       th:text="${stat.title}">Analysis Item</p>
+                    <p class="text-2xl font-[900] text-gray-800 italic" th:text="${stat.value}">0,000</p>
+                </div>
+            </th:block>
+            <th:block th:if="${statsSummary == null or #lists.isEmpty(statsSummary)}">
+                <div th:each="i : ${#numbers.sequence(1, 5)}"
+                     class="bg-white p-8 rounded-[40px] border border-gray-100 text-center shadow-sm opacity-50">
+                    <p class="text-gray-400 text-[10px] font-black mb-3 uppercase tracking-[0.2em]">WAITING DATA</p>
+                    <p class="text-2xl font-black text-gray-300 italic">--</p>
+                </div>
+            </th:block>
+        </div>
+
+        <div class="grid grid-cols-2 gap-10 flex-1 min-h-[500px]">
+            <div class="bg-white p-10 rounded-[45px] shadow-sm border border-gray-100 flex flex-col transition-all">
+                <h3 class="text-xl font-black mb-10 text-gray-800 flex items-center italic uppercase px-2">
+                    <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>발전량 추이
+                </h3>
+                <div class="flex-1 relative flex items-center justify-center">
+                    <canvas id="timeGenChart" th:if="${generationTrend != null and !#lists.isEmpty(generationTrend)}"></canvas>
+                    <div th:if="${generationTrend == null or #lists.isEmpty(generationTrend)}" class="text-center opacity-60">
+                        <div class="text-5xl mb-4">📈</div>
+                        <p class="text-gray-400 font-bold italic uppercase">분석할 발전량 데이터가 없습니다.</p>
+                        <p class="text-[10px] text-gray-300 uppercase tracking-widest mt-2 italic">Daily generation logs needed</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-10 rounded-[45px] shadow-sm border border-gray-100 flex flex-col transition-all">
+                <h3 class="text-xl font-black mb-10 text-gray-800 flex items-center italic uppercase px-2">
+                    <span class="w-1.5 h-6 bg-blue-500 rounded-full mr-3"></span>기상 조건별 발전 효율
+                </h3>
+                <div class="flex-1 relative flex items-center justify-center">
+                    <canvas id="weatherDistChart" th:if="${weatherEfficiency != null and !#lists.isEmpty(weatherEfficiency)}"></canvas>
+                    <div th:if="${weatherEfficiency == null or #lists.isEmpty(weatherEfficiency)}" class="text-center opacity-60">
+                        <div class="text-5xl mb-4">☁️</div>
+                        <p class="text-gray-400 font-bold italic uppercase">기상 조건 데이터가 집계되지 않았습니다.</p>
+                        <p class="text-[10px] text-gray-300 uppercase tracking-widest mt-2 italic">Weather-linked logs needed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const generationTrend = /*[[${generationTrend}]]*/ [];
+        const weatherEfficiency = /*[[${weatherEfficiency}]]*/ [];
+
+        const timeGenCtx = document.getElementById('timeGenChart');
+        if (timeGenCtx && generationTrend.length > 0) {
+            new Chart(timeGenCtx, {
+                type: 'line',
+                data: {
+                    labels: generationTrend.map(item => item.label),
+                    datasets: [{
+                        label: '발전량 (kWh)',
+                        data: generationTrend.map(item => item.value),
+                        borderColor: '#facc15',
+                        backgroundColor: 'rgba(250, 204, 21, 0.15)',
+                        fill: true,
+                        tension: 0.35,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        const weatherCtx = document.getElementById('weatherDistChart');
+        if (weatherCtx && weatherEfficiency.length > 0) {
+            new Chart(weatherCtx, {
+                type: 'bar',
+                data: {
+                    labels: weatherEfficiency.map(item => item.label),
+                    datasets: [{
+                        label: '평균 효율 (%)',
+                        data: weatherEfficiency.map(item => item.value),
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+        /*]]>*/
+    </script>
+</th:block>
+</html>

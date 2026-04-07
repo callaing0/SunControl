@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+
+<div layout:fragment="content">
+
+    <!-- 사용자 관리 -->
+    <section class="bg-white rounded-3xl p-10 shadow-sm border">
+
+        <div class="flex justify-between mb-6">
+            <h2 class="text-xl font-bold">사용자 관리</h2>
+
+            <button onclick="openModal('createAccountModal')"
+                    class="bg-yellow-400 px-4 py-2 rounded-xl font-bold">
+                계정 생성
+            </button>
+        </div>
+
+        <table class="w-full text-sm">
+            <thead>
+            <tr class="border-b">
+                <th>ID</th>
+                <th>이름</th>
+                <th>소속</th>
+                <th>권한</th>
+                <th>상태</th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <tbody th:if="${userList != null and !#lists.isEmpty(userList)}">
+            <tr th:each="user : ${userList}" class="border-b">
+
+                <td th:text="${user.userId}"></td>
+                <td th:text="${user.name}"></td>
+                <td th:text="${user.affiliation}"></td>
+
+                <td th:text="${user.role}"></td>
+                <td th:text="${user.status}"></td>
+
+                <td class="space-x-2">
+
+                    <button
+                            th:data-id="${user.id}"
+                            th:data-role="${user.role}"
+                            th:data-status="${user.status}"
+                            onclick="openEditModal(this)"
+                            class="bg-black text-white px-2 py-1 rounded">
+                        수정
+                    </button>
+
+                    <button th:if="${user.status == 'ACTIVE'}"
+                            th:data-id="${user.id}"
+                            onclick="lockUser(this.dataset.id)"
+                            class="bg-red-500 text-white px-2 py-1 rounded">
+                        잠금
+                    </button>
+
+                    <button th:if="${user.status != 'ACTIVE'}"
+                            th:data-id="${user.id}"
+                            onclick="unlockUser(this.dataset.id)"
+                            class="bg-green-500 text-white px-2 py-1 rounded">
+                        해제
+                    </button>
+
+                </td>
+            </tr>
+            </tbody>
+
+            <tbody th:if="${userList == null or #lists.isEmpty(userList)}">
+            <tr>
+                <td colspan="6" class="text-center py-10 text-gray-400">
+                    사용자 없음
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+    </section>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- SCRIPT (여기가 핵심) -->
+<!-- ========================= -->
+<th:block layout:fragment="script">
+    <script>
+
+        const API = '/api/admin';
+
+        // =========================
+        // 계정 생성
+        // =========================
+        async function createAccount() {
+
+            const userId = document.querySelector('[name="userId"]').value.trim();
+            const name = document.querySelector('[name="name"]').value.trim();
+            const affiliation = document.querySelector('[name="affiliation"]').value.trim();
+            const role = document.querySelector('[name="role"]').value;
+
+            if (!userId || !name || !affiliation) {
+                showToast('입력값 확인', true);
+                return;
+            }
+
+            // 아이디 중복 체크
+            const check = await fetch(`${API}/check-id?userId=${userId}`);
+            const checkResult = await check.json();
+
+            if (!checkResult.data) {
+                showToast('아이디 중복', true);
+                return;
+            }
+
+            await fetch(`${API}/new`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ userId, name, affiliation, role })
+            });
+
+            showToast('생성 완료');
+            closeModal('createAccountModal');
+            location.reload();
+        }
+
+
+        // =========================
+        // 수정 모달 열기
+        // =========================
+        function openEditModal(btn) {
+
+            document.getElementById('editMemberId').value = btn.dataset.id;
+            document.getElementById('editRole').value = btn.dataset.role;
+            document.getElementById('editStatus').value = btn.dataset.status;
+
+            openModal('accountModal');
+        }
+
+
+        // =========================
+        // 수정
+        // =========================
+        async function updateAccount() {
+
+            const id = document.getElementById('editMemberId').value;
+            const role = document.getElementById('editRole').value;
+            const status = document.getElementById('editStatus').value;
+
+            await fetch(`${API}/members/${id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id, role, status })
+            });
+
+            showToast('수정 완료');
+            closeModal('accountModal');
+            location.reload();
+        }
+
+
+        // =========================
+        // 잠금
+        // =========================
+        async function lockUser(id) {
+            await fetch(`${API}/members/${id}/lock`, { method: 'PATCH' });
+            location.reload();
+        }
+
+
+        // =========================
+        // 잠금 해제
+        // =========================
+        async function unlockUser(id) {
+            await fetch(`${API}/${id}/unlock`, { method: 'POST' });
+            location.reload();
+        }
+
+    </script>
+</th:block>
+
+</html>

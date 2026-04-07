@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <th:block th:fragment="modalStyle">
+        <style>
+            .modal-bg { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px); }
+            .modal-content { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+            .btn-disabled { opacity: 0.5; cursor: not-allowed !important; pointer-events: none; filter: grayscale(1); }
+        </style>
+    </th:block>
+
+    <!--계정 생성 모달-->
+    <div th:fragment="createAccountModal" id="createAccountModal"
+         class="hidden fixed inset-0 z-[300] items-center justify-center modal-bg p-4">
+
+        <div class="bg-white w-full max-w-lg rounded-[50px] shadow-2xl border border-gray-100 overflow-hidden p-12 relative">
+
+            <!-- 닫기 -->
+            <button type="button"
+                    onclick="closeModal('createAccountModal')"
+                    class="absolute top-10 right-10 text-gray-300 hover:text-gray-600">
+                ✕
+            </button>
+
+            <header class="mb-10 italic uppercase">
+                <h3 class="text-2xl font-black text-gray-800">신규 계정 등록</h3>
+            </header>
+
+            <!-- ⚠️ submit 제거 -->
+            <form id="createAccountForm" class="space-y-6">
+
+                <div class="grid grid-cols-2 gap-6">
+                    <input type="text" name="userId" placeholder="아이디" required class="input">
+                    <input type="text" name="name" placeholder="이름" required class="input">
+                </div>
+
+                <input type="text" name="affiliation" placeholder="소속" required class="input">
+
+                <select name="role" class="input">
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+
+                <!-- ✅ 여기 핵심 -->
+                <button type="button"
+                        onclick="createAccount()"
+                        class="w-full bg-yellow-400 py-4 rounded-xl font-bold">
+                    계정 생성
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+    <!--발전소 등록 모달-->
+    <div th:fragment="plantModal" id="plantModal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-bg">
+        <div class="bg-white rounded-[45px] shadow-2xl w-[550px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
+            <button type="button" onclick="closeModal('plantModal')" class="absolute top-10 right-10 text-gray-300 hover:text-gray-600 transition-all active:scale-90 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <header class="mb-10 text-center border-b border-gray-50 pb-8">
+                <h3 class="text-3xl font-[900] text-gray-800 tracking-tighter italic uppercase">발전소 등록</h3>
+                <p class="text-[11px] text-gray-400 mt-2 font-black uppercase tracking-widest italic">New Solar Plant Registration</p>
+            </header>
+
+            <form class="space-y-6" id="plantForm" method="post">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">발전소 명 *</label>
+                    <input type="text" name="name" placeholder="예: 솔라가드 대전 제1발전소" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 outline-none focus:border-yellow-400 focus:bg-white transition-all font-bold text-gray-700">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">주소 *</label>
+                    <div class="flex gap-3">
+                        <input type="text" id="address" name="address" placeholder="주소를 검색해 주세요" class="flex-1 bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 outline-none font-bold text-gray-700" readonly>
+                        <button type="button" onclick="execDaumPostcode()" class="px-8 bg-gray-900 text-white font-black rounded-[25px] hover:bg-black transition-all active:scale-95 italic uppercase text-[10px]">검색</button>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">행정동 코드</label>
+                    <input type="text" id="districtCode" name="districtCode" placeholder="자동 표시" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 outline-none font-[900] text-center text-gray-700 italic" readonly>
+                </div>
+                <div class="grid grid-cols-2 gap-6 pt-2">
+                    <input type="number" name="azimuth" placeholder="방향 0°" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 text-center font-black italic">
+                    <input type="number" name="tilt" placeholder="각도 30°" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 text-center font-black italic text-blue-600">
+                </div>
+                <button type="submit" class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-[900] text-lg shadow-xl shadow-yellow-400/20 hover:bg-yellow-500 transition-all active:scale-95 italic uppercase mt-4">
+                    등록하기
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!--인버터 등록 모달-->
+    <div th:fragment="inverterModal" id="inverterModal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-bg">
+        <div class="bg-white rounded-[45px] shadow-2xl w-[550px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
+            <button type="button" onclick="closeModal('inverterModal')" class="absolute top-10 right-10 text-gray-300 hover:text-gray-600 transition-all active:scale-90 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <header class="mb-10 text-center border-b border-gray-50 pb-8">
+                <h3 class="text-3xl font-[900] text-gray-800 tracking-tighter italic uppercase">인버터 등록</h3>
+                <p class="text-[11px] text-gray-400 mt-2 font-black uppercase tracking-widest italic">Inverter Configuration</p>
+            </header>
+            <form class="space-y-6" id="inverterForm">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">발전소명 *</label>
+                    <input type="text"
+                           th:value="${myPage != null and myPage.plant != null and myPage.plant.name != null ? myPage.plant.name : ''}"
+                           placeholder="발전소를 먼저 등록하세요"
+                           readonly
+                           class="w-full bg-gray-100 border-2 border-transparent rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+                </div>
+                <div class="grid grid-cols-2 gap-6">
+                    <input type="text" name="name" placeholder="인버터 명칭" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-6 text-center font-[900] italic">
+                    <input type="number" name="capacity" placeholder="용량(kW)" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-6 text-center font-[900] text-2xl italic">
+                </div>
+                <button type="submit"
+                        th:classappend="${myPage == null or myPage.plant == null} ? 'btn-disabled' : ''"
+                        class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-[900] text-lg shadow-xl shadow-yellow-400/20 hover:bg-yellow-500 transition-all active:scale-95 italic uppercase mt-4">
+                    <span th:text="${myPage == null or myPage.plant == null} ? '발전소 등록 필요' : '인버터 등록하기'"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!--패널 등록 모달-->
+    <div th:fragment="panelModal" id="panelModal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-bg">
+        <div class="bg-white rounded-[45px] shadow-2xl w-[650px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
+            <button type="button" onclick="closeModal('panelModal')" class="absolute top-10 right-10 text-gray-300 hover:text-gray-600 active:scale-90">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h3 class="text-3xl font-[900] text-gray-800 text-center italic uppercase mb-8">패널 등록</h3>
+            <form class="space-y-5" id="panelForm">
+                <input type="text"
+                       th:value="${myPage != null and myPage.plant != null and myPage.plant.name != null ? myPage.plant.name : ''}"
+                       placeholder="발전소명"
+                       readonly
+                       class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500">
+                <div class="grid grid-cols-2 gap-6">
+                    <input type="text" name="name" placeholder="모델명" class="w-full bg-gray-50 rounded-[25px] p-5 font-black text-center italic">
+                    <input type="number" name="output" placeholder="출력(W)" class="w-full bg-gray-50 rounded-[25px] p-5 font-black text-center text-blue-600 italic">
+                </div>
+                <button type="submit"
+                        th:classappend="${myPage == null or myPage.plant == null} ? 'btn-disabled' : ''"
+                        class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-black italic uppercase">
+                    <span th:text="${myPage == null or myPage.plant == null} ? '발전소 등록 필요' : '패널 등록하기'"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!--비밀번호 변경 모달-->
+    <div th:fragment="passwordModal" id="passwordModal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-bg">
+        <div class="bg-white rounded-[45px] shadow-2xl w-[500px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
+            <button type="button" onclick="closeModal('passwordModal')" class="absolute top-10 right-10 text-gray-300 hover:text-gray-600 active:scale-90">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h3 class="text-3xl font-[900] text-gray-800 text-center italic uppercase mb-8">비밀번호 변경</h3>
+            <form class="space-y-4" id="passwordForm">
+                <input type="password" name="currentPassword" placeholder="현재 비밀번호" class="w-full bg-gray-50 rounded-[25px] p-5 font-bold outline-none border-2 border-transparent focus:border-yellow-400 transition-all">
+                <input type="password" name="newPassword" placeholder="새 비밀번호" class="w-full bg-gray-50 rounded-[25px] p-5 font-bold outline-none border-2 border-transparent focus:border-yellow-400 transition-all">
+                <input type="password" name="confirmPassword" placeholder="새 비밀번호 확인" class="w-full bg-gray-50 rounded-[25px] p-5 font-bold outline-none border-2 border-transparent focus:border-yellow-400 transition-all">
+                <button type="submit" class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-black italic uppercase mt-4 shadow-lg shadow-yellow-400/20 hover:bg-yellow-500 active:scale-95 transition-all">
+                    비밀번호 변경
+                </button>
+            </form>
+        </div>
+    </div>
+
+</html>

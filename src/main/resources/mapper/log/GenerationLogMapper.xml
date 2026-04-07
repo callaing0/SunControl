@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.suncontrol.core.repository.log.GenerationLogRepository">
+    <insert id="saveAll" parameterType="com.suncontrol.core.entity.log.GenerationLog">
+        INSERT INTO generation_log
+        (
+        inverter_id, base_time, value_expected, value_actual,
+        performance_ratio, expected_ratio, capacity_factor,
+        accum_energy, weather_code, status
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+             (
+            #{item.inverterId}, #{item.baseTime},
+            #{item.valueExpected}, #{item.valueActual},
+            #{item.performanceRatio}, #{item.expectedRatio}, #{item.capacityFactor},
+            #{item.accumEnergy}, #{item.weatherCode}, #{item.status}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        value_expected = VALUES(value_expected),
+        value_actual = VALUES(value_actual),
+        performance_ratio = VALUES(performance_ratio),
+        expected_ratio = VALUES(expected_ratio),
+        capacity_factor = VALUES(capacity_factor),
+        accum_energy = VALUES(accum_energy),
+        weather_code = VALUES(weather_code),
+        status = VALUES(status)
+    </insert>
+</mapper>
