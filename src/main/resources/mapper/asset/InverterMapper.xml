@@ -34,4 +34,8 @@
             WHERE id = #{item.id}
         </foreach>
     </update>
+    <select id = "findAllByPlantId"
+            resultType="com.suncontrol.core.entity.asset.Inverter">
+        SELECT * FROM inverter WHERE plant_id = #{plantId}
+    </select>
 </mapper>

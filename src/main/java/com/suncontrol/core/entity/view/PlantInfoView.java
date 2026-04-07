@@ -34,6 +34,7 @@ public class PlantInfoView {
     private int statusCode;
     private LocalDateTime updatedAt;
 
+    /// 객체 변환을 위한 가상필드
     public void setId(Long id) {
         this.plant.setId(id);
     }

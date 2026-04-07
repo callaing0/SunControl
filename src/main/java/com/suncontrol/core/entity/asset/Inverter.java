@@ -2,7 +2,7 @@ package com.suncontrol.core.entity.asset;
 
 import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
-import com.suncontrol.core.dto.asset.InverterDataTransferObject;
+import com.suncontrol.core.dto.asset.InverterDto;
 import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
 import lombok.*;
 
@@ -36,7 +36,7 @@ public class Inverter {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Inverter(InverterDataTransferObject dto) {
+    public Inverter(InverterDto dto) {
         this.plantId = dto.getPlantId();
         this.ratedCapacity = dto.getRatedCapacity();
         /// 가상 필드용 메서드 활용

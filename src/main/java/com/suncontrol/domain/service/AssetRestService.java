@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class AssetService {
-    /// 자산 등록 오케스트레이터
+public class AssetRestService {
+    /// 자산 CRUD 오케스트레이터
 //    private final MemberService memberService;
     private final PlantService plantService;
     private final InverterService inverterService;
@@ -42,8 +42,8 @@ public class AssetService {
     public void savePanel(String userId, PanelSaveForm form) {
         /// TODO : memberService로 유효성 검사
         /// TODO : plantId 기준 올바른 소유주인지 검사
-        panelService.save(form.getPanelDto());
-        inverterService.updateCap(form.getInverterCapSurplusDto());
+        panelService.save(form.toDto());
+        inverterService.updateCap(form.toInvCapDto());
         /// TODO : ResponseEntity용 메시지 작성
     }
 
