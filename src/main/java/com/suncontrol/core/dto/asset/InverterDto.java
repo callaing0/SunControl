@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @SuperBuilder
-public class InverterDataTransferObject extends InverterBaseDto {
+public class InverterDto extends InverterBaseDto {
     private String serial;
     private BigDecimal ratedCapacity;
     private BigDecimal efficiency;
@@ -24,7 +24,7 @@ public class InverterDataTransferObject extends InverterBaseDto {
     private DeviceStatus status;
     private LocalDateTime createdAt;
 
-    public InverterDataTransferObject(Inverter inverter) {
+    public InverterDto(Inverter inverter) {
         super(inverter.getId(), inverter.getPlantId());
         this.serial = inverter.getSerial();
         this.ratedCapacity = inverter.getRatedCapacity();

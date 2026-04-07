@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class InverterService {
     private final InverterRepository repository;
 
-    public void save(InverterDataTransferObject dto) {
+    public void save(InverterDto dto) {
         repository.save(new Inverter(dto));
     }
 
@@ -38,23 +38,24 @@ public class InverterService {
         log.debug("{}건 저장",result);
     }
 
-    public List<InverterDataTransferObject> findAllByPlant(Long plantId) {
-        return null; //todo
+    public List<InverterDto> findAllByPlant(Long plantId) {
+        return repository.findAllByPlantId(plantId)
+                .stream().map(InverterDto::new).collect(Collectors.toList());
     }
 
-    public List<InverterDataTransferObject> findAllActive() {
+    public List<InverterDto> findAllActive() {
         /// 발전데이터 생성을 위해 시스템에 등록된 모든 활성 인버터를
         /// InverterDto로 변환하여 반환
         return repository.findAllByStatusCodeBetween(
                 DeviceStatus.INVERTER_NORMAL.getCode(),
                 DeviceStatus.INVERTER_END.getCode())
-                .stream().map(InverterDataTransferObject::new).toList();
+                .stream().map(InverterDto::new).toList();
     }
 
-    public Map<Long, List<InverterDataTransferObject>> getInverterMapByPlantId() {
+    public Map<Long, List<InverterDto>> getInverterMapByPlantId() {
         /// 검색의 편의성을 위해 발전소 ID를 기준으로 매핑
         return findAllActive()
                 .stream()
-                .collect(Collectors.groupingBy(InverterDataTransferObject::getPlantId));
+                .collect(Collectors.groupingBy(InverterDto::getPlantId));
     }
 }
