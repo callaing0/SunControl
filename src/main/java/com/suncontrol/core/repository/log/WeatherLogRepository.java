@@ -11,6 +11,6 @@ import java.util.List;
 public interface WeatherLogRepository {
     int saveAll(List<WeatherLog> entities);
 
-    List<WeatherLog> findLatestLog(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    List<WeatherLog> findLatestLogs(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     //todo
 }

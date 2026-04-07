@@ -58,5 +58,7 @@ public class WeatherLog {
         this.cloudHigh = dto.getCloudHigh();
         this.ghi = dto.getGhi();
         this.dayOffset = dto.getDayOffset();
+        this.createdAt = dto.getCreatedAt();
+        this.updatedAt = dto.getUpdatedAt();
     }
 }

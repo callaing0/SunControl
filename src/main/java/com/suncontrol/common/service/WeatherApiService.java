@@ -12,6 +12,7 @@ import com.suncontrol.core.service.log.RadiationLogService;
 import com.suncontrol.core.service.log.WeatherLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -45,17 +46,18 @@ public class WeatherApiService {
 
         saveWeatherResponses(responses);
     }
+
     public String buildOpenMeteoRequestUrl(WeatherRequestDto request) {
         return UriComponentsBuilder.fromUriString("https://api.open-meteo.com/v1/forecast")
                 .queryParam("latitude", request.getLatitude())
                 .queryParam("longitude", request.getLongitude())
                 .queryParam("timezone", request.getTimezone())
                 .queryParam("hourly", request.getHourly())
-//                .queryParam("daily", request.getDaily())
-//                .queryParam("tilt", request.getTilt())
-//                .queryParam("azimuth", request.getAzimuth())
-//                .queryParam("past_days", request.getPastDays())
-//                .queryParam("forecast_days", request.getForecastDays())
+                .queryParam("daily", request.getDaily())
+                .queryParam("tilt", request.getTilt())
+                .queryParam("azimuth", request.getAzimuth())
+                .queryParam("past_days", request.getPastDays())
+                .queryParam("forecast_days", request.getForecastDays())
                 .build().toUriString();
     }
 
@@ -67,14 +69,20 @@ public class WeatherApiService {
                 String requestUrl = buildOpenMeteoRequestUrl(new WeatherRequestDto(plant));
 
                 log.info("requestUrl: {}", requestUrl);
-                WeatherResponseDto response =
-                        restTemplate.getForObject(requestUrl, WeatherResponseDto.class);
+                ResponseEntity<WeatherResponseDto> responseEntity =
+                        restTemplate.getForEntity(requestUrl, WeatherResponseDto.class);
 
-                if (response != null) {
-                    response.setPlant(plant);
-                    responses.add(response);
-                    log.info("발전소 {} 날씨정보 수집완료 {}", plant.getId(), response);
-                }
+                log.info("수집 데이터 코드 : {}", responseEntity.getStatusCode());
+                log.info("원본 JSON 확인: {}", responseEntity.getBody());
+
+//                if (responseEntity.getStatusCode().is2xxSuccessful()) {
+//                    WeatherResponseDto response = responseEntity.getBody();
+//                    if(response != null) {
+//                        response.setPlant(plant);
+//                        responses.add(response);
+//                        log.info("발전소 {} 날씨정보 수집완료 {}", plant.getId(), response);
+//                    }
+//                }
             } catch (Exception e) {
                 log.error("발전소 {} 날씨정보 수집중 오류 발생 : {}", plant.getId(), e.getMessage());
             }

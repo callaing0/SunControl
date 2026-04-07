@@ -69,5 +69,7 @@ public class DailyWeather {
         this.snowSum = dto.getSnowSum();
         this.radiationSum = dto.getRadiationSum();
         this.dayOffset = dto.getDayOffset();
+        this.createdAt = dto.getCreatedAt();
+        this.updatedAt = dto.getUpdatedAt();
     }
 }

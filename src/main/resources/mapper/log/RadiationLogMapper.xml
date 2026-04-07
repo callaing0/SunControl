@@ -8,15 +8,16 @@
     <!--  TODO : 건수가 많아지면 BATCH로 전환해야 함  -->
     <insert id="saveAll" parameterType="com.suncontrol.core.entity.log.RadiationLog">
         INSERT INTO radiation_log (
-        plant_id, base_time, gti, gti_instance, day_offset
+        plant_id, base_time, gti, gti_instance, day_offset, created_at, updated_at
         ) VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.plantId}, #{item.baseTime}, #{item.gti}, #{item.gtiInstance}, #{item.dayOffset})
+            (#{item.plantId}, #{item.baseTime}, #{item.gti},
+            #{item.gtiInstance}, #{item.dayOffset}, #{item.createdAt}, #{item.updatedAt})
         </foreach>
         ON DUPLICATE KEY UPDATE
-        gti = VALUES(gti),
-        gti_instance = VALUES(gti_instance),
-        updated_at = NOW()
+        gti = COALESCE(VALUES(gti), gti),
+        gti_instance = COALESCE(VALUES(gti_instance), gti_instance),
+        updated_at = COALESCE(VALUES(updated_at), updated_at)
     </insert>
     <select id="findLatestLogs"
             resultType="com.suncontrol.core.entity.log.RadiationLog">

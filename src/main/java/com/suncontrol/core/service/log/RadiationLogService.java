@@ -53,6 +53,6 @@ public class RadiationLogService {
     }
 
     private List<RadiationLog> findLatestLog(LocalDateTime start, LocalDateTime end) {
-        return repository.findLatestLog(start, end);
+        return repository.findLatestLogs(start, end);
     }
 }

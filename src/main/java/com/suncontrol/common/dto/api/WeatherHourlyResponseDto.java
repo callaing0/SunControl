@@ -1,7 +1,10 @@
 package com.suncontrol.common.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
 import com.suncontrol.core.constant.util.ReportDataType;
@@ -16,6 +19,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class WeatherHourlyResponseDto {
     ///  기상 API 수신 시간별 데이터
 
@@ -44,13 +49,15 @@ public class WeatherHourlyResponseDto {
 
     @JsonProperty("global_tilted_irradiance")
     private double gti;
-    @JsonProperty("global_tilted_irradiance_instance")
-    private double gtiInstance;
+//    @JsonProperty("global_tilted_irradiance_instance")
+//    private double gtiInstance;
 
+    @JsonProperty("weather_code")
     public void setWeatherCode(String weatherCode) {
         this.weather = Weather.fromCode(weatherCode);
         this.weatherCode = weatherCode;
     }
+    @JsonProperty("weather_code")
     public String getWeatherCode() {
         return weatherCode == null ?
                 weather == null ? null : weather.getWeatherCode() : this.weatherCode;
@@ -79,7 +86,7 @@ public class WeatherHourlyResponseDto {
     }
 
     @JsonIgnore
-    public WeatherLogDto getWeatherLogDto(District district) {
+    public WeatherLogDto getWeatherLogDto(District district, LocalDateTime responseTime) {
         return WeatherLogDto.builder()
                 .district(district)
                 .baseTime(baseTime)
@@ -91,17 +98,21 @@ public class WeatherHourlyResponseDto {
                 .weather(getWeather())
                 .weatherCode(weatherCode)
                 .dataType(ReportDataType.findByDayOffset(getDayOffset()))
+                .createdAt(responseTime)
+                .updatedAt(responseTime)
                 .build();
     }
 
     @JsonIgnore
-    public RadiationLogDto getRadiationLogDto(Long plantId) {
+    public RadiationLogDto getRadiationLogDto(Long plantId, LocalDateTime responseTime) {
         return RadiationLogDto.builder()
                 .plantId(plantId)
                 .baseTime(baseTime)
                 .gti(gti)
-                .gtiInstance(gtiInstance)
+//                .gtiInstance(gtiInstance)
                 .dataType(ReportDataType.findByDayOffset(getDayOffset()))
+                .createdAt(responseTime)
+                .updatedAt(responseTime)
                 .build();
     }
 }

@@ -60,6 +60,6 @@ public class WeatherLogService {
     }
 
     private List<WeatherLog>  findLatestLog(LocalDateTime start, LocalDateTime end) {
-        return repository.findLatestLog(start, end);
+        return repository.findLatestLogs(start, end);
     }
 }

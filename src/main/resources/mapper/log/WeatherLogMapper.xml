@@ -9,20 +9,21 @@
 <!--  TODO : 건수가 많아지면 BATCH로 전환해야 함  -->
     <insert id="saveAll" parameterType="com.suncontrol.core.entity.log.WeatherLog">
         INSERT INTO weather_log (
-            district_code, base_time, temperature, day_offset
-            cloud_low, cloud_mid, cloud_high, ghi
+            district_code, base_time, temperature, day_offset,
+            cloud_low, cloud_mid, cloud_high, ghi, created_at, updated_at
         ) VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.districtCode}, #{item.baseTime}, #{item.temperature}, #{item.dayOffset},
-            #{item.cloudLow}, #{item.cloudMid}, #{item.cloudHigh}, #{item.ghi})
+            (#{item.districtCode}, #{item.baseTime}, #{item.temperature},
+            #{item.dayOffset}, #{item.cloudLow}, #{item.cloudMid}, #{item.cloudHigh},
+            #{item.ghi}, #{item.createdAt}, #{item.updatedAt})
         </foreach>
         ON DUPLICATE KEY UPDATE
-            temperature = VALUES(temperature),
-            cloud_low = VALUES(cloud_low),
-            cloud_mid = VALUES(cloud_mid),
-            cloud_high = VALUES(cloud_high),
-            ghi = VALUES(ghi),
-            updated_at = NOW()
+            temperature = COALESCE(VALUES(temperature), temperature),
+            cloud_low = COALESCE(VALUES(cloud_low), cloud_low),
+            cloud_mid = COALESCE(VALUES(cloud_mid), cloud_mid),
+            cloud_high = COALESCE(VALUES(cloud_high), cloud_high),
+            ghi = COALESCE(VALUES(ghi), ghi),
+            updated_at = COALESCE(VALUES(updated_at), updated_at)
     </insert>
     <select id="findLatestLogs"
             resultType="com.suncontrol.core.entity.log.WeatherLog">

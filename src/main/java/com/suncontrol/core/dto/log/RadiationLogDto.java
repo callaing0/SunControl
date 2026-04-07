@@ -18,6 +18,8 @@ public class RadiationLogDto {
     private double gti;
     private double gtiInstance;
     private ReportDataType dataType;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public RadiationLogDto(RadiationLog entity) {
         this.plantId = entity.getPlantId();
@@ -25,6 +27,8 @@ public class RadiationLogDto {
         this.gti = entity.getGti();
         this.gtiInstance = entity.getGtiInstance();
         this.dataType = ReportDataType.findByDayOffset(entity.getDayOffset());
+        this.createdAt = entity.getCreatedAt();
+        this.updatedAt = entity.getUpdatedAt();
     }
 
     public Integer getDayOffset() {

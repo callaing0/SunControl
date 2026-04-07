@@ -1,7 +1,10 @@
 package com.suncontrol.common.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
 import com.suncontrol.core.constant.util.ReportDataType;
@@ -15,12 +18,13 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DailyWeatherResponseDto {
     /// 기상 API 수신용 일별 데이터
 
     @JsonProperty("time")
-    @Getter(AccessLevel.NONE)
-    private LocalDateTime baseDate;
+    private LocalDate baseDate;
     @JsonProperty("temperature_2m_max")
     private double tempMax;
     @JsonProperty("temperature_2m_min")
@@ -54,18 +58,15 @@ public class DailyWeatherResponseDto {
     private Weather weather;
 
     /// 커스텀 setter/getter로 Weather 객체 형성
+    @JsonProperty("weather_code")
     public void setWeatherCode(String weatherCode) {
         this.weather = Weather.fromCode(weatherCode);
         this.weatherCode = weatherCode;
     }
+    @JsonProperty("weather_code")
     public String getWeatherCode() {
         return weatherCode == null ?
                 weather == null ? null : weather.getWeatherCode() : this.weatherCode;
-    }
-
-    /// DB 저장할 때 LocalDateTime 에서 반환하여 저장하기 위한 getter메서드
-    public LocalDate getBaseDate() {
-        return this.baseDate == null ? null : this.baseDate.toLocalDate();
     }
 
     @JsonIgnore
@@ -91,10 +92,10 @@ public class DailyWeatherResponseDto {
     }
     /// Entity 송신용 DailyWeatherDto "간이 생성자"
     @JsonIgnore
-    public DailyWeatherDto getDailyWeatherDto(District district) {
+    public DailyWeatherDto getDailyWeatherDto(District district, LocalDateTime responseTime) {
         DailyWeatherDto dto = new DailyWeatherDto();
         dto.setDistrict(district);
-        dto.setBaseDate(getBaseDate());
+        dto.setBaseDate(baseDate);
         dto.setTempMax(this.tempMax);
         dto.setTempMin(this.tempMin);
         dto.setWeatherCode(this.weatherCode);
@@ -106,6 +107,8 @@ public class DailyWeatherResponseDto {
         dto.setPrecSum(this.precSum);
         dto.setSnowSum(this.snowSum);
         dto.setRadiationSum(this.radiationSum);
+        dto.setCreatedAt(responseTime);
+        dto.setUpdatedAt(responseTime);
         dto.setDataType(ReportDataType.findByDayOffset(getDayOffset()));
 
         return dto;

@@ -26,5 +26,7 @@ public class RadiationLog {
         this.gti = dto.getGti();
         this.gtiInstance = dto.getGtiInstance();
         this.dayOffset = dto.getDayOffset();
+        this.createdAt = dto.getCreatedAt();
+        this.updatedAt = dto.getUpdatedAt();
     }
 }

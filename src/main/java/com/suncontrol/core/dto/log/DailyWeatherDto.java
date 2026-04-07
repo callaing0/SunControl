@@ -38,6 +38,8 @@ public class DailyWeatherDto {
     private double snowSum;
     private double radiationSum;
     private ReportDataType dataType;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 
     public String getWeatherCode() {
@@ -60,6 +62,8 @@ public class DailyWeatherDto {
         this.snowSum = entity.getSnowSum();
         this.radiationSum = entity.getRadiationSum();
         this.dataType = ReportDataType.findByDayOffset(entity.getDayOffset());
+        this.createdAt = entity.getCreatedAt();
+        this.updatedAt = entity.getUpdatedAt();
     }
 
     public Integer getDayOffset() {

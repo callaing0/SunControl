@@ -23,9 +23,12 @@ public class WeatherLogDto {
     private int cloudMid;
     private int cloudHigh;
     private int ghi;
-    private ReportDataType dataType;
     private String weatherCode;
     private Weather weather;
+    private ReportDataType dataType;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
 
     public WeatherLogDto(WeatherLog entity) {
         this.district = entity.getDistrict();
@@ -36,6 +39,8 @@ public class WeatherLogDto {
         this.cloudHigh = entity.getCloudHigh();
         this.ghi = entity.getGhi();
         this.dataType = ReportDataType.findByDayOffset(entity.getDayOffset());
+        this.createdAt = entity.getCreatedAt();
+        this.updatedAt = entity.getUpdatedAt();
     }
 
     public Integer getDayOffset() {

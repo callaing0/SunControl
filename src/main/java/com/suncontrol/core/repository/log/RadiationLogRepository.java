@@ -11,6 +11,6 @@ import java.util.List;
 public interface RadiationLogRepository {
     int saveAll(List<RadiationLog> entities);
 
-    List<RadiationLog> findLatestLog(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    List<RadiationLog> findLatestLogs(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     //todo
 }
