@@ -1,7 +1,7 @@
 package com.suncontrol.domain.service;
 
-import com.suncontrol.domain.dto.AlertDTO; // [중요] 경로 확인
-import com.suncontrol.mapper.SolarMapper;
+import com.suncontrol.domain.dto.AlertDTO;
+import com.suncontrol.mapper.MapperStory; // 바뀐 인터페이스 임포트
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,23 +9,24 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AlertService {
 
-    private final SolarMapper solarMapper;
+    private final MapperStory mapperStory; // 타입 이름 변경
 
     public String checkAndCreateAlert(Double eff) {
-        // 클래스 이름을 AlertDTO로 통일해서 생성
         AlertDTO data = new AlertDTO();
 
-        // 여기서 빨간줄이 뜬다면 인텔리제이 상단
-        // File -> Settings -> Annotation Processors에서 'Enable annotation processing' 체크!
-        data.setLocation("Daejeon_Center");
+        data.setLocation("Daejeon_Solar_Lab");
         data.setEfficiency(eff);
-        data.setStatus(eff < 80.0 ? "WARNING" : "NORMAL");
-        data.setMessage("태양광 발전 효율: " + eff + "%");
 
         if (eff < 80.0) {
-            solarMapper.insertSolarLog(data); // 매퍼의 파라미터 타입도 AlertDTO여야 함
-            return "🚨 경고 데이터 저장됨";
+            data.setStatus("WARNING");
+            data.setMessage("태양광 효율 저하 감지: " + eff + "%");
+            mapperStory.insertSolarLog(data); // 메서드 호출
+            return "🚨 [경고] 발전 효율 저하 알림 저장됨";
+        } else {
+            data.setStatus("NORMAL");
+            data.setMessage("정상 가동 중");
+            mapperStory.insertSolarLog(data);
+            return "✅ [정상] 발전 상태 양호";
         }
-        return "✅ 정상 수치";
     }
 }
