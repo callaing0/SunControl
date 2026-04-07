@@ -17,8 +17,12 @@ public class MyPageController {
 
     private final MyPageService myPageService;
 
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     public String showMyPage(Model model, Principal principal) {
+
+        if (principal == null) {
+            return "redirect:/login";
+        }
 
         // 로그인 사용자 userId 가져오기
         String userId = principal.getName();

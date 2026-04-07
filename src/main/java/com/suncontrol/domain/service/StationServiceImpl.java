@@ -1,8 +1,8 @@
 package com.suncontrol.domain.service;
+
 import com.suncontrol.core.entity.view.PlantInfoView;
 import com.suncontrol.core.repository.report.StationRepository;
 import com.suncontrol.domain.dto.StationHourlyGenerationDto;
-import com.suncontrol.domain.service.StationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,27 +23,25 @@ public class StationServiceImpl implements StationService {
     private final StationRepository stationRepository;
 
     /**
-     * 현재 로그인한 사용자가 보유한 발전소들의 지역 목록을 조회
+     * 현재 로그인한 사용자가 보유한 발전소 주소 목록 조회
      */
     @Override
     public List<String> getRegionList(Long memberId) {
         validateMemberId(memberId);
 
         List<String> regionList = stationRepository.findRegionListByMemberId(memberId);
-
-        // null 방어 (MyBatis 결과 null 방지)
         return regionList != null ? regionList : Collections.emptyList();
     }
 
     /**
-     * 발전소 리스트 조회
-     * PlantInfoView를 사용하여 발전소 + 집계 데이터(용량, 출력 등)를 함께 반환
+     * 발전소 목록 조회
+     * - region 값이 null / 공백 / "all" 이면 전체 조회
+     * - 허용되지 않은 region 값이면 전체 조회로 fallback
      */
     @Override
     public List<PlantInfoView> getPlantList(Long memberId, String region) {
         validateMemberId(memberId);
 
-        // region 파라미터 안전 처리
         String safeRegion = sanitizeRegion(memberId, region);
 
         List<PlantInfoView> plantList =
@@ -53,8 +51,7 @@ public class StationServiceImpl implements StationService {
     }
 
     /**
-     * 시간대별 발전량 조회
-     * Chart.js에서 사용할 데이터 생성용
+     * 오늘 날짜 기준 시간대별 발전량 조회
      */
     @Override
     public List<StationHourlyGenerationDto> getHourlyGenerationList(Long memberId, String region) {
@@ -78,32 +75,34 @@ public class StationServiceImpl implements StationService {
     }
 
     /**
-     * region 파라미터 안전 처리
-     * 처리 내용:
-     * 1. null / 공백 → "all" 처리
-     * 2. 길이 제한 (255 초과 방어)
-     * 3. 사용자가 실제 보유한 지역인지 검증
+     * region 파라미터 정규화 및 검증
      */
     private String sanitizeRegion(Long memberId, String region) {
 
-        // null 또는 공백이면 전체 조회
+        // 전체 조회 처리
         if (region == null || region.trim().isEmpty() || "all".equalsIgnoreCase(region.trim())) {
             return "all";
         }
 
         String normalized = region.trim();
 
-        // 비정상적으로 긴 값 방어 (보안)
+        // 비정상적으로 긴 입력 방어
         if (normalized.length() > 255) {
             log.warn("region 값이 너무 깁니다. memberId={}, length={}", memberId, normalized.length());
             return "all";
         }
 
-        // 실제 사용자가 보유한 지역인지 검증
-        List<String> regionList = getRegionList(memberId);
+        // 현재 사용자가 보유한 region 목록 조회
+        List<String> regionList = stationRepository.findRegionListByMemberId(memberId);
+
+        if (regionList == null || regionList.isEmpty()) {
+            log.warn("사용자가 보유한 region 정보가 없습니다. memberId={}", memberId);
+            return "all";
+        }
+
         boolean matched = regionList.stream().anyMatch(normalized::equals);
 
-        // 허용되지 않은 지역 접근 방어
+        // 허용되지 않은 region 접근 방어
         if (!matched) {
             log.warn("허용되지 않은 region 접근. memberId={}, region={}", memberId, normalized);
             return "all";

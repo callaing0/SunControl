@@ -15,10 +15,8 @@
         SELECT '총 발전량' AS title,
                CONCAT(ROUND(COALESCE(SUM(dr.value_actual), 0), 2), ' kWh') AS value
         FROM daily_report dr
-            INNER JOIN inverter i
-        ON dr.inverter_id = i.id
-            INNER JOIN plant p
-            ON i.plant_id = p.id
+            INNER JOIN inverter i ON dr.inverter_id = i.id
+            INNER JOIN plant p ON i.plant_id = p.id
         WHERE p.member_id = #{memberId}
           AND dr.base_date = #{selectedDate}
 
@@ -27,29 +25,27 @@
         SELECT '예상 발전량' AS title,
                CONCAT(ROUND(COALESCE(SUM(dr.value_expected), 0), 2), ' kWh') AS value
         FROM daily_report dr
-            INNER JOIN inverter i
-        ON dr.inverter_id = i.id
-            INNER JOIN plant p
-            ON i.plant_id = p.id
+            INNER JOIN inverter i ON dr.inverter_id = i.id
+            INNER JOIN plant p ON i.plant_id = p.id
         WHERE p.member_id = #{memberId}
           AND dr.base_date = #{selectedDate}
 
         UNION ALL
 
         SELECT '평균 효율' AS title,
-               CONCAT(ROUND(COALESCE(AVG(pi.efficiency), 0), 2), ' %') AS value
-        FROM plant_info pi
-            INNER JOIN plant p
-        ON pi.plant_id = p.id
+               CONCAT(ROUND(COALESCE(AVG(dr.performance_ratio), 0), 2), ' %') AS value
+        FROM daily_report dr
+            INNER JOIN inverter i ON dr.inverter_id = i.id
+            INNER JOIN plant p ON i.plant_id = p.id
         WHERE p.member_id = #{memberId}
+          AND dr.base_date = #{selectedDate}
 
         UNION ALL
 
         SELECT '인버터 수' AS title,
                CONCAT(COUNT(i.id), ' 대') AS value
         FROM inverter i
-            INNER JOIN plant p
-        ON i.plant_id = p.id
+            INNER JOIN plant p ON i.plant_id = p.id
         WHERE p.member_id = #{memberId}
 
         UNION ALL
@@ -57,24 +53,21 @@
         SELECT '장애 건수' AS title,
                CONCAT(COUNT(al.id), ' 건') AS value
         FROM alert_log al
-            INNER JOIN plant p
-        ON al.plant_id = p.id
+            INNER JOIN inverter i ON al.inverter_id = i.id
+            INNER JOIN plant p ON i.plant_id = p.id
         WHERE p.member_id = #{memberId}
-          AND DATE(al.occurred_at) = #{selectedDate}
+          AND DATE(al.created_at) = #{selectedDate}
     </select>
 
     <!--
         시간대별 발전량 추이 조회
     -->
     <select id="selectGenerationTrend" resultType="com.suncontrol.domain.dto.chartDto">
-        SELECT
-            DATE_FORMAT(hr.base_time, '%H시') AS label,
-            ROUND(COALESCE(SUM(hr.value_actual), 0), 2) AS value
+        SELECT DATE_FORMAT(hr.base_time, '%H시') AS label,
+               ROUND(COALESCE(SUM(hr.value_actual), 0), 2) AS value
         FROM hourly_report hr
-            INNER JOIN inverter i
-        ON hr.inverter_id = i.id
-            INNER JOIN plant p
-            ON i.plant_id = p.id
+            INNER JOIN inverter i ON hr.inverter_id = i.id
+            INNER JOIN plant p ON i.plant_id = p.id
         WHERE p.member_id = #{memberId}
           AND DATE(hr.base_time) = #{selectedDate}
         GROUP BY HOUR(hr.base_time), DATE_FORMAT(hr.base_time, '%H시')
@@ -85,21 +78,18 @@
         기상 조건별 평균 효율 조회
     -->
     <select id="selectWeatherEfficiency" resultType="com.suncontrol.domain.dto.chartDto">
-        SELECT
-            CASE gl.weather_code
-                WHEN '01' THEN '맑음'
-                WHEN '02' THEN '구름'
-                WHEN '03' THEN '흐림'
-                WHEN '04' THEN '비'
-                WHEN '05' THEN '눈'
-                ELSE '기타'
-                END AS label,
-            ROUND(COALESCE(AVG(gl.perfomance_ratio), 0), 2) AS value
+        SELECT CASE gl.weather_code
+                   WHEN '01' THEN '맑음'
+                   WHEN '02' THEN '구름'
+                   WHEN '03' THEN '흐림'
+                   WHEN '04' THEN '비'
+                   WHEN '05' THEN '눈'
+                   ELSE '기타'
+                   END AS label,
+               ROUND(COALESCE(AVG(gl.performance_ratio), 0), 2) AS value
         FROM generation_log gl
-            INNER JOIN inverter i
-        ON gl.inverter_id = i.id
-            INNER JOIN plant p
-            ON i.plant_id = p.id
+            INNER JOIN inverter i ON gl.inverter_id = i.id
+            INNER JOIN plant p ON i.plant_id = p.id
         WHERE p.member_id = #{memberId}
           AND DATE(gl.base_time) = #{selectedDate}
         GROUP BY gl.weather_code

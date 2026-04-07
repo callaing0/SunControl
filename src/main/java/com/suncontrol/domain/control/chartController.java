@@ -16,10 +16,10 @@ public class chartController {
 
     private final chartService chartService;
 
-    @GetMapping("/stats")
-    public String stats(Model model) {
+    @GetMapping("/chart")
+    public String chart(Model model) {
         Long memberId = 1L;
-        String selectedDate = LocalDate.now().toString();
+        LocalDate selectedDate = LocalDate.now();
 
         List<chartDto> generationTrend = chartService.getGenerationTrend(memberId, selectedDate);
         List<chartDto> weatherEfficiency = chartService.getWeatherEfficiency(memberId, selectedDate);
@@ -30,6 +30,6 @@ public class chartController {
         model.addAttribute("selectedDate", selectedDate);
         model.addAttribute("menu", "stats");
 
-        return "stats";
+        return "chart";
     }
 }

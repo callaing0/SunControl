@@ -6,6 +6,7 @@ import com.suncontrol.core.repository.report.chartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -15,17 +16,17 @@ public class chartServiceImpl implements chartService {
     private final chartRepository chartRepository;
 
     @Override
-    public List<chartSummaryDto> getStatsSummary(Long memberId, String selectedDate) {
+    public List<chartSummaryDto> getStatsSummary(Long memberId, LocalDate selectedDate) {
         return chartRepository.selectStatsSummary(memberId, selectedDate);
     }
 
     @Override
-    public List<chartDto> getGenerationTrend(Long memberId, String selectedDate) {
+    public List<chartDto> getGenerationTrend(Long memberId, LocalDate selectedDate) {
         return chartRepository.selectGenerationTrend(memberId, selectedDate);
     }
 
     @Override
-    public List<chartDto> getWeatherEfficiency(Long memberId, String selectedDate) {
+    public List<chartDto> getWeatherEfficiency(Long memberId, LocalDate selectedDate) {
         return chartRepository.selectWeatherEfficiency(memberId, selectedDate);
     }
 }
