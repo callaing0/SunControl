@@ -1,4 +1,4 @@
-package com.suncontrol.core.repository;
+package com.suncontrol.core.repository.report;
 
 import com.suncontrol.core.entity.Member;
 import org.apache.ibatis.annotations.Mapper;

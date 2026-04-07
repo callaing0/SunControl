@@ -1,4 +1,4 @@
-package com.suncontrol.core.repository;
+package com.suncontrol.core.repository.report;
 
 import com.suncontrol.domain.dto.DashboardInverterDto;
 import com.suncontrol.domain.dto.dashboardSummaryDto;

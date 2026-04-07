@@ -6,7 +6,7 @@
 <!--
     차트/통계 화면용 MyBatis Mapper XML
 -->
-<mapper namespace="com.suncontrol.core.repository.chartRepository">
+<mapper namespace="com.suncontrol.core.repository.report.chartRepository">
 
     <!--
         상단 요약 카드 데이터 조회

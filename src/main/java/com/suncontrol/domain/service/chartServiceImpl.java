@@ -2,7 +2,7 @@ package com.suncontrol.domain.service;
 
 import com.suncontrol.domain.dto.chartDto;
 import com.suncontrol.domain.dto.chartSummaryDto;
-import com.suncontrol.core.repository.chartRepository;
+import com.suncontrol.core.repository.report.chartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

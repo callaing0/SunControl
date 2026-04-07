@@ -1,6 +1,6 @@
 package com.suncontrol.domain.service;
 
-import com.suncontrol.core.repository.dashboardRepository;
+import com.suncontrol.core.repository.report.dashboardRepository;
 import com.suncontrol.domain.dto.DashboardInverterDto;
 import com.suncontrol.domain.dto.dashboardSummaryDto;
 import lombok.RequiredArgsConstructor;
