@@ -183,11 +183,11 @@ public class GenerationEnergyService {
             GenerateDataContext gContext = new GenerateDataContext(
                     current, inv, base, new GenerateValueDto()
             );
-            GenerateValueDto dto = new GenerateValueDto();
             gContext = expStrategy.generateEnergy(gContext);
             gContext = actStrategy.generateEnergy(gContext);
             /// 계산이 끝난 값은 capacity 기준으로 클리핑
             gContext.getDto().setCapacity(inv.getRatedCapacity(), inv.getMeasuredCapacity());
+            GenerateValueDto dto = gContext.getDto();
 
             lastAccumEnergy = calculateAccumEnergy(
                     lastAccumEnergy, dto.getValueActual(), termSecond);
