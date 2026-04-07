@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
+import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -83,6 +84,11 @@ public class DailyWeatherResponseDto {
         }
         return this.weather;
     }
+
+    @JsonIgnore
+    public Integer getDayOffset() {
+        return this.getBaseDate().compareTo(LocalDate.now());
+    }
     /// Entity 송신용 DailyWeatherDto "간이 생성자"
     @JsonIgnore
     public DailyWeatherDto getDailyWeatherDto(District district) {
@@ -100,6 +106,8 @@ public class DailyWeatherResponseDto {
         dto.setPrecSum(this.precSum);
         dto.setSnowSum(this.snowSum);
         dto.setRadiationSum(this.radiationSum);
+        dto.setDataType(ReportDataType.findByDayOffset(getDayOffset()));
+
         return dto;
     }
 }

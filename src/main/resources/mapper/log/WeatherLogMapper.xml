@@ -9,11 +9,11 @@
 <!--  TODO : 건수가 많아지면 BATCH로 전환해야 함  -->
     <insert id="saveAll" parameterType="com.suncontrol.core.entity.log.WeatherLog">
         INSERT INTO weather_log (
-            district_code, base_time, temperature,
+            district_code, base_time, temperature, day_offset
             cloud_low, cloud_mid, cloud_high, ghi
         ) VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.districtCode}, #{item.baseTime}, #{item.temperature},
+            (#{item.districtCode}, #{item.baseTime}, #{item.temperature}, #{item.dayOffset},
             #{item.cloudLow}, #{item.cloudMid}, #{item.cloudHigh}, #{item.ghi})
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -24,5 +24,18 @@
             ghi = VALUES(ghi),
             updated_at = NOW()
     </insert>
+    <select id="findLatestLogs"
+            resultType="com.suncontrol.core.entity.log.WeatherLog">
+        SELECT * FROM (
+        SELECT *,
+        ROW_NUMBER() OVER(
+        PARTITION BY base_time, district_code
+        ORDER BY FIELD(day_offset, 0, 1, 7)
+        ) as rn
+        FROM weather_log
+        WHERE base_time BETWEEN #{start} AND #{end}
+        ) t
+        WHERE rn = 1
+    </select>
     <!-- TODO 계산로직용 조회 / 대시보드 출력용 조회 -->
 </mapper>

@@ -1,5 +1,6 @@
 package com.suncontrol.common.service;
 
+import com.suncontrol.common.dto.api.WeatherRequestDto;
 import com.suncontrol.common.dto.api.WeatherResponseDto;
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.dto.asset.PlantDto;
@@ -10,9 +11,13 @@ import com.suncontrol.core.service.log.DailyWeatherService;
 import com.suncontrol.core.service.log.RadiationLogService;
 import com.suncontrol.core.service.log.WeatherLogService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WeatherApiService {
     /// 기상 조회 API 서비스
 
@@ -28,6 +34,7 @@ public class WeatherApiService {
     private final RadiationLogService radiationLogService;
     private final DailyWeatherService dailyWeatherService;
     private final PlantService plantService;
+    private final RestTemplate restTemplate;
 
     public void requestAndSaveWeather() {
         List<PlantDto> plants = plantService.findAllActive();
@@ -38,10 +45,42 @@ public class WeatherApiService {
 
         saveWeatherResponses(responses);
     }
+    public String buildOpenMeteoRequestUrl(WeatherRequestDto request) {
+        return UriComponentsBuilder.fromUriString("https://api.open-meteo.com/v1/forecast")
+                .queryParam("latitude", request.getLatitude())
+                .queryParam("longitude", request.getLongitude())
+                .queryParam("timezone", request.getTimezone())
+                .queryParam("hourly", request.getHourly())
+//                .queryParam("daily", request.getDaily())
+//                .queryParam("tilt", request.getTilt())
+//                .queryParam("azimuth", request.getAzimuth())
+//                .queryParam("past_days", request.getPastDays())
+//                .queryParam("forecast_days", request.getForecastDays())
+                .build().toUriString();
+    }
 
     private List<WeatherResponseDto> getWeatherResponses(List<PlantWeatherApiDto> plants) {
         // TODO "진짜로 Open-Meteo 접속해서 데이터 가져오는 것"
-        return Collections.emptyList();
+        List<WeatherResponseDto> responses = new ArrayList<>();
+        for(PlantWeatherApiDto plant : plants) {
+            try {
+                String requestUrl = buildOpenMeteoRequestUrl(new WeatherRequestDto(plant));
+
+                log.info("requestUrl: {}", requestUrl);
+                WeatherResponseDto response =
+                        restTemplate.getForObject(requestUrl, WeatherResponseDto.class);
+
+                if (response != null) {
+                    response.setPlant(plant);
+                    responses.add(response);
+                    log.info("발전소 {} 날씨정보 수집완료 {}", plant.getId(), response);
+                }
+            } catch (Exception e) {
+                log.error("발전소 {} 날씨정보 수집중 오류 발생 : {}", plant.getId(), e.getMessage());
+            }
+        }
+
+        return responses;
     }
 
     @Transactional

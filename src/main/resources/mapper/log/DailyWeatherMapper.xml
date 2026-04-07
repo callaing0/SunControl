@@ -8,14 +8,14 @@
     <!--  TODO : 건수가 많아지면 BATCH로 전환해야 함  -->
     <insert id="saveAll" parameterType="com.suncontrol.core.entity.log.DailyWeather">
         INSERT INTO daily_weather (
-        district, base_date, temp_max, temp_min, weather_code, sunrise, sunset,
-        sunshine_duration, daylight_duration, prec_sum, snow_sum, radiation_sum
+        district_code, base_date, temp_max, temp_min, weather_code, sunrise, sunset,
+        sunshine_duration, daylight_duration, prec_sum, snow_sum, radiation_sum, day_offset
         ) VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.district}, #{item.baseDate}, #{item.tempMax}, #{item.tempMin},
+            (#{item.districtCode}, #{item.baseDate}, #{item.tempMax}, #{item.tempMin},
             #{item.weatherCode}, #{item.sunrise}, #{item.sunset},
             #{item.sunshineDuration}, #{item.daylightDuration},
-            #{item.precSum}, #{item.snowSum}, #{item.radiationSum})
+            #{item.precSum}, #{item.snowSum}, #{item.radiationSum}, #{item.dayOffset})
         </foreach>
         ON DUPLICATE KEY UPDATE
         temp_max = VALUES(temp_max),
@@ -31,4 +31,17 @@
         updated_at = NOW()
     </insert>
 
+    <select id="findLatestLogs"
+            resultType="com.suncontrol.core.entity.log.DailyWeather">
+        SELECT * FROM (
+            SELECT *,
+                ROW_NUMBER() OVER(
+                    PARTITION BY base_date, district_code
+                    ORDER BY FIELD(day_offset, 0, 1, 7)
+                ) as rn
+            FROM daily_weather
+            WHERE base_date BETWEEN #{start} AND #{end}
+        ) t
+        WHERE rn = 1
+    </select>
 </mapper>

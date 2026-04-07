@@ -2,6 +2,7 @@ package com.suncontrol.core.dto.log;
 
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
+import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.entity.log.WeatherLog;
 import lombok.*;
 
@@ -22,6 +23,7 @@ public class WeatherLogDto {
     private int cloudMid;
     private int cloudHigh;
     private int ghi;
+    private ReportDataType dataType;
     private String weatherCode;
     private Weather weather;
 
@@ -33,5 +35,10 @@ public class WeatherLogDto {
         this.cloudMid = entity.getCloudMid();
         this.cloudHigh = entity.getCloudHigh();
         this.ghi = entity.getGhi();
+        this.dataType = ReportDataType.findByDayOffset(entity.getDayOffset());
+    }
+
+    public Integer getDayOffset() {
+        return dataType != null ? this.dataType.getDayOffset() : ReportDataType.UNKNOWN.getDayOffset();
     }
 }

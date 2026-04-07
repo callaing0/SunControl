@@ -33,6 +33,7 @@ public class DailyWeather {
     private double precSum;
     private double snowSum;
     private double radiationSum;
+    private Integer dayOffset;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -67,5 +68,6 @@ public class DailyWeather {
         this.precSum = dto.getPrecSum();
         this.snowSum = dto.getSnowSum();
         this.radiationSum = dto.getRadiationSum();
+        this.dayOffset = dto.getDayOffset();
     }
 }

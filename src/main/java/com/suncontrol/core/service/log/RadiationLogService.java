@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,9 +22,9 @@ public class RadiationLogService {
     private final RadiationLogRepository repository;
 
     @Transactional
-    public void saveAll(List<RadiationLogDto> dtos) {
+    public void saveAll(List<RadiationLogDto> dtoList) {
         /// 파라미터로 받은 dto를 entity로 변환
-        List<RadiationLog> entities = dtos.stream().map(RadiationLog::new).toList();
+        List<RadiationLog> entities = dtoList.stream().map(RadiationLog::new).toList();
 
         /// 변환한 entity를 저장
         int result = repository.saveAll(entities);
@@ -34,9 +35,24 @@ public class RadiationLogService {
 
     public Map<Long, Map<LocalDateTime, RadiationLogDto>> getMapByPlantIdAndTime
             (LocalDateTime start, LocalDateTime end) {
+        List<RadiationLog> entities = findLatestLog(start, end);
         /// DB가 비어있으면 null이 아닌 빈 맵으로 반환
-        return Collections.emptyMap();
-        /// todo
-        ///
+        if(entities.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return entities.stream().collect(
+                Collectors.groupingBy(
+                        RadiationLog::getPlantId,
+                        Collectors.toMap(
+                                RadiationLog::getBaseTime,
+                                RadiationLogDto::new
+                        )
+                )
+        );
+    }
+
+    private List<RadiationLog> findLatestLog(LocalDateTime start, LocalDateTime end) {
+        return repository.findLatestLog(start, end);
     }
 }

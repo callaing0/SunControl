@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
+import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.dto.log.RadiationLogDto;
 import com.suncontrol.core.dto.log.WeatherLogDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -72,6 +74,11 @@ public class WeatherHourlyResponseDto {
     }
 
     @JsonIgnore
+    public Integer getDayOffset() {
+        return this.baseTime.toLocalDate().compareTo(LocalDate.now());
+    }
+
+    @JsonIgnore
     public WeatherLogDto getWeatherLogDto(District district) {
         return WeatherLogDto.builder()
                 .district(district)
@@ -83,6 +90,7 @@ public class WeatherHourlyResponseDto {
                 .ghi(ghi)
                 .weather(getWeather())
                 .weatherCode(weatherCode)
+                .dataType(ReportDataType.findByDayOffset(getDayOffset()))
                 .build();
     }
 
@@ -93,6 +101,7 @@ public class WeatherHourlyResponseDto {
                 .baseTime(baseTime)
                 .gti(gti)
                 .gtiInstance(gtiInstance)
+                .dataType(ReportDataType.findByDayOffset(getDayOffset()))
                 .build();
     }
 }

@@ -16,6 +16,7 @@ public class RadiationLog {
     private LocalDateTime baseTime;
     private double gti;
     private double gtiInstance;
+    private Integer dayOffset;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -24,5 +25,6 @@ public class RadiationLog {
         this.baseTime = dto.getBaseTime();
         this.gti = dto.getGti();
         this.gtiInstance = dto.getGtiInstance();
+        this.dayOffset = dto.getDayOffset();
     }
 }

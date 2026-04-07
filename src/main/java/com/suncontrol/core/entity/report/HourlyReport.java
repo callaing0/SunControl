@@ -20,7 +20,7 @@ public class HourlyReport {
     private BigDecimal capacityFactor; /// 실측값 / 인버터용량
     private BigDecimal accumEnergy; /// 인버터 계량기 수치
     private String  weatherCode;
-    private int dayOffset; /// 0: 당일 1~7:N일전 예측 표시
+    private Integer dayOffset; /// 0: 당일 1~7:N일전 예측 표시
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -8,6 +8,7 @@ import com.suncontrol.core.dto.log.RadiationLogDto;
 import com.suncontrol.core.dto.log.WeatherLogDto;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@ToString
 public class WeatherResponseDto {
     /// 기상 API 수신용 Dto
 

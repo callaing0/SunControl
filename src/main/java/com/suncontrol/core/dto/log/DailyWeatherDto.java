@@ -2,6 +2,7 @@ package com.suncontrol.core.dto.log;
 
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
+import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.entity.log.DailyWeather;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,6 +37,7 @@ public class DailyWeatherDto {
     private double precSum;
     private double snowSum;
     private double radiationSum;
+    private ReportDataType dataType;
 
 
     public String getWeatherCode() {
@@ -57,5 +59,10 @@ public class DailyWeatherDto {
         this.precSum = entity.getPrecSum();
         this.snowSum = entity.getSnowSum();
         this.radiationSum = entity.getRadiationSum();
+        this.dataType = ReportDataType.findByDayOffset(entity.getDayOffset());
+    }
+
+    public Integer getDayOffset() {
+        return dataType != null ? this.dataType.getDayOffset() : ReportDataType.UNKNOWN.getDayOffset();
     }
 }

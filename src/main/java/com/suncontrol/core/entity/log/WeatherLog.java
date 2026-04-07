@@ -28,6 +28,7 @@ public class WeatherLog {
     private Weather weather;
     private String weatherCode;
 
+    private Integer dayOffset;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -56,5 +57,6 @@ public class WeatherLog {
         this.cloudMid = dto.getCloudMid();
         this.cloudHigh = dto.getCloudHigh();
         this.ghi = dto.getGhi();
+        this.dayOffset = dto.getDayOffset();
     }
 }
