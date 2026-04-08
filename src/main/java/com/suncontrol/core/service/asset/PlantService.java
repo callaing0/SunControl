@@ -68,8 +68,8 @@ public class PlantService {
                 );
     }
 
-    /// TODO : MainSummaryDto 추출 (내용 : 개소 수, 전체 발전량, 수집 주기)
     /// plant_info_view에서 COUNT, SUM 을 통해 추출, 수집 주기는 "60"이라는 정수를 시스템 상수로 받아온다.
-    public void getMainSummary() {
+    public MainSummaryDto getMainSummary() {
+        return repository.countPlantsAndSumTotalAccum();
     }
 }
