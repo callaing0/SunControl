@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>태양광 테스트 페이지</title>
+</head>
+<body>
+<h1>☀️ 태양광 발전 효율 테스트</h1>
+
+<form th:action="@{/test/alert}" th:object="${alertDTO}" method="get">
+
+    <label>현재 발전 효율 입력 (%): </label>
+    <input type="number" step="0.1" name="eff" placeholder="예: 75.5">
+
+    <button type="submit">테스트 실행 (클릭 시 컨트롤러로 이동!)</button>
+</form>
+
+<hr>
+<p>※ 버튼을 누르면 컨트롤러의 checkAndCreateAlert 로직이 실행됩니다.</p>
+</body>
+</html>
