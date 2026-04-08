@@ -21,7 +21,7 @@
     </style>
 
     <th:block layout:fragment="css"></th:block>
-    <th:block th:replace="~{fragments/adminModals :: modalStyle}"></th:block>
+    <th:block th:replace="~{fragments/adminModal :: modalStyle}"></th:block>
 </head>
 <body class="bg-[#f8fafc] min-h-screen flex">
 
@@ -39,9 +39,9 @@
     <div th:replace="~{fragments/modals :: logoutModal}"></div>
 
     <!-- 관리자 전용 모달 -->
-    <div th:replace="~{fragments/adminModals :: createAccountModal}"></div>
-    <div th:replace="~{fragments/adminModals :: accountModal}"></div>
-    <div th:replace="~{fragments/adminModals :: confirmModal}"></div>
+    <div th:replace="~{fragments/adminModal :: createAccountModal}"></div>
+    <div th:replace="~{fragments/adminModal :: accountModal}"></div>
+    <div th:replace="~{fragments/adminModal :: confirmModal}"></div>
 </div>
 
 <script>
@@ -89,7 +89,7 @@
     }
 </script>
 
-<th:block th:replace="~{fragments/adminModals :: script}"></th:block>
+<th:block th:replace="~{fragments/adminModal :: script}"></th:block>
 <th:block layout:fragment="script"></th:block>
 
 </body>
