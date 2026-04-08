@@ -20,7 +20,7 @@ public class plantSelectController {
 
         Long memberId = (Long) session.getAttribute("memberId");
         if (memberId == null) {
-            return "redirect:/login";
+            return "redirect:" + redirectUrl;
         }
 
         Long resolvedPlantId = plantSelectionService.resolveSelectedPlantId(memberId, plantId);
