@@ -106,11 +106,15 @@
                 </div>
 
                 <div th:if="${hasInverters}" class="space-y-3">
-                    <div th:each="inv : ${inverters}"
-                         class="p-5 bg-white border border-gray-100 rounded-2xl flex justify-between items-center hover:border-blue-300 transition-all">
+                    <!-- 인버터별 버튼 -->
+                    <button type="button"
+                            th:each="inv : ${inverters}"
+                            th:attr="data-inverter-id=${inv.id}"
+                            th:onclick="|showPanels(${inv.id}, this)|"
+                            class="panel-filter-btn w-full p-5 bg-white border border-gray-100 rounded-2xl flex justify-between items-center hover:border-blue-300 transition-all">
                         <span class="font-[900] text-gray-700 uppercase italic"
                               th:text="${inv.name != null ? inv.name : '인버터'}">인버터 명칭</span>
-                    </div>
+                    </button>
                 </div>
 
                 <div th:if="${!hasPlant or !hasInverters}"
@@ -133,7 +137,9 @@
                 </div>
 
                 <div th:if="${hasPanels}" class="space-y-3">
-                    <div th:each="panelEntry : ${panels}">
+                    <div th:each="panelEntry : ${panels}"
+                         th:id="|panel-group-${panelEntry.key}|"
+                         class="panel-group hidden">
                         <div th:if="${panelEntry.value != null and !#lists.isEmpty(panelEntry.value)}"
                              th:each="pnl : ${panelEntry.value}"
                              class="p-5 bg-white border border-gray-100 rounded-2xl flex justify-between items-center hover:border-yellow-300 transition-all mb-3">
@@ -176,6 +182,32 @@
             if (mypageModals.includes(e.target.id)) {
                 closeModal(e.target.id);
             }
+        });
+
+        function showPanels(key, clickedButton) {
+            document.querySelectorAll('.panel-group').forEach(group => {
+                group.classList.add('hidden');
+            });
+
+            const target = document.getElementById(`panel-group-${key}`);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+
+            document.querySelectorAll('.panel-filter-btn').forEach(btn => {
+                btn.classList.remove('border-yellow-300', 'bg-yellow-50');
+                btn.classList.add('border-gray-100', 'bg-white');
+            });
+
+            if (clickedButton) {
+                clickedButton.classList.remove('border-gray-100', 'bg-white');
+                clickedButton.classList.add('border-yellow-300', 'bg-yellow-50');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const defaultButton = document.querySelector('.panel-filter-btn');
+            showPanels(0, defaultButton);
         });
     </script>
 </th:block>
