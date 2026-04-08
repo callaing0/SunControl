@@ -1,7 +1,11 @@
 package com.suncontrol.core.repository.report;
 
+import com.suncontrol.domain.dto.DashboardGenerationDto;
+import com.suncontrol.domain.dto.DashboardHourlyValueDto;
 import com.suncontrol.domain.dto.DashboardInverterDto;
-import com.suncontrol.domain.dto.dashboardSummaryDto;
+import com.suncontrol.domain.dto.DashboardPlantDto;
+import com.suncontrol.domain.dto.DashboardRealtimeDto;
+import com.suncontrol.domain.dto.DashboardSunTimeDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -11,11 +15,21 @@ import java.util.List;
 @Mapper
 public interface dashboardRepository {
 
-    dashboardSummaryDto selectDashboardSummary(@Param("memberId") Long memberId);
+    DashboardPlantDto selectMainPlant(@Param("memberId") Long memberId);
+
+    DashboardRealtimeDto selectPlantRealtime(@Param("plantId") Long plantId);
+
+    DashboardSunTimeDto selectTodaySunTime(@Param("districtCode") String districtCode);
+
+    BigDecimal selectLatestTemperature(@Param("districtCode") String districtCode);
+
+    BigDecimal selectTodayInsolation(@Param("plantId") Long plantId);
+
+    DashboardGenerationDto selectTodayGeneration(@Param("plantId") Long plantId);
 
     List<DashboardInverterDto> selectInverters(@Param("memberId") Long memberId);
 
-    List<BigDecimal> selectHourlyPower(@Param("plantId") Long plantId);
+    List<DashboardHourlyValueDto> selectHourlyPower(@Param("plantId") Long plantId);
 
-    List<BigDecimal> selectHourlyInsolation(@Param("plantId") Long plantId);
+    List<DashboardHourlyValueDto> selectHourlyInsolation(@Param("plantId") Long plantId);
 }
