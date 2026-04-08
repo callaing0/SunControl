@@ -41,8 +41,8 @@ public class WeatherApiService {
     @Transactional
     public void requestAndSaveWeather() {
         // TODO : 정기 수집 시간, 서버 구동이 같은 통로로 들어와서 분기처리가 어렵다.
-        // TODO : 서버 구동 시의 분기처리 로직이므로 recent ~ 조건식 종료까지 떼어내서 가져가야함.
-        // TODO : 아래의 로직은 놔두고, 각 경우의 호출 통로를 따로 두어 처리하도록 할 것.
+        //        서버 구동 시의 분기처리 로직이므로 recent ~ 조건식 종료까지 떼어내서 가져가야함.
+        //        아래의 로직은 놔두고, 각 경우의 호출 통로를 따로 두어 처리하도록 할 것.
         // 서버 시작할 때마다 무한정 기상데이터를 받아올 수는 없다.
         // 차단봉 세워야 함.
         WeatherLogDto recent = weatherLogService.getRecentLog();
@@ -80,7 +80,7 @@ public class WeatherApiService {
     }
 
     private List<WeatherResponseDto> getWeatherResponses(List<PlantWeatherApiDto> plants) {
-        // TODO "진짜로 Open-Meteo 접속해서 데이터 가져오는 것"
+
         List<WeatherResponseDto> responses = new ArrayList<>();
         for(PlantWeatherApiDto plant : plants) {
             try {

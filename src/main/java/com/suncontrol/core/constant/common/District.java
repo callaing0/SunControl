@@ -16,7 +16,15 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public enum District {
     DAEJEON_JUNG("30140", Province.DAEJEON, "중구",
-            new BigDecimal("36.325781"), new BigDecimal("127.42133"));
+            new BigDecimal("36.325781"), new BigDecimal("127.42133")),
+    DAEJEON_SEO("30170", Province.DAEJEON, "서구",
+            new BigDecimal("36.355498"), new BigDecimal("127.38378")),
+    DAEJEON_DONG("30110", Province.DAEJEON, "동구",
+            new BigDecimal("36.311776"), new BigDecimal("127.45480")),
+    DAEJEON_YUSEONG("30200", Province.DAEJEON, "유성구",
+            new BigDecimal("36.362285"), new BigDecimal("127.35625")),
+    DAEJEON_DAEDEOK("30230", Province.DAEJEON, "대덕구",
+            new BigDecimal("36.346705"), new BigDecimal("127.41556"));
     // TODO: 다른 행정구역도 추가
 
     private final String code; // 지역 코드(기초단체 행정동코드 5자리)
