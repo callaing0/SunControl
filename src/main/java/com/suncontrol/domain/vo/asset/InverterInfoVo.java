@@ -38,4 +38,8 @@ public class InverterInfoVo {
     public BigDecimal getPerformanceRate() {
         return currentPower.divide(capacity, 3, RoundingMode.HALF_EVEN);
     }
+
+    public String getName() {
+        return serial;
+    }
 }
