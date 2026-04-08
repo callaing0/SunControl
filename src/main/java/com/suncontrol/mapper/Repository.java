@@ -15,4 +15,10 @@ public interface Repository { // 인터페이스 이름을 'Repository'로 변�
             "status " +
             "FROM alert_log ORDER BY id DESC")
     List<AlertDTO> findAllAlerts();
+
+    List<AlertDTO> findAll();
+
+    List<AlertDTO> findByLocation(String location);
+
+    void insertAlert(AlertDTO dto);
 }

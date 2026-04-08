@@ -8,12 +8,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AlertService {
-
-
+public class AlertListService {
     private final Repository repository;
 
-    public List<AlertDTO> getAlertList() {
-        return repository.findAllAlerts();
+    public List<AlertDTO> getAlertList(String location) {
+        if (location == null || location.isEmpty()) return repository.findAll();
+        return repository.findByLocation(location);
     }
 }
