@@ -51,5 +51,15 @@ public class AssetRestController {
             @Valid @RequestBody InverterSaveForm form,
             BindingResult bindingResult,
             Principal principal
-    )
+    ) throws AccessDeniedException {
+        if(bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new ResponseDto<>(
+                    false, DEFAULT_ERR_MSG, service.writeErrorMsg(bindingResult)
+            ));
+        }
+        String result = service.saveInverter(principal.getName(), form);
+
+        return ResponseEntity.ok(
+                new ResponseDto<>(true, result, null));
+    }
 }
