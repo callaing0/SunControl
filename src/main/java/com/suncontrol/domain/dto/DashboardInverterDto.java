@@ -10,5 +10,5 @@ public class DashboardInverterDto {
     private Long id;
     private Long plantId;
     private String serial;
-    private DeviceStatus status;
+    private Integer status;;
 }

@@ -24,8 +24,8 @@
             COALESCE(rad_today.insolation, 0) AS insolation,
 
             CASE
-                WHEN wl.temperature IS NOT NULL AND wl.humidity IS NOT NULL
-                    THEN CONCAT(ROUND(wl.temperature, 1), '°C / ', ROUND(wl.humidity, 0), '%')
+                WHEN wl.temperature IS NOT NULL
+                    THEN CONCAT(ROUND(wl.temperature, 1), '°C')
                 ELSE '--'
                 END AS weatherStatus,
 
@@ -36,13 +36,13 @@
             FLOOR((COALESCE(dr_today.value_actual, 0) * 0.424) / 6.6) AS treeCount
 
         FROM plant p
-                 LEFT JOIN plant_info pi
-                           ON p.id = pi.plant_id
+                 LEFT JOIN plant_info_view pi
+                           ON p.id = pi.id
                  LEFT JOIN daily_weather dw
                            ON dw.district_code = p.district_code
                                AND dw.base_date = CURDATE()
                  LEFT JOIN (
-            SELECT w1.district_code, w1.temperature, w1.humidity
+            SELECT w1.district_code, w1.temperature
             FROM weather_log w1
                      INNER JOIN (
                 SELECT district_code, MAX(base_time) AS max_time
@@ -54,7 +54,7 @@
         ) wl
                            ON wl.district_code = p.district_code
                  LEFT JOIN (
-            SELECT plant_id, ROUND(AVG(ghi), 2) AS insolation
+            SELECT plant_id, ROUND(AVG(gti), 2) AS insolation
             FROM radiation_log
             WHERE DATE(base_time) = CURDATE()
         GROUP BY plant_id
@@ -73,6 +73,7 @@
             ON dr_today.plant_id = p.id
         WHERE p.member_id = #{memberId}
           AND p.is_main = 1
+          AND p.is_deleted = 0
             LIMIT 1
     </select>
 
@@ -107,7 +108,7 @@
     <!-- 시간별 일사량 조회 (확인 필요)-->
     <select id="selectHourlyInsolation" resultType="java.math.BigDecimal">
         SELECT
-            COALESCE(AVG(r.ghi), 0) AS insolationValue
+            COALESCE(AVG(r.gti), 0) AS insolationValue
         FROM radiation_log r
         WHERE r.plant_id = #{plantId}
           AND DATE(r.base_time) = CURDATE()
