@@ -3,32 +3,51 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.core.repository.log.DailyWeatherRepository">
+<mapper namespace="com.suncontrol.core.repository.log.DailyWeatherRepository">
     <!--  일일 기상데이터 저장  -->
     <!--  TODO : 건수가 많아지면 BATCH로 전환해야 함  -->
     <insert id="saveAll" parameterType="com.suncontrol.core.entity.log.DailyWeather">
         INSERT INTO daily_weather (
-        district, base_date, temp_max, temp_min, weather_code, sunrise, sunset,
-        sunshine_duration, daylight_duration, prec_sum, snow_sum, radiation_sum
+        district_code, base_date, day_offset,
+        temp_max, temp_min,
+        weather_code, sunrise, sunset,
+        sunshine_duration, daylight_duration,
+        prec_sum, snow_sum, radiation_sum,
+        created_at, updated_at
         ) VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.district}, #{item.baseDate}, #{item.tempMax}, #{item.tempMin},
+            (#{item.districtCode}, #{item.baseDate}, #{item.dayOffset},
+            #{item.tempMax}, #{item.tempMin},
             #{item.weatherCode}, #{item.sunrise}, #{item.sunset},
             #{item.sunshineDuration}, #{item.daylightDuration},
-            #{item.precSum}, #{item.snowSum}, #{item.radiationSum})
+            #{item.precSum}, #{item.snowSum}, #{item.radiationSum},
+            #{item.createdAt}, #{item.updatedAt})
         </foreach>
         ON DUPLICATE KEY UPDATE
-        temp_max = VALUES(temp_max),
-        temp_min = VALUES(temp_min),
-        weather_code = VALUES(weather_code),
-        sunrise = VALUES(sunrise),
-        sunset = VALUES(sunset),
-        sunshine_duration = VALUES(sunshine_duration),
-        daylight_duration = VALUES(daylight_duration),
-        prec_sum = VALUES(prec_sum),
-        snow_sum = VALUES(snow_sum),
-        radiation_sum = VALUES(radiation_sum),
-        updated_at = NOW()
+        temp_max = COALESCE(VALUES(temp_max), temp_max),
+        temp_min = COALESCE(VALUES(temp_min), temp_min),
+        weather_code = COALESCE(VALUES(weather_code), weather_code),
+        sunrise = COALESCE(VALUES(sunrise), sunrise),
+        sunset = COALESCE(VALUES(sunset), sunset),
+        sunshine_duration = COALESCE(VALUES(sunshine_duration), sunshine_duration),
+        daylight_duration = COALESCE(VALUES(daylight_duration), daylight_duration),
+        prec_sum = COALESCE(VALUES(prec_sum), prec_sum),
+        snow_sum = COALESCE(VALUES(snow_sum), snow_sum),
+        radiation_sum = COALESCE(VALUES(radiation_sum), radiation_sum),
+        updated_at = COALESCE(VALUES(updated_at), updated_at)
     </insert>
 
+    <select id="findLatestLogs"
+            resultType="com.suncontrol.core.entity.log.DailyWeather">
+        SELECT * FROM (
+            SELECT *,
+                ROW_NUMBER() OVER(
+                    PARTITION BY base_date, district_code
+                    ORDER BY FIELD(day_offset, 0, 1, 7)
+                ) as rn
+            FROM daily_weather
+            WHERE base_date BETWEEN #{start} AND #{end}
+        ) t
+        WHERE rn = 1
+    </select>
 </mapper>

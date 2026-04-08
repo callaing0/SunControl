@@ -13,7 +13,7 @@
         )
         VALUES
         <foreach collection="list" item="item" separator=",">
-             (
+            (
             #{item.inverterId}, #{item.baseTime},
             #{item.valueExpected}, #{item.valueActual},
             #{item.performanceRatio}, #{item.expectedRatio}, #{item.capacityFactor},
@@ -28,6 +28,13 @@
         capacity_factor = VALUES(capacity_factor),
         accum_energy = VALUES(accum_energy),
         weather_code = VALUES(weather_code),
-        status = VALUES(status)
+        status = VALUES(status),
+        updated_at = NOW()
     </insert>
+
+    <select id="findLastsOf" resultType="com.suncontrol.core.dto.log.LastGeneratedTime">
+        SELECT inverter_id, MAX(base_time) as base_time
+        FROM generation_log
+        GROUP BY inverter_id
+    </select>
 </mapper>

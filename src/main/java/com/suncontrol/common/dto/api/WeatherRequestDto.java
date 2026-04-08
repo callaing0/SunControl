@@ -16,10 +16,11 @@ import java.time.LocalDate;
 @Setter
 public class WeatherRequestDto {
     /// 기상 API송신용 DTO
-    @JsonProperty("start_date")
-    private LocalDate startDate;
-    @JsonProperty("end_date")
-    private LocalDate endDate;
+    @JsonProperty("past_days")
+    private int pastDays;
+    @JsonProperty("forecast_days")
+    private int forecastDays;
+
     @JsonProperty("hourly")
     private String hourly;
     @JsonProperty("daily")
@@ -27,10 +28,19 @@ public class WeatherRequestDto {
     @JsonIgnore
     private PlantWeatherApiDto plant;
 
-    public WeatherRequestDto(PlantWeatherApiDto dto, LocalDate start, LocalDate end) {
+    public WeatherRequestDto(PlantWeatherApiDto dto, int pastDays, int forecastDays) {
         if (dto == null) throw new IllegalArgumentException("발전소 정보없음");
-        this.startDate = start;
-        this.endDate = end;
+        this.pastDays = pastDays;
+        this.forecastDays = forecastDays;
+        this.plant = dto;
+        this.hourly = WeatherApiHourlyRequest.HOURLY_REQUEST; /// 시간 데이터 요청
+        this.daily = WeatherApiDailyRequest.DAILY_REQUEST; /// 일간 데이터 요청
+    }
+
+    public WeatherRequestDto(PlantWeatherApiDto dto) {
+        if (dto == null) throw new IllegalArgumentException("발전소 정보없음");
+        this.pastDays = 0;
+        this.forecastDays = 7;
         this.plant = dto;
         this.hourly = WeatherApiHourlyRequest.HOURLY_REQUEST; /// 시간 데이터 요청
         this.daily = WeatherApiDailyRequest.DAILY_REQUEST; /// 일간 데이터 요청

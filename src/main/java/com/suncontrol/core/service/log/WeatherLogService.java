@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -35,15 +36,34 @@ public class WeatherLogService {
 
     public Map<District, Map<LocalDateTime, WeatherLogDto>> getMapByDistrictAndTime
             (LocalDateTime start, LocalDateTime end) {
+        List<WeatherLog> entities = findLatestLog(start, end);
         /// 결과가 없으면 빈 맵으로 반환
-        return Collections.emptyMap();
+        if(entities.isEmpty()) {
+            return Collections.emptyMap();
+        }
         /// 레포지토리 결과 List<Entity> -> Map<K1, Map<K2, DTO>>
-        // todo
+        return entities.stream().collect(
+                Collectors.groupingBy(
+                        WeatherLog::getDistrict,
+                        Collectors.toMap(
+                                WeatherLog::getBaseTime,
+                                WeatherLogDto::new
+                        )
+                )
+        );
     }
 
     public WeatherLogDto findByDistrict(District district, LocalDateTime time) {
         /// todo : 대시보드용 기상 정보 조회용
         /// district와 time 기준 가장 가까운 과거시점의 스냅샷 1건을 반환한다.
         return null;
+    }
+
+    private List<WeatherLog>  findLatestLog(LocalDateTime start, LocalDateTime end) {
+        return repository.findLatestLogs(start, end);
+    }
+
+    public WeatherLogDto getRecentLog() {
+        return new WeatherLogDto(repository.findLatestLogOfAll());
     }
 }
