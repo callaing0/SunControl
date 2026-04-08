@@ -22,8 +22,15 @@ public class chartController {
     @GetMapping("/chart")
     public String chart(Model model, HttpSession session) {
         Long memberId = (Long) session.getAttribute("memberId");
+        LocalDate selectedDate = LocalDate.now();
+
         if (memberId == null) {
-            return "redirect:/login";
+            model.addAttribute("statsSummary", List.of());
+            model.addAttribute("generationTrend", List.of());
+            model.addAttribute("weatherEfficiency", List.of());
+            model.addAttribute("selectedDate", selectedDate);
+            model.addAttribute("menu", "stats");
+            return "chart";
         }
 
         Long selectedPlantId = (Long) session.getAttribute("selectedPlantId");
@@ -33,14 +40,12 @@ public class chartController {
             model.addAttribute("statsSummary", List.of());
             model.addAttribute("generationTrend", List.of());
             model.addAttribute("weatherEfficiency", List.of());
-            model.addAttribute("selectedDate", LocalDate.now());
+            model.addAttribute("selectedDate", selectedDate);
             model.addAttribute("menu", "stats");
             return "chart";
         }
 
         session.setAttribute("selectedPlantId", resolvedPlantId);
-
-        LocalDate selectedDate = LocalDate.now();
 
         List<chartDto> generationTrend = chartService.getGenerationTrend(resolvedPlantId, selectedDate);
         List<chartDto> weatherEfficiency = chartService.getWeatherEfficiency(resolvedPlantId, selectedDate);
