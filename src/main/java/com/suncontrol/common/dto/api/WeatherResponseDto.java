@@ -34,7 +34,7 @@ public class WeatherResponseDto {
     private BigDecimal longitude;
     @JsonProperty("timezone")
     private String timezone;
-    @JsonProperty("hourly") //TODO 객체의 리스트가 아니라 리스트를 필드로 가진 객체임
+    @JsonProperty("hourly")
     private WeatherHourlyResponseDto hourly;
     @JsonProperty("daily")
     private DailyWeatherResponseDto daily;
