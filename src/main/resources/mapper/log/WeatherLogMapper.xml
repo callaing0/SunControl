@@ -42,5 +42,8 @@
         ) t
         WHERE rn = 1
     </select>
+    <select id="findLatestLogOfAll" resultType="com.suncontrol.core.entity.log.WeatherLog">
+        SELECT * FROM weather_log ORDER BY updated_at DESC LIMIT 1
+    </select>
     <!-- TODO 계산로직용 조회 / 대시보드 출력용 조회 -->
 </mapper>

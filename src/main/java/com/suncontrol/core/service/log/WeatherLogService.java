@@ -62,4 +62,8 @@ public class WeatherLogService {
     private List<WeatherLog>  findLatestLog(LocalDateTime start, LocalDateTime end) {
         return repository.findLatestLogs(start, end);
     }
+
+    public WeatherLogDto getRecentLog() {
+        return new WeatherLogDto(repository.findLatestLogOfAll());
+    }
 }

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,7 +38,24 @@ public class WeatherApiService {
     private final PlantService plantService;
     private final RestTemplate restTemplate;
 
+    @Transactional
     public void requestAndSaveWeather() {
+        // TODO : 정기 수집 시간, 서버 구동이 같은 통로로 들어와서 분기처리가 어렵다.
+        // TODO : 서버 구동 시의 분기처리 로직이므로 recent ~ 조건식 종료까지 떼어내서 가져가야함.
+        // TODO : 아래의 로직은 놔두고, 각 경우의 호출 통로를 따로 두어 처리하도록 할 것.
+        // 서버 시작할 때마다 무한정 기상데이터를 받아올 수는 없다.
+        // 차단봉 세워야 함.
+        WeatherLogDto recent = weatherLogService.getRecentLog();
+        if (recent != null) {
+            LocalDateTime recentUpdated = recent.getUpdatedAt();
+            log.info("{}시점에 수집한 기상데이터 이미 존재", recentUpdated);
+            boolean needUpdate = recentUpdated.isBefore(LocalDateTime.now().minusHours(1));
+            if (!needUpdate) {
+                log.info("기상데이터 수집 필요 없음. 프로세스 종료합니다.");
+                return;
+            }
+        }
+
         List<PlantDto> plants = plantService.findAllActive();
         List<PlantWeatherApiDto> plantWeatherApiList =
                 plants.stream().map(PlantWeatherApiDto::new).toList();

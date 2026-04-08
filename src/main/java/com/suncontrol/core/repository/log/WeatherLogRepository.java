@@ -12,5 +12,7 @@ public interface WeatherLogRepository {
     int saveAll(List<WeatherLog> entities);
 
     List<WeatherLog> findLatestLogs(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    WeatherLog findLatestLogOfAll();
     //todo
 }
