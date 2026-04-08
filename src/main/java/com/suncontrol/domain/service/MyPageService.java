@@ -3,16 +3,19 @@ package com.suncontrol.domain.service;
 import com.suncontrol.core.dto.asset.InverterDto;
 import com.suncontrol.core.dto.asset.PanelDto;
 import com.suncontrol.core.dto.asset.PlantDto;
+import com.suncontrol.core.entity.Member;
 import com.suncontrol.core.service.asset.InverterService;
 import com.suncontrol.core.service.asset.PanelService;
 import com.suncontrol.core.service.asset.PlantService;
 import com.suncontrol.core.vo.MemberDetailVo;
+import com.suncontrol.domain.form.PasswordChangeForm;
 import com.suncontrol.domain.vo.MyPageVo;
 import com.suncontrol.domain.vo.asset.InverterDetailVo;
 import com.suncontrol.domain.vo.asset.PanelVo;
 import com.suncontrol.domain.vo.asset.PlantDetailVo;
 import com.suncontrol.domain.vo.asset.PlantVo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 public class MyPageService {
 
     private final MemberService memberService;
+    private final PasswordEncoder passwordEncoder;
     private final PlantService plantService;
     private final InverterService inverterService;
     private final PanelService panelService;
@@ -99,5 +103,34 @@ public class MyPageService {
 
 
         return myPageVo;
+    }
+
+    // 비밀번호 변경
+    public String changePassword(String userId, PasswordChangeForm passwordChangeForm) {
+        Member member = memberService.findByUserId(userId);
+
+        if (member == null) {
+            return "사용자 정보를 찾을 수 없습니다.";
+        }
+
+        // 현재 비밀번호 확인
+        if (!passwordEncoder.matches(passwordChangeForm.getCurrentPassword(), member.getPassword())) {
+            return "현재 비밀번호가 일치하지 않습니다.";
+        }
+
+        // 새 비밀번호와 일치 여부 확인
+        if (!passwordChangeForm.getNewPassword().equals(passwordChangeForm.getConfirmPassword())) {
+            return "새 비밀번호와 비밀번호 확인이 일치하지 않습니다.";
+        }
+
+        // 새 비밀번호가 기존 비밀번호와 같은지 확인
+        if (passwordEncoder.matches(passwordChangeForm.getNewPassword(), member.getPassword())) {
+            return "새 비밀번호는 현재 비밀번호와 다르게 입력해야 합니다.";
+        }
+
+        // 비밀번호 변경
+        memberService.changePassword(member, passwordEncoder.encode(passwordChangeForm.getNewPassword()));
+
+        return "success";
     }
 }

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="h-screen flex">
+
+<!-- 왼쪽 영역 -->
+<div class="w-[60%] relative bg-cover bg-center"
+     style="background-image: url('https://energium.kier.re.kr/attach/board/enerland/20231024/494c7838480c39f464e99bba88c9e2a8.jpg');">
+
+    <!-- 어두운 오버레이 -->
+    <div class="absolute inset-0 bg-black/40"></div>
+
+    <div class="relative z-10 text-white h-full flex flex-col justify-center px-28">
+
+        <!-- 로고 -->
+        <div class="flex items-center gap-3 mb-6">
+            <div class="bg-yellow-400 w-10 h-10 rounded flex items-center justify-center text-black font-bold">
+                ☀
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold">SolarGuard</h2>
+                <p class="text-sm opacity-80">태양광 발전소 관제 시스템</p>
+            </div>
+        </div>
+
+        <!-- 메인 문구 -->
+        <h1 class="text-5xl font-bold leading-tight mb-6">
+            태양광 발전소를 <br>
+            <span class="text-yellow-400">한눈에 관제하다</span>
+        </h1>
+
+        <p class="text-lg opacity-90 mb-10">
+            실시간 발전 현황부터 장애 감지, 수익 예측, 환경 기여도까지<br>
+            스마트한 태양광 관제를 경험하세요
+        </p>
+
+        <!-- 하단 정보 -->
+        <div class="flex gap-16 text-center">
+            <div>
+                <p class="text-3xl font-bold">0</p>
+                <p class="text-sm opacity-70">등록된 발전소 수</p>
+            </div>
+            <div>
+                <p class="text-3xl font-bold">60분</p>
+                <p class="text-sm opacity-70">데이터 갱신 주기</p>
+            </div>
+            <div>
+                <p class="text-3xl font-bold">0</p>
+                <p class="text-sm opacity-70">총(누적) 발전량</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 오른쪽 로그인 영역 -->
+<div class="w-[40%] bg-slate-900 flex items-center justify-center">
+
+    <div class="bg-gray-100 w-96 p-10 rounded-3xl shadow-xl">
+
+        <h2 class="text-2xl font-bold mb-2">로그인</h2>
+        <p class="text-sm text-gray-500 mb-6">
+            관리자에게 발급받은 계정으로 로그인하세요
+        </p>
+
+        <form method="post" th:action="@{/login}" class="space-y-4">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <div>
+                <label class="text-sm text-gray-700">아이디</label>
+                <input type="text" name="username" autocomplete="username" required
+                       class="w-full border rounded-lg p-2 mt-1">
+            </div>
+
+            <div>
+                <label class="text-sm text-gray-700">비밀번호</label>
+                <input type="password" name="password" autocomplete="current-password" required
+                       class="w-full border rounded-lg p-2 mt-1">
+            </div>
+
+            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 text-sm p-3 rounded-lg">
+                최초 로그인 시 임시 비밀번호로 접속하면<br>
+                비밀번호 변경 페이지로 이동됩니다.
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg font-semibold">
+                로그인
+            </button>
+
+            <p th:if="${param.error}" class="text-red-500 text-sm mt-3 text-center">
+                아이디 또는 비밀번호가 틀렸습니다.
+            </p>
+        </form>
+
+        <p class="text-xs text-gray-500 text-center mt-6">
+            계정 발급은 관리자에게 문의해주세요<br>
+            043-123-4567 · SolarGuard@email.com
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+</html>
