@@ -2,11 +2,12 @@ package com.suncontrol.domain.dto;
 
 import lombok.Data;
 
-@Data // 이 어노테이션이 setLocation, setEfficiency 등을 만듭니다.
+@Data
 public class AlertDTO {
-    private Long alertId;
-    private String location;    // 위치
-    private Double efficiency;  // 발전 효율
-    private String status;      // 상태 (WARNING / NORMAL)
-    private String message;     // 알림 메시지
+    private Long id;           // alert_id 매핑
+    private String detectTime;  // 장애 감지 시간
+    private String resolvedTime;// 조치 완료 시간
+    private String location;    // 발전소 위치
+    private String status;      // 상태 (장애/정상)
+    private Double efficiency;  // 효율
 }
