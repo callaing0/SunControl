@@ -43,5 +43,6 @@ public class PlantDto {
         this.azimuth = entity.getAzimuth();
         this.tilt = entity.getTilt();
         this.createdAt = entity.getCreatedAt();
+        this.isMain = entity.isMain();
     }
 }

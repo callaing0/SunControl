@@ -20,6 +20,10 @@
         }
     </style>
 
+    <!--TODO : 추가한 내용 -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
     <th:block layout:fragment="css"></th:block>
     <th:block th:replace="~{fragments/adminModal :: modalStyle}"></th:block>
 </head>

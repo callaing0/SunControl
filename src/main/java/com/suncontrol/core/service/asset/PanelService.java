@@ -26,6 +26,10 @@ public class PanelService {
         // 0번 key (Long 0L) 에는 지정해 준 모든 인버터의 정보를 합산하여 저장한다.
         // 더미데이터 다 밀어넣고 기상 조회/저장하고 한 8일~10일쯤에 구현예정.
 
+        if (inverters == null || inverters.isEmpty()) {
+            return Map.of(); // 여기 없으면 또 터진다
+        }
+
         Map<Long, List<PanelDto>> panelMap =
                 repository.findAllByInverterIds(inverters)
                         .stream()
