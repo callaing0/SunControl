@@ -65,10 +65,12 @@
             <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center min-h-[220px]">
                 <div class="flex items-center space-x-2 mb-4 text-yellow-500">
                     <span class="text-xl">☀️</span>
-                    <p class="text-gray-500 font-bold uppercase text-[11px] tracking-widest">발전 효율</p>
+                    <p class="text-gray-500 font-bold uppercase text-[11px] tracking-widest">현재 출력 효율</p>
                 </div>
                 <h2 class="text-6xl font-black text-yellow-400 tracking-tighter">
-                    <span th:text="${summary != null and summary.efficiency != null ? summary.efficiency : '--'}">--</span>
+                   <span th:text="${summary != null and summary.efficiency != null
+                    ? #numbers.formatDecimal(summary.efficiency, 1, 2)
+                    : '--'}">--</span>
                     <span class="text-xl font-bold text-yellow-400/30 ml-2 italic uppercase">%</span>
                 </h2>
             </div>
