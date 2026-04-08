@@ -23,7 +23,7 @@ public class AssetRestService {
     @Transactional
     public void savePlant(String userId, PlantSaveForm form) {
         /// TODO : memberService로 유효성 검사
-//        form.getMemberId();
+        Long memberId = form.getMemberId();
         plantService.save(form.toDto());
         /// TODO : ResponseEntity용 메시지 작성
     }
