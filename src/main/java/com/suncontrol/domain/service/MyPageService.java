@@ -15,6 +15,7 @@ import com.suncontrol.domain.vo.asset.PanelVo;
 import com.suncontrol.domain.vo.asset.PlantDetailVo;
 import com.suncontrol.domain.vo.asset.PlantVo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MyPageService {
 
     private final MemberService memberService;
@@ -43,6 +45,7 @@ public class MyPageService {
         }
 
         myPageVo.setMember(memberDetail);
+        log.info("{}", memberDetail.getName());
 
         /** 4/7 추가
          * 가져온 사용자의 정보를 토대로 개별 자산 정보를 추출하여
@@ -58,11 +61,13 @@ public class MyPageService {
                 .map(PlantDto::getId)
                 .findFirst()
                 .orElse(null);
+        log.info("{}", plantService.findAllByMemberId(memberDetail.getId()).get(0).isMain());
 
         // 발전소 상세정보 조회
         myPageVo.setPlant(
                 new PlantDetailVo(
                         plantService.getInfoViewById(mainPlantId)));
+        log.info("{} 번 발전소", mainPlantId);
         
         // 발전소의 인버터 모두가져오기
         List<InverterDto> inverters = inverterService.findAllByPlant(mainPlantId);
@@ -74,6 +79,7 @@ public class MyPageService {
                 .map(dto -> new InverterDetailVo(parentPlant,dto))
                 .collect(Collectors.toList())
         );
+        log.info("{} 인버터", inverters.get(0).getSerial());
 
         // 패널의 조회정보를 삽입
         // 해당 맵의 0L 키에는 발전소 전체 패널에 대한 정보가 들어있다.

@@ -21,7 +21,7 @@ public class MyPageController {
     private final MyPageService myPageService;
 
     // 마이페이지 조회
-    @GetMapping("/")
+    @GetMapping
     public String showMyPage(Model model, Principal principal) {
 
         if (principal == null) {

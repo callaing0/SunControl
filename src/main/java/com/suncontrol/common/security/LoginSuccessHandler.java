@@ -1,5 +1,6 @@
 package com.suncontrol.common.security;
 
+import com.suncontrol.core.constant.common.Role;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +19,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException, ServletException {
 
         CustomUserDetails userDetails= (CustomUserDetails) authentication.getPrincipal();
+
+        // 관리자가 로그인 시 관리자 페이지로 이동
+        if(userDetails.getRole().equals(Role.ROLE_ADMIN)){
+            response.sendRedirect("/admin");
+            return;
+        }
 
         // 임시 비밀번호 사용자면 비밀번호 변경 페이지로 이동
         if(userDetails.isTemporary()){
