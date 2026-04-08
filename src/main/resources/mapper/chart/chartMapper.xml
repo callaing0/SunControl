@@ -11,7 +11,8 @@
         FROM daily_report dr
                  INNER JOIN inverter i ON dr.inverter_id = i.id
                  INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.member_id = #{memberId}
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
           AND dr.base_date = #{selectedDate}
     </select>
 
@@ -21,7 +22,8 @@
         FROM daily_report dr
                  INNER JOIN inverter i ON dr.inverter_id = i.id
                  INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.member_id = #{memberId}
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
           AND dr.base_date = #{selectedDate}
     </select>
 
@@ -31,7 +33,8 @@
         FROM daily_report dr
                  INNER JOIN inverter i ON dr.inverter_id = i.id
                  INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.member_id = #{memberId}
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
           AND dr.base_date = #{selectedDate}
     </select>
 
@@ -40,7 +43,8 @@
         SELECT COUNT(i.id)
         FROM inverter i
                  INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.member_id = #{memberId}
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
     </select>
 
     <!-- 장애 건수 -->
@@ -49,7 +53,8 @@
         FROM alert_log al
                  INNER JOIN inverter i ON al.inverter_id = i.id
                  INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.member_id = #{memberId}
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
           AND DATE(al.created_at) = #{selectedDate}
     </select>
 
@@ -60,7 +65,8 @@
         FROM hourly_report hr
             INNER JOIN inverter i ON hr.inverter_id = i.id
             INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.member_id = #{memberId}
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
           AND DATE(hr.base_time) = #{selectedDate}
         GROUP BY HOUR(hr.base_time), DATE_FORMAT(hr.base_time, '%H시')
         ORDER BY HOUR(hr.base_time)
@@ -80,7 +86,8 @@
         FROM generation_log gl
             INNER JOIN inverter i ON gl.inverter_id = i.id
             INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.member_id = #{memberId}
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
           AND DATE(gl.base_time) = #{selectedDate}
         GROUP BY gl.weather_code
         ORDER BY gl.weather_code
