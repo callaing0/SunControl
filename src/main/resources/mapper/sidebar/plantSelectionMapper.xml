@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.suncontrol.core.repository.report.plantSelectionRepository">
+
+    <select id="selectPlantListByMemberId" resultType="com.suncontrol.domain.dto.PlantSelectDto">
+        SELECT
+            p.id      AS id,
+            p.name    AS name,
+            p.address AS address
+        FROM plant p
+        WHERE p.member_id = #{memberId}
+          AND p.is_deleted = 0
+        ORDER BY p.is_main DESC, p.id ASC
+    </select>
+
+    <select id="selectPlantById" resultType="com.suncontrol.domain.dto.PlantSelectDto">
+        SELECT
+            p.id      AS id,
+            p.name    AS name,
+            p.address AS address
+        FROM plant p
+        WHERE p.member_id = #{memberId}
+          AND p.id = #{plantId}
+          AND p.is_deleted = 0
+            LIMIT 1
+    </select>
+
+</mapper>

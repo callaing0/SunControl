@@ -16,7 +16,7 @@ public enum WeatherApiHourlyRequest {
     GHI("shortwave_radiation"), /// 수직면 일사량(위도때문에 GTI보다 낮음)
     WMO("weather_code"), /// 기상코드
     GTI("global_tilted_irradiance"), /// 경사면 일사량
-    GTI_INSTANCE("global_tilted_irradiance_instance"); /// 순간 경사면 일사량
+    GTI_INSTANT("global_tilted_irradiance_instant"); /// 순간 경사면 일사량
 
     private final String label;
 

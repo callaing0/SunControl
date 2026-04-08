@@ -35,7 +35,7 @@ public record GenerateCalcBase(
                             DailyWeatherDto daily) {
         this(
                 radiation != null ? radiation.getGti() : DEFAULT_ZERO,
-                radiation != null ? radiation.getGtiInstance() : DEFAULT_ZERO,
+                radiation != null ? radiation.getGtiInstant() : DEFAULT_ZERO,
                 weather != null ? weather.getTemperature() : DEFAULT_ZERO,
                 weather != null && radiation != null && daily != null ?
                         GenerationStrategy.REAL_EXP : GenerationStrategy.VIRTUAL_EXP,

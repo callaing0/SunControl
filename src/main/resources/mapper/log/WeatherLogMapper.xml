@@ -9,20 +9,41 @@
 <!--  TODO : 건수가 많아지면 BATCH로 전환해야 함  -->
     <insert id="saveAll" parameterType="com.suncontrol.core.entity.log.WeatherLog">
         INSERT INTO weather_log (
-            district_code, base_time, temperature,
-            cloud_low, cloud_mid, cloud_high, ghi
+            district_code, base_time, day_offset,
+            temperature, cloud_low, cloud_mid, cloud_high,
+            weather_code, ghi, created_at, updated_at
         ) VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.districtCode}, #{item.baseTime}, #{item.temperature},
-            #{item.cloudLow}, #{item.cloudMid}, #{item.cloudHigh}, #{item.ghi})
+            (
+            #{item.districtCode}, #{item.baseTime}, #{item.dayOffset},
+            #{item.temperature}, #{item.cloudLow}, #{item.cloudMid}, #{item.cloudHigh},
+            #{item.weatherCode}, #{item.ghi}, #{item.createdAt}, #{item.updatedAt}
+            )
         </foreach>
         ON DUPLICATE KEY UPDATE
-            temperature = VALUES(temperature),
-            cloud_low = VALUES(cloud_low),
-            cloud_mid = VALUES(cloud_mid),
-            cloud_high = VALUES(cloud_high),
-            ghi = VALUES(ghi),
-            updated_at = NOW()
+            temperature = COALESCE(VALUES(temperature), temperature),
+            cloud_low = COALESCE(VALUES(cloud_low), cloud_low),
+            cloud_mid = COALESCE(VALUES(cloud_mid), cloud_mid),
+            cloud_high = COALESCE(VALUES(cloud_high), cloud_high),
+            weather_code = COALESCE(VALUES(weather_code), weather_code),
+            ghi = COALESCE(VALUES(ghi), ghi),
+            updated_at = COALESCE(VALUES(updated_at), updated_at)
     </insert>
+    <select id="findLatestLogs"
+            resultType="com.suncontrol.core.entity.log.WeatherLog">
+        SELECT * FROM (
+        SELECT *,
+        ROW_NUMBER() OVER(
+        PARTITION BY base_time, district_code
+        ORDER BY FIELD(day_offset, 0, 1, 7)
+        ) as rn
+        FROM weather_log
+        WHERE base_time BETWEEN #{start} AND #{end}
+        ) t
+        WHERE rn = 1
+    </select>
+    <select id="findLatestLogOfAll" resultType="com.suncontrol.core.entity.log.WeatherLog">
+        SELECT * FROM weather_log ORDER BY updated_at DESC LIMIT 1
+    </select>
     <!-- TODO 계산로직용 조회 / 대시보드 출력용 조회 -->
 </mapper>

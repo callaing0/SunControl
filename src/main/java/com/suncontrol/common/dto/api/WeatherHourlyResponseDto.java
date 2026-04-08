@@ -1,98 +1,50 @@
 package com.suncontrol.common.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
+import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.dto.log.RadiationLogDto;
 import com.suncontrol.core.dto.log.WeatherLogDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
+@ToString
 public class WeatherHourlyResponseDto {
     ///  기상 API 수신 시간별 데이터
 
     @JsonProperty("time")
-    private LocalDateTime baseTime;
+    private List<LocalDateTime> baseTime;
 
     @JsonProperty("temperature_2m")
-    private double temperature;
+    private List<Double> temperature;
 
     @JsonProperty("cloud_cover_low")
-    private int cloudLow;
+    private List<Integer> cloudLow;
     @JsonProperty("cloud_cover_mid")
-    private int cloudMid;
+    private List<Integer> cloudMid;
     @JsonProperty("cloud_cover_high")
-    private int cloudHigh;
+    private List<Integer> cloudHigh;
 
     @JsonProperty("shortwave_radiation")
-    private int ghi;
+    private List<Integer> ghi;
     @JsonProperty("weather_code")
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    private String weatherCode;
-    @JsonIgnore
-    @Getter(AccessLevel.NONE)
-    private Weather weather;
+    private List<Integer> weatherCode;
 
     @JsonProperty("global_tilted_irradiance")
-    private double gti;
-    @JsonProperty("global_tilted_irradiance_instance")
-    private double gtiInstance;
-
-    public void setWeatherCode(String weatherCode) {
-        this.weather = Weather.fromCode(weatherCode);
-        this.weatherCode = weatherCode;
-    }
-    public String getWeatherCode() {
-        return weatherCode == null ?
-                weather == null ? null : weather.getWeatherCode() : this.weatherCode;
-    }
-
-    @JsonIgnore
-    public Weather getWeather() {
-        /// 마지막 Entity로 옮길 때 데이터 일치여부를 확인하고
-        /// DB로 전송하기 위한 커스텀 getter 메서드
-        Weather weatherByCode = Weather.fromCode(weatherCode);
-        /// weather Enum 객체에 제대로 값이 저장되지 않았을 경우 재추적하여 갱신
-        if(!weatherByCode.equals(weather)) {
-            this.weather = weatherByCode;
-
-            /// 외부에서 입력된 값이 없으면 강제로 "맑음" 주입
-            if(this.weatherCode == null)
-                this.weatherCode = weather.getWeatherCode();
-
-        }
-        return this.weather;
-    }
-
-    @JsonIgnore
-    public WeatherLogDto getWeatherLogDto(District district) {
-        return WeatherLogDto.builder()
-                .district(district)
-                .baseTime(baseTime)
-                .temperature(temperature)
-                .cloudLow(cloudLow)
-                .cloudMid(cloudMid)
-                .cloudHigh(cloudHigh)
-                .ghi(ghi)
-                .weather(getWeather())
-                .weatherCode(weatherCode)
-                .build();
-    }
-
-    @JsonIgnore
-    public RadiationLogDto getRadiationLogDto(Long plantId) {
-        return RadiationLogDto.builder()
-                .plantId(plantId)
-                .baseTime(baseTime)
-                .gti(gti)
-                .gtiInstance(gtiInstance)
-                .build();
-    }
+    private List<Double> gti;
+    @JsonProperty("global_tilted_irradiance_instant")
+    private List<Double> gtiInstant;
 }
