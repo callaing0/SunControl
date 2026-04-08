@@ -2,6 +2,7 @@ package com.suncontrol.domain.api;
 
 import com.suncontrol.common.response.ResponseDto;
 import com.suncontrol.domain.form.InverterSaveForm;
+import com.suncontrol.domain.form.PanelSaveForm;
 import com.suncontrol.domain.form.PlantSaveForm;
 import com.suncontrol.domain.service.AssetRestService;
 import jakarta.validation.Valid;
@@ -59,6 +60,22 @@ public class AssetRestController {
         }
         String result = service.saveInverter(principal.getName(), form);
 
+        return ResponseEntity.ok(
+                new ResponseDto<>(true, result, null));
+    }
+
+    @PostMapping("/panels")
+    public ResponseEntity<ResponseDto<?>> registerPanel(
+            @Valid @RequestBody PanelSaveForm form,
+            BindingResult bindingResult,
+            Principal principal
+            )  throws AccessDeniedException {
+        if(bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new ResponseDto<>(
+                    false, DEFAULT_ERR_MSG, service.writeErrorMsg(bindingResult)
+            ));
+        }
+        String result = service.savePanel(principal.getName(), form);
         return ResponseEntity.ok(
                 new ResponseDto<>(true, result, null));
     }
