@@ -29,24 +29,24 @@ public class dashboardServiceImpl implements dashboardService {
     private final dashboardRepository dashboardRepository;
 
     @Override
-    public dashboardSummaryDto getDashboardSummary(Long memberId) {
-        DashboardPlantDto plant = dashboardRepository.selectMainPlant(memberId);
+    public dashboardSummaryDto getDashboardSummary(Long memberId, Long plantId) {
+        DashboardPlantDto plant = dashboardRepository.selectPlantById(memberId, plantId);
 
         if (plant == null) {
             return null;
         }
 
-        Long plantId = plant.getPlantId();
+        Long targetPlantId = plant.getPlantId();
 
-        DashboardRealtimeDto realtime = dashboardRepository.selectPlantRealtime(plantId);
+        DashboardRealtimeDto realtime = dashboardRepository.selectPlantRealtime(targetPlantId);
         DashboardSunTimeDto sunTime = dashboardRepository.selectTodaySunTime(plant.getDistrictCode());
         BigDecimal temperature = dashboardRepository.selectLatestTemperature(plant.getDistrictCode());
-        BigDecimal insolation = dashboardRepository.selectTodayInsolation(plantId);
-        DashboardGenerationDto generation = dashboardRepository.selectTodayGeneration(plantId);
+        BigDecimal insolation = dashboardRepository.selectTodayInsolation(targetPlantId);
+        DashboardGenerationDto generation = dashboardRepository.selectTodayGeneration(targetPlantId);
 
         dashboardSummaryDto summary = new dashboardSummaryDto();
 
-        summary.setPlantId(plantId);
+        summary.setPlantId(targetPlantId);
         summary.setPlantName(plant.getPlantName());
         summary.setLocation(plant.getLocation());
 
@@ -72,8 +72,8 @@ public class dashboardServiceImpl implements dashboardService {
                 co2Reduction.divide(TREE_DIVISOR, 0, RoundingMode.DOWN).intValue()
         );
 
-        List<DashboardHourlyValueDto> powerRows = dashboardRepository.selectHourlyPower(plantId);
-        List<DashboardHourlyValueDto> insolationRows = dashboardRepository.selectHourlyInsolation(plantId);
+        List<DashboardHourlyValueDto> powerRows = dashboardRepository.selectHourlyPower(targetPlantId);
+        List<DashboardHourlyValueDto> insolationRows = dashboardRepository.selectHourlyInsolation(targetPlantId);
 
         summary.setChartLabels(buildChartLabels());
         summary.setPowerList(buildHourlySeries(powerRows, 6, 18));
@@ -83,8 +83,8 @@ public class dashboardServiceImpl implements dashboardService {
     }
 
     @Override
-    public List<DashboardInverterDto> getInverters(Long memberId) {
-        return dashboardRepository.selectInverters(memberId);
+    public List<DashboardInverterDto> getInverters(Long memberId, Long plantId) {
+        return dashboardRepository.selectInvertersByPlant(memberId, plantId);
     }
 
     private List<String> buildChartLabels() {

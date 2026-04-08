@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface chartService {
 
-    List<chartSummaryDto> getStatsSummary(Long memberId, LocalDate selectedDate);
+    List<chartSummaryDto> getStatsSummary(Long plantId, LocalDate selectedDate);
 
-    List<chartDto> getGenerationTrend(Long memberId, LocalDate selectedDate);
+    List<chartDto> getGenerationTrend(Long plantId, LocalDate selectedDate);
 
-    List<chartDto> getWeatherEfficiency(Long memberId, LocalDate selectedDate);
+    List<chartDto> getWeatherEfficiency(Long plantId, LocalDate selectedDate);
 }

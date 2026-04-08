@@ -18,12 +18,12 @@ public class chartServiceImpl implements chartService {
     private final chartRepository chartRepository;
 
     @Override
-    public List<chartSummaryDto> getStatsSummary(Long memberId, LocalDate selectedDate) {
-        BigDecimal totalGeneration = nvl(chartRepository.selectTotalGeneration(memberId, selectedDate));
-        BigDecimal expectedGeneration = nvl(chartRepository.selectExpectedGeneration(memberId, selectedDate));
-        BigDecimal averageEfficiency = nvl(chartRepository.selectAverageEfficiency(memberId, selectedDate));
-        int inverterCount = chartRepository.selectInverterCount(memberId);
-        int alertCount = chartRepository.selectAlertCount(memberId, selectedDate);
+    public List<chartSummaryDto> getStatsSummary(Long plantId, LocalDate selectedDate) {
+        BigDecimal totalGeneration = nvl(chartRepository.selectTotalGeneration(plantId, selectedDate));
+        BigDecimal expectedGeneration = nvl(chartRepository.selectExpectedGeneration(plantId, selectedDate));
+        BigDecimal averageEfficiency = nvl(chartRepository.selectAverageEfficiency(plantId, selectedDate));
+        int inverterCount = chartRepository.selectInverterCount(plantId);
+        int alertCount = chartRepository.selectAlertCount(plantId, selectedDate);
 
         List<chartSummaryDto> summaryList = new ArrayList<>();
         summaryList.add(createSummary("총 발전량", totalGeneration.stripTrailingZeros().toPlainString() + " kWh"));
@@ -36,13 +36,13 @@ public class chartServiceImpl implements chartService {
     }
 
     @Override
-    public List<chartDto> getGenerationTrend(Long memberId, LocalDate selectedDate) {
-        return chartRepository.selectGenerationTrend(memberId, selectedDate);
+    public List<chartDto> getGenerationTrend(Long plantId, LocalDate selectedDate) {
+        return chartRepository.selectGenerationTrend(plantId, selectedDate);
     }
 
     @Override
-    public List<chartDto> getWeatherEfficiency(Long memberId, LocalDate selectedDate) {
-        return chartRepository.selectWeatherEfficiency(memberId, selectedDate);
+    public List<chartDto> getWeatherEfficiency(Long plantId, LocalDate selectedDate) {
+        return chartRepository.selectWeatherEfficiency(plantId, selectedDate);
     }
 
     private chartSummaryDto createSummary(String title, String value) {
