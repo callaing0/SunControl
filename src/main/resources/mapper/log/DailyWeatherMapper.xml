@@ -3,21 +3,25 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.core.repository.log.DailyWeatherRepository">
+<mapper namespace="com.suncontrol.core.repository.log.DailyWeatherRepository">
     <!--  일일 기상데이터 저장  -->
     <!--  TODO : 건수가 많아지면 BATCH로 전환해야 함  -->
     <insert id="saveAll" parameterType="com.suncontrol.core.entity.log.DailyWeather">
         INSERT INTO daily_weather (
-        district_code, base_date, temp_max, temp_min, weather_code, sunrise, sunset,
-        sunshine_duration, daylight_duration, prec_sum, snow_sum, radiation_sum,
-        day_offset, created_at, updated_at
+        district_code, base_date, day_offset,
+        temp_max, temp_min,
+        weather_code, sunrise, sunset,
+        sunshine_duration, daylight_duration,
+        prec_sum, snow_sum, radiation_sum,
+        created_at, updated_at
         ) VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.districtCode}, #{item.baseDate}, #{item.tempMax}, #{item.tempMin},
+            (#{item.districtCode}, #{item.baseDate}, #{item.dayOffset},
+            #{item.tempMax}, #{item.tempMin},
             #{item.weatherCode}, #{item.sunrise}, #{item.sunset},
             #{item.sunshineDuration}, #{item.daylightDuration},
             #{item.precSum}, #{item.snowSum}, #{item.radiationSum},
-            #{item.dayOffset}, #{item.createdAt}, #{item.updatedAt})
+            #{item.createdAt}, #{item.updatedAt})
         </foreach>
         ON DUPLICATE KEY UPDATE
         temp_max = COALESCE(VALUES(temp_max), temp_max),

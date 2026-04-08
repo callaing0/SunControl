@@ -8,16 +8,17 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
+@NoArgsConstructor
 public class RadiationLogDto {
-    /// Map<Long(plantId), RadLogDto> - 저장
-    /// Map<Long,Map<L.D.T,RadLogDto>> - 데이터생성
+    /// List<RadLogDto> - 저장
+    /// Map<발전소ID,Map<시간,RadLogDto>> - 데이터생성
     private Long plantId;
     private LocalDateTime baseTime;
-    private double gti;
-    private double gtiInstance;
     private ReportDataType dataType;
+
+    private double gti;
+    private double gtiInstant;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -25,7 +26,7 @@ public class RadiationLogDto {
         this.plantId = entity.getPlantId();
         this.baseTime = entity.getBaseTime();
         this.gti = entity.getGti();
-        this.gtiInstance = entity.getGtiInstance();
+        this.gtiInstant = entity.getGtiInstant();
         this.dataType = ReportDataType.findByDayOffset(entity.getDayOffset());
         this.createdAt = entity.getCreatedAt();
         this.updatedAt = entity.getUpdatedAt();

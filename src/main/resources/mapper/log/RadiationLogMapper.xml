@@ -3,20 +3,24 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.core.repository.log.RadiationLogRepository">
+<mapper namespace="com.suncontrol.core.repository.log.RadiationLogRepository">
     <!--  일사량데이터 저장  -->
     <!--  TODO : 건수가 많아지면 BATCH로 전환해야 함  -->
     <insert id="saveAll" parameterType="com.suncontrol.core.entity.log.RadiationLog">
         INSERT INTO radiation_log (
-        plant_id, base_time, gti, gti_instance, day_offset, created_at, updated_at
+        plant_id, base_time, day_offset,
+        gti, gti_instant, created_at, updated_at
         ) VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.plantId}, #{item.baseTime}, #{item.gti},
-            #{item.gtiInstance}, #{item.dayOffset}, #{item.createdAt}, #{item.updatedAt})
+            (
+            #{item.plantId}, #{item.baseTime}, #{item.dayOffset},
+            #{item.gti}, #{item.gtiInstant},
+            #{item.createdAt}, #{item.updatedAt}
+            )
         </foreach>
         ON DUPLICATE KEY UPDATE
         gti = COALESCE(VALUES(gti), gti),
-        gti_instance = COALESCE(VALUES(gti_instance), gti_instance),
+        gti_instant = COALESCE(VALUES(gti_instant), gti_instant),
         updated_at = COALESCE(VALUES(updated_at), updated_at)
     </insert>
     <select id="findLatestLogs"

@@ -75,14 +75,14 @@ public class WeatherApiService {
                 log.info("수집 데이터 코드 : {}", responseEntity.getStatusCode());
                 log.info("원본 JSON 확인: {}", responseEntity.getBody());
 
-//                if (responseEntity.getStatusCode().is2xxSuccessful()) {
-//                    WeatherResponseDto response = responseEntity.getBody();
-//                    if(response != null) {
-//                        response.setPlant(plant);
-//                        responses.add(response);
-//                        log.info("발전소 {} 날씨정보 수집완료 {}", plant.getId(), response);
-//                    }
-//                }
+                if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                    WeatherResponseDto response = responseEntity.getBody();
+                    if(response != null) {
+                        response.setPlant(plant);
+                        responses.add(response);
+                        log.info("발전소 {} 날씨정보 수집완료 {}", plant.getId(), response);
+                    }
+                }
             } catch (Exception e) {
                 log.error("발전소 {} 날씨정보 수집중 오류 발생 : {}", plant.getId(), e.getMessage());
             }

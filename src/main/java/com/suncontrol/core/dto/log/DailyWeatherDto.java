@@ -17,19 +17,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class DailyWeatherDto {
     /// 발전 데이터 "통계" 생성용 일별 데이터
-    /// Map<District, List<DailyWeatherDto>> 를 통해 DB저장,
-    /// Map<District, Map<LocalDate, DailyWeatherDto>> 로
+    /// List<DailyWeatherDto> 를 통해 DB저장,
+    /// Map<지역, Map<날짜, DailyWeatherDto>> 로
     /// 발전 데이터 생성용 맵 객체를 형성한다
 
     private District district;
     private LocalDate baseDate;
+    private ReportDataType dataType;
+
     private double tempMax;
     private double tempMin;
-
-    @Getter(AccessLevel.NONE)
-    private String weatherCode;
+    private Integer weatherCode;
     private Weather weather;
-
     private LocalDateTime sunrise;
     private LocalDateTime sunset;
     private double sunshineDuration;
@@ -37,23 +36,17 @@ public class DailyWeatherDto {
     private double precSum;
     private double snowSum;
     private double radiationSum;
-    private ReportDataType dataType;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-
-    public String getWeatherCode() {
-        return weatherCode == null ?
-                weather == null ? null : weather.getWeatherCode() : this.weatherCode;
-    }
 
     public DailyWeatherDto(DailyWeather entity) {
         this.district = entity.getDistrict();
         this.baseDate = entity.getBaseDate();
         this.tempMax = entity.getTempMax();
         this.tempMin = entity.getTempMin();
-        this.weather = entity.getWeather();
         this.weatherCode = entity.getWeatherCode();
+        this.weather = Weather.fromCode(weatherCode);
         this.sunrise = entity.getSunrise();
         this.sunset = entity.getSunset();
         this.sunshineDuration = entity.getSunshineDuration();
