@@ -24,7 +24,7 @@ public class PanelVo {
         this.manufacturer = dto.getModel().getManufacturer();
     }
 
-    public String getname() {
+    public String getName() {
         return model.getName();
     }
 }

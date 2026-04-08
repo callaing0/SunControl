@@ -3,9 +3,11 @@ package com.suncontrol.domain.vo.asset;
 import com.suncontrol.core.dto.asset.PlantDto;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class PlantVo {
     ///  발전소 목록 표시용(드롭다운, 리스트)
     private Long id;

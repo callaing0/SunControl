@@ -4,6 +4,7 @@ import com.suncontrol.core.dto.asset.InverterDto;
 import com.suncontrol.core.dto.asset.PanelDto;
 import com.suncontrol.core.dto.asset.PlantDto;
 import com.suncontrol.core.entity.Member;
+import com.suncontrol.core.entity.view.PlantInfoView;
 import com.suncontrol.core.service.asset.InverterService;
 import com.suncontrol.core.service.asset.PanelService;
 import com.suncontrol.core.service.asset.PlantService;
@@ -61,17 +62,19 @@ public class MyPageService {
                 .map(PlantDto::getId)
                 .findFirst()
                 .orElse(null);
-        log.info("{}", plantService.findAllByMemberId(memberDetail.getId()).get(0).isMain());
+//        log.info("{}", plantService.findAllByMemberId(memberDetail.getId()).get(0).isMain());
 
+        PlantInfoView view = plantService.getInfoViewById(mainPlantId);
+        log.info("plant view : {}", view);
         // 발전소 상세정보 조회
         myPageVo.setPlant(
                 new PlantDetailVo(
                         plantService.getInfoViewById(mainPlantId)));
-        log.info("{} 번 발전소", mainPlantId);
         
         // 발전소의 인버터 모두가져오기
         List<InverterDto> inverters = inverterService.findAllByPlant(mainPlantId);
         PlantVo parentPlant = new PlantVo(myPageVo.getPlant());
+        log.info("발전소 : {}", myPageVo.getPlant());
 
         // 인버터의 조회정보를 삽입
         myPageVo.setInverters(inverters

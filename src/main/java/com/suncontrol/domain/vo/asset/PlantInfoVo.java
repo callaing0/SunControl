@@ -6,11 +6,13 @@ import com.suncontrol.core.dto.asset.PlantDto;
 import com.suncontrol.core.entity.view.PlantInfoView;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class PlantInfoVo extends PlantVo {
     /// 내비게이션 메뉴용,
     private District district;
