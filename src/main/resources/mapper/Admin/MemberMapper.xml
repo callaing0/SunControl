@@ -42,6 +42,8 @@
     <update id="updateMember">
         UPDATE member
         SET role = #{role},
+        name = #{name},                <!-- 🔥 추가 -->
+        affiliation = #{affiliation}, <!-- 🔥 추가 -->
         status = #{status},
         updated_at = #{updatedAt}
         WHERE id = #{id}
