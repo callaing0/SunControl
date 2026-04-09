@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<div layout:fragment="content">
+    <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 min-h-[82vh] flex flex-col justify-center">
+        <div class="max-w-5xl mx-auto w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-10 items-stretch">
+
+                <!-- 안내 영역 -->
+                <section class="bg-white rounded-[45px] border border-gray-100 shadow-sm p-10 lg:p-12 flex flex-col justify-between">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-50 border border-yellow-100 text-yellow-600 text-[11px] font-black uppercase tracking-[0.18em]">
+                            <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                            Asset Setup Required
+                        </div>
+
+                        <h2 class="mt-6 text-4xl font-black text-gray-800 tracking-tighter italic uppercase leading-tight">
+                            등록된 발전소가 없습니다.
+                        </h2>
+
+                        <p class="mt-4 text-base text-gray-400 font-bold tracking-tight leading-relaxed break-keep">
+                            서비스를 정상적으로 이용하려면 먼저 발전소 자산 등록이 필요합니다.<br>
+                            마이페이지에서 발전소 정보를 등록한 뒤 인버터와 패널 자산까지 순서대로 설정해 주세요.
+                        </p>
+                    </div>
+
+                    <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-gray-50 border border-gray-100 rounded-[28px] p-6">
+                            <p class="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">Step 01</p>
+                            <p class="mt-3 text-lg font-black text-gray-800 italic uppercase">발전소 등록</p>
+                            <p class="mt-2 text-sm text-gray-400 font-bold leading-relaxed break-keep">
+                                발전소명과 주소 등 기본 정보를 먼저 입력합니다.
+                            </p>
+                        </div>
+
+                        <div class="bg-gray-50 border border-gray-100 rounded-[28px] p-6">
+                            <p class="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">Step 02</p>
+                            <p class="mt-3 text-lg font-black text-gray-800 italic uppercase">인버터 등록</p>
+                            <p class="mt-2 text-sm text-gray-400 font-bold leading-relaxed break-keep">
+                                등록한 발전소에 연결된 인버터 자산을 추가합니다.
+                            </p>
+                        </div>
+
+                        <div class="bg-gray-50 border border-gray-100 rounded-[28px] p-6">
+                            <p class="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">Step 03</p>
+                            <p class="mt-3 text-lg font-black text-gray-800 italic uppercase">패널 등록</p>
+                            <p class="mt-2 text-sm text-gray-400 font-bold leading-relaxed break-keep">
+                                패널 정보까지 등록하면 자산 관리 준비가 완료됩니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                        <a th:href="@{/mypage}"
+                           class="inline-flex items-center justify-center bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-4 rounded-2xl font-black text-sm shadow-lg shadow-yellow-400/20 transition-all active:scale-95 uppercase italic">
+                            마이페이지로 이동
+                        </a>
+                    </div>
+                </section>
+
+                <!-- 상태/시각 영역 -->
+                <aside class="bg-gray-50/70 border border-gray-100 rounded-[45px] p-8 lg:p-10 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="w-20 h-20 rounded-[28px] bg-white border border-gray-100 shadow-sm flex items-center justify-center text-4xl">
+                            ☀️
+                        </div>
+
+                        <h3 class="mt-8 text-2xl font-black text-gray-800 tracking-tighter italic uppercase">
+                            자산 등록 안내
+                        </h3>
+
+                        <p class="mt-3 text-sm text-gray-400 font-bold leading-relaxed break-keep">
+                            현재 계정에는 연결된 발전소 자산이 없어 실시간 발전 현황과 통계 데이터를 표시할 수 없습니다.
+                        </p>
+                    </div>
+
+                    <div class="mt-8 space-y-4">
+                        <div class="bg-white border border-gray-100 rounded-[26px] p-5 flex items-center justify-between">
+                            <span class="text-[11px] text-gray-400 font-black uppercase tracking-widest">등록 상태</span>
+                            <span class="px-3 py-1.5 rounded-full bg-red-50 text-red-500 border border-red-100 text-[10px] font-black uppercase tracking-widest">
+                                No Plant
+                            </span>
+                        </div>
+
+                        <div class="bg-white border border-gray-100 rounded-[26px] p-5 flex items-center justify-between">
+                            <span class="text-[11px] text-gray-400 font-black uppercase tracking-widest">이동 위치</span>
+                            <span class="text-sm text-gray-800 font-black italic uppercase">My Page</span>
+                        </div>
+
+                        <div class="bg-white border border-gray-100 rounded-[26px] p-5 flex items-center justify-between">
+                            <span class="text-[11px] text-gray-400 font-black uppercase tracking-widest">필수 작업</span>
+                            <span class="text-sm text-gray-800 font-black italic uppercase">Plant Register</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-white border border-dashed border-gray-200 rounded-[30px] p-6 text-center">
+                        <p class="text-[10px] text-gray-300 font-black uppercase tracking-[0.25em]">Guide Message</p>
+                        <p class="mt-3 text-gray-500 font-black leading-relaxed break-keep">
+                            발전소 등록 후 인버터/패널 메뉴가 활성화됩니다.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</div>
+
+</html>
