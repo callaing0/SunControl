@@ -48,13 +48,13 @@
                 <th:block th:if="${alerts != null and !#lists.isEmpty(alerts)}">
                     <div th:each="alert : ${alerts}" class="flex py-8 px-12 text-center items-center text-xl font-black text-gray-700 hover:bg-gray-50 transition-all cursor-default group">
                         <div class="w-32 text-base font-bold text-gray-400 group-hover:text-gray-600" th:text="${alert.id}">L-0000</div>
-                        <div class="flex-1 text-base text-gray-800" th:text="${alert.detectTime}">Time</div>
-                        <div class="flex-1 text-base text-gray-400 font-medium" th:text="${alert.resolvedTime != null ? alert.resolvedTime : '진행 중...'}">--</div>
+                        <div class="flex-1 text-base text-gray-800" th:text="${#temporals.format(alert.createdAt, 'yyyy-MM-dd HH:mm:ss')}">Time</div>
+                        <div class="flex-1 text-base text-gray-400 font-medium" th:text="${alert.resolvedAt != null ? #temporals.format(alert.resolvedAt, 'yyyy-MM-dd HH:mm:ss') : '진행 중...'}">--</div>
                         <div class="w-40 text-sm font-bold text-gray-600 uppercase" th:text="${alert.location}">Location</div>
                         <div class="w-32">
                             <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border"
-                                  th:classappend="${alert.status == '장애' or alert.status == 'ERROR' ? 'bg-red-50 text-red-500 border-red-100' : 'bg-green-50 text-green-500 border-green-100'}"
-                                  th:text="${alert.status}">정상</span>
+                                  th:classappend="${alert.severity >= 3 ? 'bg-red-50 text-red-500 border-red-100' : 'bg-green-50 text-green-500 border-green-100'}"
+                                  th:text="${alert.message}">정상</span>
                         </div>
                     </div>
                 </th:block>
