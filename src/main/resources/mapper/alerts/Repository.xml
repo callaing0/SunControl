@@ -12,7 +12,14 @@
 
     <select id="findAll" resultType="com.suncontrol.domain.dto.AlertResponseDTO">
         SELECT
-            id AS id,                       created_at AS detectTime,       resolved_at AS resolvedTime,    message AS status,              '알 수 없음' AS location          FROM alert_log
-        ORDER BY created_at DESC
-        </select>
+            id,
+            inverter_id AS inverterId,
+            status,           -- 여긴 숫자(Integer)가 들어가야 함!
+            alert_type AS alertType,
+            severity,
+            message,          -- 여기에 'DB연결 테스트'가 들어감!
+            created_at AS createdAt,
+            resolved_at AS resolvedAt
+        FROM alert_log
+    </select>
 </mapper>
