@@ -26,7 +26,6 @@ public class AssetRestService {
     private final InverterService inverterService;
     private final PanelService panelService;
 
-    private final String DEFAULT_ERR_MSG = "입력값이 잘못되었습니다";
     private final String NOT_LOGIN_MESSAGE = "로그인 정보가 올바르지 않습니다.";
     private final String ACCESS_DENIED_MESSAGE_PLANT = "본인의 계정으로 자산관리를 진행해주세요!";
     private final String ACCESS_DENIED_MESSAGE_ASSETS = "본인 소유의 발전소만 자산관리가 가능합니다!";
@@ -79,10 +78,13 @@ public class AssetRestService {
         panelService.save(form.toDto());
         inverterService.updateCap(form.toInvCapDto());
 
-        /// TODO : ResponseEntity용 메시지 작성
         return String.format("[%s] 패널 %d개 등록 완료!", form.getModelName(), form.getCount());
     }
 
+    /// BingingResult의 유효성 검사에 통과하지 못했을 경우,
+    /// form 의 유효성 문구를 찾아서 json 문자열 형태로 반환하는 메서드
+    /// 추후에 다른 컨트롤러에도 사용한다면 별도의 클래스로 빼서 관리할 필요성이 있음.
+    private final String DEFAULT_ERR_MSG = "입력값이 잘못되었습니다";
     public Map<String, String> writeErrorMsg(BindingResult bindingResult) {
         return bindingResult.getFieldErrors()
                 .stream()
@@ -90,7 +92,7 @@ public class AssetRestService {
                         FieldError::getField,
                         error -> error.getDefaultMessage() != null ?
                                 error.getDefaultMessage() : DEFAULT_ERR_MSG,
-                        (existing, replacement) -> existing
+                        (existing, replacement) -> existing + ", " + replacement
                 ));
     }
 
