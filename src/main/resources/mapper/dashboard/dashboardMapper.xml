@@ -37,6 +37,7 @@
         FROM daily_weather dw
         WHERE dw.district_code = #{districtCode}
           AND dw.base_date = CURDATE()
+            LIMIT 1
     </select>
 
     <!-- 최신 기온 조회 -->
