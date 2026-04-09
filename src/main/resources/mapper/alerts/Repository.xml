@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.suncontrol.mapper.Repository">
+
+    <resultMap id="AlertMap" type="com.suncontrol.domain.dto.AlertResponseDTO">
+        <id property="id" column="alert_id" />
+        <result property="detectTime" column="detect_time" />
+        <result property="location" column="location" />
+        <result property="status" column="message" />
+    </resultMap>
+
+    <select id="findAll" resultType="com.suncontrol.domain.dto.AlertResponseDTO">
+        SELECT
+            id AS id,                       created_at AS detectTime,       resolved_at AS resolvedTime,    message AS status,              '알 수 없음' AS location          FROM alert_log
+        ORDER BY created_at DESC
+        </select>
+</mapper>
