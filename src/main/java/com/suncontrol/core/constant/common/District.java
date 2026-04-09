@@ -24,7 +24,9 @@ public enum District {
     DAEJEON_YUSEONG("30200", Province.DAEJEON, "유성구",
             new BigDecimal("36.362285"), new BigDecimal("127.35625")),
     DAEJEON_DAEDEOK("30230", Province.DAEJEON, "대덕구",
-            new BigDecimal("36.346705"), new BigDecimal("127.41556"));
+            new BigDecimal("36.346705"), new BigDecimal("127.41556")),
+    OUT_OF_SERVICE(null, null, "서비스 지역 이탈",
+            null, null);
     // TODO: 다른 행정구역도 추가
 
     private final String code; // 지역 코드(기초단체 행정동코드 5자리)
@@ -57,6 +59,6 @@ public enum District {
 
     /// 5자리 문자열 지역코드로 기초단체 리턴
     public static District fromCode(String code) {
-        return CODE_MAP.get(code);
+        return CODE_MAP.getOrDefault(code, OUT_OF_SERVICE);
     }
 }

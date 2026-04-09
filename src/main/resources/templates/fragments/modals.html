@@ -36,7 +36,7 @@
         </header>
 
         <form class="space-y-6" id="plantForm" method="post">
-            <input type="hidden" name="provinceCode" id="provinceCode">
+            <!-- provinceCode는 districtCode의 앞 두자리이므로 불필요정보 삭제 -->
             <input type="hidden" name="latitude" id="latitude">
             <input type="hidden" name="longitude" id="longitude">
             <input type="hidden" name="isMain" value="0">
@@ -62,8 +62,9 @@
             </div>
 
             <div class="grid grid-cols-2 gap-6 pt-2">
-                <input type="number" name="azimuth" placeholder="방향 0°" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 text-center font-black italic" required>
-                <input type="number" name="tilt" placeholder="각도 30°" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 text-center font-black italic text-blue-600" required>
+                <!-- azimuth의 기본값 value=0 범위-90~90, tilt의 기본값 value=30 범위 20~40 추가 -->
+                <input type="number" name="azimuth" placeholder="방향 0°" value="0" min="-90" max="90" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 text-center font-black italic" required>
+                <input type="number" name="tilt" placeholder="각도 30°" value="30" min="20" max="40" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 text-center font-black italic text-blue-600" required>
             </div>
 
             <button type="submit" class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-[900] text-lg shadow-xl shadow-yellow-400/20 hover:bg-yellow-500 transition-all active:scale-95 italic uppercase mt-4">
