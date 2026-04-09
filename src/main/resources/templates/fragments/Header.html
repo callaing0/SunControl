@@ -30,13 +30,11 @@
 
         <!-- 이름 + 역할 -->
         <span th:text="
-        ${session.user == null} ? 'SYSTEM USER' :
-        (${session.user.role == 'ADMIN'} ?
-            session.user.realName + ' (ADMIN)' :
-            session.user.realName + ' (USER)')
-    ">
-        사용자
-    </span>
+    ${session.user == null} ? 'SYSTEM USER' :
+    (${session.user.role == 'ADMIN'} ? '관리자' : '일반 사용자')
+">
+    사용자
+</span>
 
     </div>
 </header>
