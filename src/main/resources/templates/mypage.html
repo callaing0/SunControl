@@ -152,10 +152,9 @@
                          th:id="|panel-group-${panelEntry.key}|"
                          class="panel-group hidden">
                         <div th:if="${panelEntry.value != null and !#lists.isEmpty(panelEntry.value)}"
-                             th:each="pnl : ${panelEntry.value}"
                              class="p-5 bg-white border border-gray-100 rounded-2xl flex justify-between items-center hover:border-yellow-300 transition-all mb-3">
-                            <span class="font-[900] text-gray-700 uppercase italic"
-                                  th:text="${pnl.name != null ? pnl.name : '패널'}">패널 명칭</span>
+            <span class="font-[900] text-gray-700 uppercase italic"
+                  th:text="${panelEntry.value[0].name != null ? panelEntry.value[0].name : '패널'}">패널 명칭</span>
                         </div>
                     </div>
                 </div>

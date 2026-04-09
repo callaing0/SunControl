@@ -64,6 +64,8 @@ public class MemberService {
         // 수정 가능한 값
         member.setRole(form.getRole());
         member.setStatus(form.getStatus());
+        member.setName(form.getName());
+        member.setAffiliation(form.getAffiliation());
         member.setUpdatedAt(LocalDateTime.now());
 
         memberRepository.updateMember(member);
