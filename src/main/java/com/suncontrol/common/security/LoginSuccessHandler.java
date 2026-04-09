@@ -4,6 +4,7 @@ import com.suncontrol.core.constant.common.Role;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,11 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException, ServletException {
 
         CustomUserDetails userDetails= (CustomUserDetails) authentication.getPrincipal();
+        HttpSession session = request.getSession();
+
+        // 사이드 발전소 선택
+        session.setAttribute("memberId", userDetails.getId());
+        session.setAttribute("user", userDetails);
 
         // 관리자가 로그인 시 관리자 페이지로 이동
         if(userDetails.getRole().equals(Role.ROLE_ADMIN)){
