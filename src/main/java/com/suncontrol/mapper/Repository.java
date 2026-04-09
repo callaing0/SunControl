@@ -1,25 +1,19 @@
-package com.suncontrol.mapper; // 리포지토리 패키지도 domain 하위로 맞추는 게 일반적입니다
+package com.suncontrol.mapper;
 
-import com.suncontrol.domain.dto.AlertDTO;
+import com.suncontrol.domain.dto.AlertResponseDTO;
+import com.suncontrol.domain.dto.AlertSaveRequestDTO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
 public interface Repository {
 
-    @Select("SELECT alert_id as id, " +
-            "DATE_FORMAT(detect_time, '%Y-%m-%d %H:%i:%s') as detectTime, " +
-            "DATE_FORMAT(resolved_time, '%Y-%m-%d %H:%i:%s') as resolvedTime, " +
-            "location, status, efficiency " +
-            "FROM alert_log ORDER BY detect_time DESC")
-    List<AlertDTO> findAll();
+    // 1. 전체 조회 (List용)
+    List<AlertResponseDTO> findAll();
 
-    @Select("SELECT alert_id as id, " +
-            "DATE_FORMAT(detect_time, '%Y-%m-%d %H:%i:%s') as detectTime, " +
-            "DATE_FORMAT(resolved_time, '%Y-%m-%d %H:%i:%s') as resolvedTime, " +
-            "location, status, efficiency " +
-            "FROM alert_log WHERE location = #{location} ORDER BY detect_time DESC")
-    List<AlertDTO> findByLocation(@Param("location") String location);
+    // 2. 지역별 조회 (이게 없어서 빨간 줄 뜬 겁니다! 🥊)
+    List<AlertResponseDTO> findByLocation(String location);
+
+    // 3. 데이터 삽입 (API 저장용)
+    void insertAlert(AlertSaveRequestDTO dto);
 }

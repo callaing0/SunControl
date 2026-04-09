@@ -1,5 +1,6 @@
 package com.suncontrol.core.vo;
 
+import com.suncontrol.core.entity.Member;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,4 +12,10 @@ public class MemberInfoVo {
     private Long id;
     // 사용자 이름
     private String name;
+
+    public MemberInfoVo(Member member) {
+        if (member == null) return;
+        this.id = member.getId();
+        this.name = member.getName();
+    }
 }
