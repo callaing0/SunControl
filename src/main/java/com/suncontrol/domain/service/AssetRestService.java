@@ -34,10 +34,7 @@ public class AssetRestService {
     @Transactional
     public String savePlant(String userId, PlantSaveForm form)
             throws AccessDeniedException {
-        Member member = memberService.findByUserId(userId);
-        if(member == null) {
-            throw new IllegalArgumentException(NOT_LOGIN_MESSAGE);
-        }
+        Member member = getMember(userId);
         if(!form.getMemberId().equals(member.getId())) {
             throw new AccessDeniedException(ACCESS_DENIED_MESSAGE_PLANT);
         }
@@ -51,10 +48,7 @@ public class AssetRestService {
     @Transactional
     public String saveInverter(String userId, InverterSaveForm form)
             throws AccessDeniedException {
-        Member member = memberService.findByUserId(userId);
-        if(member == null) {
-            throw new IllegalArgumentException(NOT_LOGIN_MESSAGE);
-        }
+        Member member = getMember(userId);
         if(plantService.isOwnPlant(member.getId(), form.getPlantId())) {
             throw new AccessDeniedException(ACCESS_DENIED_MESSAGE_ASSETS);
         }
@@ -67,10 +61,7 @@ public class AssetRestService {
     @Transactional
     public String savePanel(String userId, PanelSaveForm form)
             throws AccessDeniedException {
-        Member member = memberService.findByUserId(userId);
-        if(member == null) {
-            throw new IllegalArgumentException(NOT_LOGIN_MESSAGE);
-        }
+        Member member = getMember(userId);
         if(plantService.isOwnPlant(member.getId(), form.getPlantId())) {
             throw new AccessDeniedException(ACCESS_DENIED_MESSAGE_ASSETS);
         }
@@ -94,6 +85,15 @@ public class AssetRestService {
                                 error.getDefaultMessage() : DEFAULT_ERR_MSG,
                         (existing, replacement) -> existing + ", " + replacement
                 ));
+    }
+
+    /// 자산 CRUD 메서드 중복코드 재사용을 위한 멤버 테이블 조회 공통로직
+    private Member getMember(String userId) {
+        Member member = memberService.findByUserId(userId);
+        if(member == null) {
+            throw new IllegalArgumentException(NOT_LOGIN_MESSAGE);
+        }
+        return member;
     }
 
 }
