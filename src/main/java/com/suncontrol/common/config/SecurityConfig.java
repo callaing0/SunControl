@@ -28,12 +28,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // 로그인 페이지 및 정적 리소스는 누구나 접근 가능
                         .requestMatchers("/auth/login", "/css/**", "/js/**", "/images/**").permitAll()
-                        // 관리자 페이지는 ADMIN 권한만 접근 가능
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        // 그 외 요청은 로그인 필요
+                        .requestMatchers("/admin/**", "/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
