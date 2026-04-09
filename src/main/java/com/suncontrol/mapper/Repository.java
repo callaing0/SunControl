@@ -1,24 +1,19 @@
 package com.suncontrol.mapper;
 
-import com.suncontrol.domain.dto.AlertDTO;
+import com.suncontrol.domain.dto.AlertResponseDTO;
+import com.suncontrol.domain.dto.AlertSaveRequestDTO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
-public interface Repository { // 인터페이스 이름을 'Repository'로 변경
+public interface Repository {
 
-    @Select("SELECT id, " +
-            "detect_time as detectTime, " +
-            "resolved_time as resolvedTime, " +
-            "location, " +
-            "status " +
-            "FROM alert_log ORDER BY id DESC")
-    List<AlertDTO> findAllAlerts();
+    // 1. 전체 조회 (List용)
+    List<AlertResponseDTO> findAll();
 
-    List<AlertDTO> findAll();
+    // 2. 지역별 조회 (이게 없어서 빨간 줄 뜬 겁니다! 🥊)
+    List<AlertResponseDTO> findByLocation(String location);
 
-    List<AlertDTO> findByLocation(String location);
-
-    void insertAlert(AlertDTO dto);
+    // 3. 데이터 삽입 (API 저장용)
+    void insertAlert(AlertSaveRequestDTO dto);
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.suncontrol.mapper.Repository">
+
+    <select id="findByLocation" resultType="com.suncontrol.domain.dto.AlertResponseDTO">
+        SELECT
+            alert_id AS id,
+            detect_time AS detectTime,
+            resolved_time AS resolvedTime,
+            location,
+            status
+        FROM alert_log
+        WHERE location = #{location}
+        ORDER BY detect_time DESC
+    </select>
+
+    <insert id="insertAlert" parameterType="com.suncontrol.domain.dto.AlertSaveRequestDTO">
+        INSERT INTO alert_log (location, status, efficiency, message, detect_time)
+        VALUES (#{location}, #{status}, #{efficiency}, #{message}, NOW())
+    </insert>
+
+</mapper>

@@ -1,12 +1,9 @@
 package com.suncontrol.domain.api;
 
-import com.suncontrol.domain.dto.AlertDTO;
-import com.suncontrol.domain.service.AlertSaveService; // 전용 서비스 사용
+import com.suncontrol.domain.dto.AlertSaveRequestDTO;
+import com.suncontrol.domain.service.AlertSaveService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/test")
@@ -16,9 +13,8 @@ public class AlertApiController {
     private final AlertSaveService alertSaveService;
 
     @PostMapping("/alert")
-    public String receiveAlert(@RequestBody AlertDTO dto) {
-        // 효율 및 메시지 저장 중심의 로직 수행
-        alertSaveService.saveEfficiencyData(dto);
-        return "Data received and processed";
+    public String receiveAlert(@RequestBody AlertSaveRequestDTO dto) {
+        alertSaveService.saveAlertData(dto);
+        return "success";
     }
 }
