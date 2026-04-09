@@ -37,15 +37,14 @@ public class PlantService {
     }
 
     public List<PlantDto> findAllByMemberId(Long memberId) {
-        //todo
-        return null;
+        return repository.findAllByMemberIdAndIsDeletedFalse(memberId)
+                .stream().map(PlantDto::new).collect(Collectors.toList());
     }
 
     public PlantInfoView getInfoViewById(Long id) {
-        /// todo
         /// 도메인 서비스가 큰 덩어리 뷰 객체를 넘기면
         /// 각 오케스트레이터가 알아서 필요한 만큼 잘라쓰는 구조
-        return null;
+        return repository.findPlantInfoViewById(id);
     }
 
     public List<PlantDto> findAllActive () {
@@ -67,5 +66,10 @@ public class PlantService {
                                 )
                         )
                 );
+    }
+
+    /// plant_info_view에서 COUNT, SUM 을 통해 추출, 수집 주기는 "60"이라는 정수를 시스템 상수로 받아온다.
+    public MainSummaryDto getMainSummary() {
+        return repository.countPlantsAndSumTotalAccum();
     }
 }

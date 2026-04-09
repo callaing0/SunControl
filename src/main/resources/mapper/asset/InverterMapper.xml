@@ -28,10 +28,15 @@
     <update id="updateLastAccumAndStatus">
         <foreach collection="list" item="item" separator=";">
             UPDATE inverter SET
-                last_accum_energy = #{item.lastAccumEnergy}
-                status_code = #{item.statusCode}
+                last_accum_energy = #{item.lastAccumEnergy},
+                current_power = #{item.currentPower},
+                status_code = #{item.statusCode},
                 updated_at = NOW()
             WHERE id = #{item.id}
         </foreach>
     </update>
+    <select id = "findAllByPlantId"
+            resultType="com.suncontrol.core.entity.asset.Inverter">
+        SELECT * FROM inverter WHERE plant_id = #{plantId}
+    </select>
 </mapper>

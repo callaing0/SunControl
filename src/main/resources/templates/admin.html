@@ -1,182 +1,423 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/admin_layout}">
+      layout:decorate="~{layout/adminLayout}">
 
 <div layout:fragment="content">
+    <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 space-y-12 min-h-[82vh] flex flex-col">
 
-    <!-- 사용자 관리 -->
-    <section class="bg-white rounded-3xl p-10 shadow-sm border">
-
-        <div class="flex justify-between mb-6">
-            <h2 class="text-xl font-bold">사용자 관리</h2>
-
-            <button onclick="openModal('createAccountModal')"
-                    class="bg-yellow-400 px-4 py-2 rounded-xl font-bold">
-                계정 생성
-            </button>
+        <!-- 페이지 헤더 -->
+        <div class="px-2">
+            <h2 class="text-3xl font-black text-gray-800 tracking-tighter italic uppercase">관리자 페이지</h2>
+            <p class="text-sm text-gray-400 font-bold mt-1 tracking-tight">
+                시스템 전체 사용자 계정 및 발전소 운영 설정을 관리합니다.
+            </p>
         </div>
 
-        <table class="w-full text-sm">
-            <thead>
-            <tr class="border-b">
-                <th>ID</th>
-                <th>이름</th>
-                <th>소속</th>
-                <th>권한</th>
-                <th>상태</th>
-                <th></th>
-            </tr>
-            </thead>
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-10 items-start flex-1">
 
-            <tbody th:if="${userList != null and !#lists.isEmpty(userList)}">
-            <tr th:each="user : ${userList}" class="border-b">
+            <!-- 좌측: 사용자 관리 -->
+            <section class="xl:col-span-2 flex flex-col bg-white rounded-[40px]">
+                <div class="flex justify-between items-end mb-8 px-1">
+                    <h2 class="text-xl font-black text-gray-800 tracking-tighter italic uppercase flex items-center">
+                        <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>사용자 계정 관리
+                    </h2>
 
-                <td th:text="${user.userId}"></td>
-                <td th:text="${user.name}"></td>
-                <td th:text="${user.affiliation}"></td>
-
-                <td th:text="${user.role}"></td>
-                <td th:text="${user.status}"></td>
-
-                <td class="space-x-2">
-
-                    <button
-                            th:data-id="${user.id}"
-                            th:data-role="${user.role}"
-                            th:data-status="${user.status}"
-                            onclick="openEditModal(this)"
-                            class="bg-black text-white px-2 py-1 rounded">
-                        수정
+                    <button type="button"
+                            onclick="openModal('createAccountModal')"
+                            class="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-3 rounded-2xl font-black text-xs shadow-lg shadow-yellow-400/20 transition-all active:scale-95 uppercase italic">
+                        + 계정 생성
                     </button>
+                </div>
 
-                    <button th:if="${user.status == 'ACTIVE'}"
-                            th:data-id="${user.id}"
-                            onclick="lockUser(this.dataset.id)"
-                            class="bg-red-500 text-white px-2 py-1 rounded">
-                        잠금
-                    </button>
+                <div class="flex-1 overflow-y-auto custom-scroll pr-2">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 bg-white z-10">
+                        <tr class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-50">
+                            <th class="py-4 px-4">ID</th>
+                            <th class="py-4 px-4">이름</th>
+                            <th class="py-4 px-4 text-center">소속</th>
+                            <th class="py-4 px-4 text-center">권한</th>
+                            <th class="py-4 px-4 text-center">상태</th>
+                            <th class="py-4 px-4 text-right">관리</th>
+                        </tr>
+                        </thead>
 
-                    <button th:if="${user.status != 'ACTIVE'}"
-                            th:data-id="${user.id}"
-                            onclick="unlockUser(this.dataset.id)"
-                            class="bg-green-500 text-white px-2 py-1 rounded">
-                        해제
-                    </button>
+                        <tbody th:if="${userList != null and !#lists.isEmpty(userList)}" class="divide-y divide-gray-50">
+                        <tr th:each="user : ${userList}" class="hover:bg-gray-50/50 transition-all group">
+                            <td class="py-6 px-4 text-sm font-bold text-gray-500" th:text="${user.userId}">admin01</td>
+                            <td class="py-6 px-4 text-sm font-[900] text-gray-800" th:text="${user.name}">홍길동</td>
+                            <td class="py-6 px-4 text-xs font-bold text-gray-400 text-center" th:text="${user.affiliation}">본사</td>
 
-                </td>
-            </tr>
-            </tbody>
+                            <td class="py-6 px-4 text-center">
+                                <span class="px-3 py-1 rounded-lg bg-yellow-50 text-yellow-600 text-[10px] font-black uppercase"
+                                      th:text="${user.role}">ADMIN</span>
+                            </td>
 
-            <tbody th:if="${userList == null or #lists.isEmpty(userList)}">
-            <tr>
-                <td colspan="6" class="text-center py-10 text-gray-400">
-                    사용자 없음
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                            <td class="py-6 px-4 text-center">
+                                <span th:classappend="${user.status == 'ACTIVE'} ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'"
+                                      class="px-3 py-1 rounded-lg text-[10px] font-black uppercase"
+                                      th:text="${user.status}">
+                                    ACTIVE
+                                </span>
+                            </td>
 
-    </section>
+                            <td class="py-6 px-4">
+                                <div class="flex justify-end gap-2 opacity-100 xl:opacity-0 group-hover:opacity-100 transition-all">
+                                    <button type="button"
+                                            th:data-id="${user.id}"
+                                            th:data-user-id="${user.userId}"
+                                            th:data-name="${user.name}"
+                                            th:data-affiliation="${user.affiliation}"
+                                            th:data-role="${user.role}"
+                                            th:data-status="${user.status}"
+                                            onclick="openEditModal(this)"
+                                            class="bg-gray-900 text-white px-4 py-2 rounded-xl text-[10px] font-black hover:bg-black transition-all shadow-md uppercase">
+                                        수정
+                                    </button>
 
+                                    <button type="button"
+                                            th:if="${user.status == 'ACTIVE'}"
+                                            th:data-id="${user.id}"
+                                            onclick="lockUser(this.dataset.id)"
+                                            class="bg-red-500 text-white px-4 py-2 rounded-xl text-[10px] font-black hover:bg-red-600 transition-all shadow-md uppercase">
+                                        잠금
+                                    </button>
+
+                                    <button type="button"
+                                            th:if="${user.status != 'ACTIVE'}"
+                                            th:data-id="${user.id}"
+                                            onclick="unlockUser(this.dataset.id)"
+                                            class="bg-green-500 text-white px-4 py-2 rounded-xl text-[10px] font-black hover:bg-green-600 transition-all shadow-md uppercase">
+                                        해제
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+
+                        <tbody th:if="${userList == null or #lists.isEmpty(userList)}">
+                        <tr>
+                            <td colspan="6" class="py-40 text-center">
+                                <div class="flex flex-col items-center justify-center space-y-4">
+                                    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-2xl mb-2">📄</div>
+                                    <p class="text-gray-300 font-black italic uppercase tracking-tighter text-lg">No Users Registered.</p>
+                                    <p class="text-xs text-gray-400 font-bold tracking-tight">현재 등록된 계정이 없습니다.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 우측: 설정 패널 -->
+            <div class="space-y-10 flex flex-col">
+
+                <!-- 장애 임계치 설정 -->
+                <section class="bg-gray-50/50 border border-gray-100 rounded-[40px] p-8">
+                    <h2 class="text-lg font-black text-gray-800 tracking-tighter italic uppercase mb-8 flex items-center">
+                        <span class="w-1 h-5 bg-yellow-400 rounded-full mr-3"></span>장애 임계치 설정
+                    </h2>
+
+                    <div class="space-y-6">
+                        <div class="relative">
+                            <span class="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-3 ml-1">
+                                데이터 수집 주기
+                            </span>
+                            <div class="flex items-center space-x-3 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                                <select id="collectInterval"
+                                        class="w-full text-sm font-black text-gray-800 outline-none bg-transparent italic">
+                                    <option value="5">5분 단위</option>
+                                    <option value="10">10분 단위</option>
+                                    <option value="15" selected>15분 단위</option>
+                                    <option value="30">30분 단위</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <span class="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-3 ml-1">
+                                발전 효율 임계치
+                            </span>
+                            <div class="flex items-center space-x-3 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                                <input type="number"
+                                       id="effThreshold"
+                                       value="70"
+                                       min="0"
+                                       max="100"
+                                       class="w-full text-sm font-black text-gray-800 outline-none bg-transparent">
+                                <span class="text-[10px] font-black text-gray-300 uppercase">%</span>
+                            </div>
+                            <p class="text-[9px] text-blue-500 font-bold mt-3 ml-1 flex items-center">
+                                <span class="mr-1">ℹ️</span> 야간(일몰~일출)에는 임계치 비교를 자동 중단합니다.
+                            </p>
+                        </div>
+
+                        <button type="button"
+                                onclick="handleSaveConfig()"
+                                class="w-full bg-yellow-400 text-black py-4 rounded-2xl font-black italic uppercase text-xs hover:bg-yellow-500 transition-all shadow-lg shadow-yellow-400/10">
+                            임계치 저장
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 발전 수동 데이터 생성 -->
+                <section class="bg-gray-50/50 border border-gray-100 rounded-[40px] p-8">
+                    <h2 class="text-lg font-black text-gray-800 tracking-tighter italic uppercase mb-8 flex items-center">
+                        <span class="w-1 h-5 bg-black rounded-full mr-3"></span>발전 수동 데이터 생성
+                    </h2>
+
+                    <div class="space-y-5">
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                            <select id="targetPlantId"
+                                    class="w-full text-xs font-black text-gray-800 outline-none bg-transparent uppercase italic cursor-pointer">
+                                <option value="" disabled selected>발전소를 선택해주세요.</option>
+                                <option th:each="plant : ${plantList}"
+                                        th:value="${plant.plantId}"
+                                        th:text="${plant.plantName}">
+                                    발전소 명칭
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <span class="text-[9px] text-gray-400 font-black uppercase ml-1">시작 날짜</span>
+                                <input type="date"
+                                       id="startDate"
+                                       class="w-full bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-[11px] font-bold outline-none">
+                            </div>
+
+                            <div class="space-y-1">
+                                <span class="text-[9px] text-gray-400 font-black uppercase ml-1">종료 날짜</span>
+                                <input type="date"
+                                       id="endDate"
+                                       class="w-full bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-[11px] font-bold outline-none">
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <span class="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-2 ml-1">
+                                장애 발생 확률
+                            </span>
+                            <div class="flex items-center space-x-3 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                                <input type="number"
+                                       id="failProbability"
+                                       placeholder="0~100"
+                                       min="0"
+                                       max="100"
+                                       class="w-full text-sm font-black text-gray-800 outline-none bg-transparent">
+                                <span class="text-[10px] font-black text-red-400 uppercase">%</span>
+                            </div>
+                        </div>
+
+                        <button type="button"
+                                onclick="handleRegenerate()"
+                                class="w-full bg-yellow-400 text-black py-4 rounded-2xl font-black italic uppercase text-xs hover:bg-yellow-500 transition-all shadow-lg shadow-yellow-400/10">
+                            데이터 생성
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
 </div>
 
-
-<!-- ========================= -->
-<!-- SCRIPT (여기가 핵심) -->
-<!-- ========================= -->
 <th:block layout:fragment="script">
-    <script>
-
+    <script th:inline="javascript">
         const API = '/api/admin';
 
-        // =========================
-        // 계정 생성
-        // =========================
-        async function createAccount() {
-
-            const userId = document.querySelector('[name="userId"]').value.trim();
-            const name = document.querySelector('[name="name"]').value.trim();
-            const affiliation = document.querySelector('[name="affiliation"]').value.trim();
-            const role = document.querySelector('[name="role"]').value;
-
-            if (!userId || !name || !affiliation) {
-                showToast('입력값 확인', true);
-                return;
+        async function parseResponse(response) {
+            let body = null;
+            try {
+                body = await response.json();
+            } catch (e) {
+                body = null;
             }
 
-            // 아이디 중복 체크
-            const check = await fetch(`${API}/check-id?userId=${userId}`);
-            const checkResult = await check.json();
-
-            if (!checkResult.data) {
-                showToast('아이디 중복', true);
-                return;
+            if (!response.ok) {
+                throw new Error(body?.message || '요청 처리 중 오류가 발생했습니다.');
             }
 
-            await fetch(`${API}/new`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ userId, name, affiliation, role })
-            });
-
-            showToast('생성 완료');
-            closeModal('createAccountModal');
-            location.reload();
+            return body;
         }
 
-
-        // =========================
-        // 수정 모달 열기
-        // =========================
         function openEditModal(btn) {
-
-            document.getElementById('editMemberId').value = btn.dataset.id;
-            document.getElementById('editRole').value = btn.dataset.role;
-            document.getElementById('editStatus').value = btn.dataset.status;
-
+            document.getElementById('editMemberId').value = btn.dataset.id || '';
+            document.getElementById('editUserId').value = btn.dataset.userId || '';
+            document.getElementById('editName').value = btn.dataset.name || '';
+            document.getElementById('editAffiliation').value = btn.dataset.affiliation || '';
+            document.getElementById('editRole').value = btn.dataset.role || 'USER';
+            document.getElementById('editStatus').value = btn.dataset.status || 'ACTIVE';
             openModal('accountModal');
         }
 
+        async function createAccount() {
+            const form = document.getElementById('createAccountForm');
+            const userId = form.querySelector('[name="userId"]').value.trim();
+            const name = form.querySelector('[name="name"]').value.trim();
+            const affiliation = form.querySelector('[name="affiliation"]').value.trim();
+            const role = form.querySelector('[name="role"]').value;
 
-        // =========================
-        // 수정
-        // =========================
+            if (!userId || !name || !affiliation) {
+                showToast('필수 입력값을 확인해 주세요.', true);
+                return;
+            }
+
+            try {
+                const checkResponse = await fetch(`${API}/check-id?userId=${encodeURIComponent(userId)}`);
+                const checkResult = await parseResponse(checkResponse);
+
+                if (!checkResult.data) {
+                    showToast('이미 사용 중인 아이디입니다.', true);
+                    return;
+                }
+
+                const response = await fetch(`${API}/new`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, name, affiliation, role })
+                });
+
+                await parseResponse(response);
+                closeModal('createAccountModal');
+                showToast('계정이 생성되었습니다.');
+                location.reload();
+            } catch (e) {
+                console.error(e);
+                showToast(e.message || '계정 생성 중 오류가 발생했습니다.', true);
+            }
+        }
+
         async function updateAccount() {
-
             const id = document.getElementById('editMemberId').value;
             const role = document.getElementById('editRole').value;
             const status = document.getElementById('editStatus').value;
 
-            await fetch(`${API}/members/${id}`, {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ id, role, status })
-            });
+            if (!id) {
+                showToast('수정 대상 계정 정보가 없습니다.', true);
+                return;
+            }
 
-            showToast('수정 완료');
-            closeModal('accountModal');
-            location.reload();
+            try {
+                const response = await fetch(`${API}/members/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role, status })
+                });
+
+                await parseResponse(response);
+                closeModal('accountModal');
+                showToast('계정 정보가 수정되었습니다.');
+                location.reload();
+            } catch (e) {
+                console.error(e);
+                showToast(e.message || '수정 중 오류가 발생했습니다.', true);
+            }
         }
 
-
-        // =========================
-        // 잠금
-        // =========================
         async function lockUser(id) {
-            await fetch(`${API}/members/${id}/lock`, { method: 'PATCH' });
-            location.reload();
+            openConfirmModal('선택한 계정을 잠금 처리하시겠습니까?', async () => {
+                try {
+                    const response = await fetch(`${API}/members/${id}/lock`, { method: 'PATCH' });
+                    await parseResponse(response);
+                    closeModal('confirmModal');
+                    showToast('계정이 잠금 처리되었습니다.');
+                    location.reload();
+                } catch (e) {
+                    console.error(e);
+                    showToast(e.message || '잠금 처리 중 오류가 발생했습니다.', true);
+                }
+            }, '계정 잠금', '잠금');
         }
 
-
-        // =========================
-        // 잠금 해제
-        // =========================
         async function unlockUser(id) {
-            await fetch(`${API}/${id}/unlock`, { method: 'POST' });
-            location.reload();
+            openConfirmModal('선택한 계정의 잠금을 해제하시겠습니까?', async () => {
+                try {
+                    const response = await fetch(`${API}/members/${id}/unlock`, { method: 'POST' });
+                    await parseResponse(response);
+                    closeModal('confirmModal');
+                    showToast('계정 잠금이 해제되었습니다.');
+                    location.reload();
+                } catch (e) {
+                    console.error(e);
+                    showToast(e.message || '잠금 해제 중 오류가 발생했습니다.', true);
+                }
+            }, '잠금 해제', '해제');
         }
 
+        async function handleSaveConfig() {
+            const collectInterval = document.getElementById('collectInterval').value;
+            const effThreshold = document.getElementById('effThreshold').value;
+
+            if (!effThreshold || Number(effThreshold) < 0 || Number(effThreshold) > 100) {
+                showToast('임계치를 0~100 사이로 입력해 주세요.', true);
+                return;
+            }
+
+            console.log('save config', { collectInterval, effThreshold });
+            showToast('설정값이 성공적으로 업데이트되었습니다.');
+        }
+
+        function handleRegenerate() {
+            const plantId = document.getElementById('targetPlantId').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const failProbability = document.getElementById('failProbability').value;
+
+            if (!plantId) {
+                showToast('데이터를 생성할 발전소를 먼저 선택해 주세요.', true);
+                return;
+            }
+
+            if (!startDate || !endDate) {
+                showToast('시작 날짜와 종료 날짜를 입력해 주세요.', true);
+                return;
+            }
+
+            if (startDate > endDate) {
+                showToast('종료 날짜가 시작 날짜보다 빠를 수 없습니다.', true);
+                return;
+            }
+
+            if (failProbability === '' || Number(failProbability) < 0 || Number(failProbability) > 100) {
+                showToast('장애 발생 확률은 0~100 사이여야 합니다.', true);
+                return;
+            }
+
+            openConfirmModal(
+                '선택한 기간 기준으로 발전 데이터를 생성하시겠습니까?',
+                executeRegenerate,
+                '데이터 생성',
+                '생성'
+            );
+        }
+
+        async function executeRegenerate() {
+            const plantId = document.getElementById('targetPlantId').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const failProbability = document.getElementById('failProbability').value;
+
+            try {
+                closeModal('confirmModal');
+
+                // 실제 API 연결 시 사용
+                // const response = await fetch(`${API}/plants/${plantId}/generate-data`, {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ startDate, endDate, failProbability })
+                // });
+                // await parseResponse(response);
+
+                console.log('regenerate', { plantId, startDate, endDate, failProbability });
+                showToast('데이터 생성 프로세스가 시작되었습니다.');
+            } catch (e) {
+                console.error(e);
+                showToast('데이터 생성 중 오류가 발생했습니다.', true);
+            }
+        }
     </script>
 </th:block>
 

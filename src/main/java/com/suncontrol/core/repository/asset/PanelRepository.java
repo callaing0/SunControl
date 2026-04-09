@@ -9,7 +9,7 @@ import java.util.Optional;
 @Mapper
 public interface PanelRepository {
     // 패널 CRUD
-    public List<Panel> findByInverterIdIn (List<Long> inverters);
+    public List<Panel> findAllByInverterIds (List<Long> inverters);
 
     public Optional<Panel> findById (Long id);
 
@@ -18,4 +18,6 @@ public interface PanelRepository {
     public int update (Panel panel);
 
     public int delete (Long id);
+
+    List<Panel> findAllofInverters(List<Long> inverters);
 }

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div id="plantModal"
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 px-4">
+    <div class="w-full max-w-2xl bg-[#0f172a] rounded-[30px] border border-gray-800 shadow-2xl overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-800 flex items-center justify-between">
+            <div>
+                <h2 class="text-white text-lg font-black italic uppercase tracking-tight">
+                    발전소 선택
+                </h2>
+                <p class="text-gray-500 text-[11px] font-bold uppercase tracking-widest mt-1">
+                    조회할 발전소를 선택하세요
+                </p>
+            </div>
+            <button type="button"
+                    onclick="closeModal('plantModal')"
+                    class="text-gray-400 hover:text-white text-xl font-black">
+                ×
+            </button>
+        </div>
+
+        <div class="p-6 space-y-3 max-h-[420px] overflow-y-auto">
+            <div th:if="${plantList == null or #lists.isEmpty(plantList)}"
+                 class="py-12 text-center text-gray-500 font-bold italic uppercase">
+                등록된 발전소가 없습니다.
+            </div>
+
+            <form th:if="${plantList != null and !#lists.isEmpty(plantList)}"
+                  th:action="@{/plants/select}"
+                  method="post"
+                  class="space-y-3">
+
+                <input type="hidden" name="redirectUrl" th:value="${#httpServletRequest.requestURI}"/>
+
+                <button type="submit"
+                        name="plantId"
+                        th:each="plant : ${plantList}"
+                        th:value="${plant.id}"
+                        class="w-full text-left p-4 rounded-[20px] border transition-all duration-200"
+                        th:classappend="${selectedPlant != null and selectedPlant.id == plant.id}
+                            ? ' bg-yellow-400/10 border-yellow-400/40'
+                            : ' bg-gray-900 border-gray-800 hover:border-yellow-400/40 hover:bg-gray-800/50'">
+
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                            <h3 class="text-white text-sm font-black italic uppercase tracking-tight truncate">
+                                🏢 <span th:text="${plant.name}">발전소명</span>
+                            </h3>
+                            <p class="mt-1 text-gray-400 text-[11px] font-bold truncate"
+                               th:text="${plant.address}">
+                                주소
+                            </p>
+                        </div>
+
+                        <div class="shrink-0">
+                            <span th:if="${selectedPlant != null and selectedPlant.id == plant.id}"
+                                  class="text-[10px] text-yellow-400 font-black uppercase tracking-widest">
+                                Selected
+                            </span>
+                        </div>
+                    </div>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

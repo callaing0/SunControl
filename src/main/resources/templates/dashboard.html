@@ -3,18 +3,21 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
+    <meta charset="UTF-8">
     <title>SolarGuard | Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            min-height: 400px;
-        }
-    </style>
+    <th:block layout:fragment="css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            .chart-container {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                min-height: 400px;
+            }
+        </style>
+    </th:block>
 </head>
-
+<body>
 <div layout:fragment="content">
     <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 flex-1 flex flex-col min-h-[82vh]">
 
@@ -62,10 +65,12 @@
             <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center min-h-[220px]">
                 <div class="flex items-center space-x-2 mb-4 text-yellow-500">
                     <span class="text-xl">☀️</span>
-                    <p class="text-gray-500 font-bold uppercase text-[11px] tracking-widest">전일 대비 효율</p>
+                    <p class="text-gray-500 font-bold uppercase text-[11px] tracking-widest">현재 출력 효율</p>
                 </div>
                 <h2 class="text-6xl font-black text-yellow-400 tracking-tighter">
-                    <span th:text="${summary != null and summary.efficiency != null ? summary.efficiency : '--'}">--</span>
+                   <span th:text="${summary != null and summary.efficiency != null
+                    ? #numbers.formatDecimal(summary.efficiency, 1, 2)
+                    : '--'}">--</span>
                     <span class="text-xl font-bold text-yellow-400/30 ml-2 italic uppercase">%</span>
                 </h2>
             </div>
@@ -99,7 +104,7 @@
                     </div>
 
                     <div class="flex justify-between items-center border-t border-gray-50 pt-3 text-gray-400 font-bold uppercase text-[11px]">
-                        <span>온도/습도</span>
+                        <span>온도</span>
                         <span class="text-gray-800 font-black"
                               th:text="${summary != null and summary.weatherStatus != null ? summary.weatherStatus : '--'}">--</span>
                     </div>
@@ -181,6 +186,8 @@
                             <span class="text-[10px] text-gray-300 uppercase tracking-widest mb-2 block font-black">Inverter Unit</span>
                             <span class="text-xl font-black text-blue-600 block italic"
                                   th:text="${inverter.serial}">INV-001</span>
+                            <span class="text-sm font-bold mt-3 block"
+                                  th:text="${inverter.status}">11</span>
                         </div>
                     </th:block>
 
@@ -202,7 +209,7 @@
         const summaryData = /*[[${summary}]]*/ null;
         const ctx = document.getElementById('solarDashboardChart');
 
-        if (ctx && summaryData) {
+        if (ctx && summaryData && summaryData.chartLabels) {
             new Chart(ctx, {
                 data: {
                     labels: summaryData.chartLabels || ['06시', '07시', '08시', '09시', '10시', '11시', '12시', '13시', '14시', '15시', '16시', '17시', '18시'],
@@ -286,4 +293,5 @@
         updateClock();
     </script>
 </th:block>
+</body>
 </html>

@@ -28,18 +28,18 @@ public class GenerationLog {
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Weather weather;
-    private String weatherCode;
+    private Integer weatherCode;
 
     private GenerationStatus generationStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     /// DB 저장 조회용 가상필드
-    public void setWeatherCode(String weatherCode) {
+    public void setWeatherCode(Integer weatherCode) {
         this.weather = Weather.fromCode(weatherCode);
         this.weatherCode = weatherCode;
     }
-    public String getWeatherCode() { /// DB에 null이 저장되었을 경우를 대비한 방어로직
+    public Integer getWeatherCode() { /// DB에 null이 저장되었을 경우를 대비한 방어로직
         return weatherCode == null ?
                 weather == null ? null : weather.getWeatherCode() : this.weatherCode;
     }

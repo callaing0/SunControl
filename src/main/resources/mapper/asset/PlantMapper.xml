@@ -30,4 +30,15 @@
             resultType="com.suncontrol.core.entity.asset.Plant">
         SELECT * FROM plant WHERE is_deleted = 0 AND member_id = #{memberId}
     </select>
+    <select id = "findPlantInfoViewById"
+            resultType="com.suncontrol.core.entity.view.PlantInfoView">
+        SELECT * FROM plant_info_view WHERE id = #{id}
+    </select>
+    <select id="countPlantsAndSumTotalAccum"
+            resultType="com.suncontrol.core.dto.asset.MainSummaryDto">
+        SELECT
+        COUNT(*) AS count,
+        SUM(accum_total) AS accumTotal
+        FROM plant_info_view
+    </select>
 </mapper>

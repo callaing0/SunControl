@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/adminLayout">
+<head>
+    <meta charset="UTF-8">
+    <title>SolarGuard | Stations</title>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 flex-1 flex flex-col min-h-[82vh]">
+
+        <!-- 페이지 헤더 -->
+        <div class="mb-10 px-2 flex justify-between items-end">
+            <div>
+                <h2 class="text-3xl font-black text-gray-800 tracking-tighter italic uppercase">지역 발전소 현황</h2>
+                <div class="flex items-center mt-1">
+                    <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse mr-2 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                    <p class="text-sm text-gray-400 font-bold uppercase tracking-widest">
+                        전국 각 지역의 발전량 데이터와 등록 시설을 통합 관리합니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <span class="text-[10px] font-black text-gray-400 bg-gray-50 px-5 py-2.5 rounded-full uppercase tracking-widest border border-gray-200 shadow-sm flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                    SYSTEM LIVE: <span id="liveClock">0000-00-00 00:00:00</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- 상단 영역 -->
+        <div class="grid grid-cols-4 gap-8 mb-8">
+
+            <!-- 지역 필터 -->
+            <div class="bg-gray-50/50 p-8 rounded-[40px] border border-gray-100 flex flex-col justify-center transition-all shadow-sm">
+
+                <th:block th:if="${not #lists.isEmpty(regionList)}">
+                    <form th:action="@{/stations}" method="get">
+                        <p class="text-gray-500 font-black uppercase text-[11px] tracking-[0.2em] mb-4 ml-1 flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-pulse"></span>
+                            Region Filter
+                        </p>
+
+                        <select id="regionSelect"
+                                name="region"
+                                class="w-full bg-white border border-gray-200 rounded-2xl px-5 py-4 text-lg font-black text-gray-800 outline-none focus:ring-4 focus:ring-yellow-400/20 transition-all appearance-none cursor-pointer">
+                            <option value="all" th:selected="${selectedRegion == 'all'}">전체 지역 보기</option>
+                            <option th:each="region : ${regionList}"
+                                    th:value="${region}"
+                                    th:text="${region}"
+                                    th:selected="${selectedRegion == region}">
+                                지역명
+                            </option>
+                        </select>
+
+                        <button type="submit"
+                                class="mt-4 w-full bg-gray-900 text-white py-4 rounded-2xl font-black italic uppercase hover:bg-black transition-all shadow-lg shadow-gray-200 flex items-center justify-center gap-2">
+                            <span>추이 데이터 조회</span>
+                            <span class="text-xs">⚡</span>
+                        </button>
+
+                        <p class="mt-4 text-[10px] text-gray-400 text-center font-medium">
+                            * 실시간 자산 현황입니다.
+                        </p>
+                    </form>
+                </th:block>
+
+                <th:block th:if="${#lists.isEmpty(regionList)}">
+                    <div class="text-center py-6">
+                        <div class="w-14 h-14 bg-white rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-sm border border-gray-100">
+                            <span class="text-2xl grayscale">📡</span>
+                        </div>
+                        <p class="text-gray-400 font-black uppercase text-[10px] tracking-widest mb-3">System Standby</p>
+                        <p class="text-base font-black text-gray-800 leading-tight mb-2 uppercase italic tracking-tighter">
+                            현재 등록된 발전소가 없습니다.
+                        </p>
+                    </div>
+                </th:block>
+            </div>
+
+            <!-- 차트 -->
+            <div class="col-span-3 bg-white p-10 rounded-[45px] shadow-sm border border-gray-100 flex flex-col">
+                <div class="flex justify-between items-center mb-6 italic uppercase">
+                    <h3 class="text-xl font-black text-gray-800 flex items-center">
+                        <span class="w-1.5 h-5 bg-yellow-400 rounded-full mr-3"></span>지역별 발전량 추이
+                    </h3>
+                </div>
+
+                <div class="relative w-full h-[350px] flex items-center justify-center">
+                    <canvas id="regionChart" th:if="${not #lists.isEmpty(hourlyData)}"></canvas>
+
+                    <div th:if="${#lists.isEmpty(hourlyData)}" class="text-center opacity-60">
+                        <span class="text-4xl block mb-3">📊</span>
+                        <p class="text-gray-400 font-bold italic uppercase tracking-widest text-sm">
+                            조회된 발전 데이터가 없습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 발전소 리스트 -->
+        <div class="bg-white rounded-[45px] shadow-sm border border-gray-100 flex-1 flex flex-col overflow-hidden">
+            <div class="p-10 pb-4 flex justify-between items-center italic uppercase">
+                <h3 class="text-xl font-black text-gray-800 flex items-center">
+                    <span class="w-1.5 h-5 bg-blue-500 rounded-full mr-3"></span>등록 시설 리스트
+                </h3>
+                <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-100 tracking-widest"
+                      th:text="${plantList != null ? plantList.size() + ' UNITS ACTIVE' : '0 UNITS'}">
+                    0 UNITS ACTIVE
+                </span>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-10 pb-10 custom-scroll">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-white z-10">
+                    <tr class="border-b-2 border-gray-50">
+                        <th class="py-5 text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">시설명</th>
+                        <th class="py-5 text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">주소</th>
+                        <th class="py-5 text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">정격 용량</th>
+                        <th class="py-5 text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">현재 출력</th>
+                        <th class="py-5 text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">상태</th>
+                    </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-gray-50">
+                    <tr th:each="plant : ${plantList}"
+                        class="group hover:bg-gray-50/50 transition-all cursor-pointer">
+
+                        <!-- 시설명 -->
+                        <td class="py-7 text-lg font-black text-gray-800 text-center italic uppercase"
+                            th:text="${plant.name}">
+                            시설명
+                        </td>
+
+                        <!-- 주소 -->
+                        <td class="py-7 text-sm font-bold text-gray-500 text-center"
+                            th:text="${plant.address}">
+                            주소
+                        </td>
+
+                        <!-- 정격 용량 -->
+                        <td class="py-7 text-center">
+                            <span class="text-lg font-black text-gray-800"
+                                  th:text="${plant.capacitySum != null ? plant.capacitySum : 0}">
+                                0
+                            </span>
+                            <span class="text-[10px] font-black text-gray-300 ml-1 uppercase">kW</span>
+                        </td>
+
+                        <!-- 현재 출력 -->
+                        <td class="py-7 text-center">
+                            <span class="text-lg font-black text-blue-600"
+                                  th:text="${plant.totalValue != null ? plant.totalValue : 0}">
+                                0
+                            </span>
+                            <span class="text-[10px] font-black text-blue-200 ml-1 uppercase">kWh</span>
+                        </td>
+
+                        <!-- 상태 -->
+                        <td class="py-7 text-center">
+                            <span class="px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors"
+                                  th:classappend="${plant.statusCode == 1} ? ' bg-green-50 text-green-600 border-green-100 group-hover:bg-green-500 group-hover:text-white'
+                                  : (${plant.statusCode == 0} ? ' bg-gray-50 text-gray-500 border-gray-200 group-hover:bg-gray-600 group-hover:text-white'
+                                  : ' bg-yellow-50 text-yellow-600 border-yellow-100 group-hover:bg-yellow-500 group-hover:text-white')"
+                                  th:text="${plant.statusCode == 1 ? 'Normal' : (plant.statusCode == 0 ? 'Offline' : 'Warning')}">
+                                Normal
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(plantList)}">
+                        <td colspan="5" class="py-32 text-center">
+                            <div class="text-5xl mb-5 opacity-20">🏢</div>
+                            <p class="text-gray-300 font-black italic uppercase tracking-[0.2em] text-xl">
+                                등록된 발전소 시설이 없습니다.
+                            </p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        const chartCtx = document.getElementById('regionChart');
+        const hourlyLabels = /*[[${hourlyLabels}]]*/ [];
+        const hourlyData = /*[[${hourlyData}]]*/ [];
+
+        if (chartCtx && Array.isArray(hourlyLabels) && Array.isArray(hourlyData) && hourlyData.length > 0) {
+            new Chart(chartCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: hourlyLabels,
+                    datasets: [{
+                        label: '발전량 (kWh)',
+                        data: hourlyData,
+                        backgroundColor: '#fbbf24',
+                        borderRadius: 15,
+                        barPercentage: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f8fafc' },
+                            ticks: { font: { weight: 'bold' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateClock() {
+            const clockElement = document.getElementById('liveClock');
+            if (!clockElement) return;
+
+            const now = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+
+            clockElement.textContent =
+                `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+                `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</th:block>
+</body>
+</html>

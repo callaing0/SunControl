@@ -1,6 +1,9 @@
-package com.suncontrol.product.vo;
+package com.suncontrol.domain.vo;
 
 import com.suncontrol.core.vo.MemberDetailVo;
+import com.suncontrol.domain.vo.asset.InverterDetailVo;
+import com.suncontrol.domain.vo.asset.PanelVo;
+import com.suncontrol.domain.vo.asset.PlantDetailVo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,11 +18,11 @@ public class MyPageVo {
     private MemberDetailVo member;
 
     // TODO:발전소 정보 (추후 사용)
-    private Object plant;
+    private PlantDetailVo plant;
 
     // TODO:인버터 정보 (추후 사용)
-    private List<Object> inverters;
+    private List<InverterDetailVo> inverters;
 
     // TODO:패널 정보 (추후 사용)
-    private Map<Long, List<Object>> panels;
+    private Map<Long, List<PanelVo>> panels;
 }

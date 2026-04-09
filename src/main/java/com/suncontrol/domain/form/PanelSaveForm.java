@@ -81,7 +81,7 @@ public class PanelSaveForm {
     /// INSERT, UPDATE 할 핵심 내용을 두 dto로 분리 추출하도록 한다.
 
     /// panel 테이블에 저장될 내용
-    public PanelDto getPanelDto() {
+    public PanelDto toDto() {
         /*
          * TODO : 시스템에 등록되어 있지 않은 모델/제조사/용량/효율 을 감지하고
          * TODO : '기존에 없던 새 패널 정보' 를 시스템에 추가 할 수 있어야 한다
@@ -93,7 +93,7 @@ public class PanelSaveForm {
         return dto;
     }
     /// inverter 테이블에 업데이트 될 내용
-    public InverterCapSurplusDto getInverterCapSurplusDto() {
+    public InverterCapSurplusDto toInvCapDto() {
         return InverterCapSurplusDto.builder()
                 .plantId(getPlantId())
                 .inverterId(getInverterId())

@@ -1,7 +1,7 @@
 package com.suncontrol.domain.service;
 
 import com.suncontrol.core.entity.Member;
-import com.suncontrol.core.repository.MemberRepository;
+import com.suncontrol.core.repository.report.MemberRepository;
 import com.suncontrol.domain.form.MemberCreateForm;
 import com.suncontrol.domain.form.MemberUpdateForm;
 import lombok.RequiredArgsConstructor;
@@ -80,5 +80,13 @@ public class MemberService {
     // 회원 잠금 해제 처리
     public void unlockMember(Long id) {
         memberRepository.unlockMember(id);
+    }
+
+    // 비밀번호 변경 처리
+    public void changePassword(Member member, String encodedPassword) {
+        member.setPassword(encodedPassword);
+        member.setTemporary(false);
+        member.setUpdatedAt(LocalDateTime.now());
+        memberRepository.updateMember(member);
     }
 }

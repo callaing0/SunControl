@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.suncontrol.core.repository.report.StationRepository">
+
+    <!--
+        PlantInfoView 매핑
+        - 스키마의 plant_info_view 정의 기준 컬럼명으로 매핑
+        - PlantInfoView 클래스의 필드명이 아래 property 와 다르면 그에 맞게 수정 필요
+    -->
+    <resultMap id="plantInfoViewMap" type="com.suncontrol.core.entity.view.PlantInfoView">
+        <id property="id" column="id"/>
+
+        <!-- 기본 정보 -->
+        <result property="memberId" column="member_id"/>
+        <result property="plantName" column="plant_name"/>
+        <result property="isMain" column="is_main"/>
+        <result property="address" column="address"/>
+        <result property="latitude" column="latitude"/>
+        <result property="longitude" column="longitude"/>
+        <result property="provinceCode" column="province_code"/>
+        <result property="districtCode" column="district_code"/>
+        <result property="azimuth" column="azimuth"/>
+        <result property="tilt" column="tilt"/>
+        <result property="createdAt" column="created_at"/>
+
+        <!-- 집계 정보 -->
+        <result property="capacitySum" column="capacity_sum"/>
+        <result property="totalValue" column="total_value"/>
+        <result property="accumTotal" column="accum_total"/>
+        <result property="efficiency" column="efficiency"/>
+        <result property="statusCode" column="status_code"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 시간대별 발전량 DTO 매핑 -->
+    <resultMap id="stationHourlyGenerationMap" type="com.suncontrol.domain.dto.StationHourlyGenerationDto">
+        <result property="hourLabel" column="hour_label"/>
+        <result property="totalGeneration" column="total_generation"/>
+    </resultMap>
+
+    <!--
+        현재 로그인 사용자가 가진 발전소 주소 목록 조회
+        - 삭제되지 않은 발전소만 조회
+        - address 전체 문자열을 region 값으로 사용
+        - 예: "서울특별시 강남구 ..."
+    -->
+    <select id="findRegionListByMemberId" resultType="string">
+        SELECT DISTINCT p.address
+        FROM plant p
+        WHERE p.member_id = #{memberId}
+        AND p.is_deleted = 0
+        AND p.address IS NOT NULL
+        AND TRIM(p.address) != ''
+        ORDER BY p.address ASC
+    </select>
+
+    <!--
+        현재 로그인 사용자의 발전소 목록 조회
+        - plant_info_view 사용
+        - region 값이 null / "" / "all" 이면 전체
+        - 삭제 여부는 view 정의에서 이미 p.is_deleted = 0 조건이 적용되어 있음
+    -->
+    <select id="findPlantInfoViewListByMemberIdAndRegion" resultMap="plantInfoViewMap">
+        SELECT
+        pi.id,
+        pi.member_id,
+        pi.plant_name,
+        pi.is_main,
+        pi.address,
+        pi.latitude,
+        pi.longitude,
+        pi.province_code,
+        pi.district_code,
+        pi.azimuth,
+        pi.tilt,
+        pi.created_at,
+        pi.capacity_sum,
+        pi.total_value,
+        pi.accum_total,
+        pi.efficiency,
+        pi.status_code,
+        pi.updated_at
+        FROM plant_info_view pi
+        WHERE pi.member_id = #{memberId}
+        <if test="region != null and region != '' and region != 'all'">
+            AND pi.address = #{region}
+        </if>
+        ORDER BY pi.created_at DESC, pi.id DESC
+    </select>
+
+    <!--
+        오늘 날짜 기준 시간대별 발전량 조회
+        - generation_log 사용
+        - generation_log 는 실측 로그 성격이라 오늘 데이터 조회에 적합
+        - 삭제되지 않은 발전소만 조회
+        - region 값이 null / "" / "all" 이면 전체
+    -->
+    <select id="findHourlyGenerationByMemberIdAndRegion" resultMap="stationHourlyGenerationMap">
+        SELECT
+        DATE_FORMAT(gl.base_time, '%H:00') AS hour_label,
+        COALESCE(SUM(gl.value_actual), 0) AS total_generation
+        FROM generation_log gl
+        INNER JOIN inverter i ON gl.inverter_id = i.id
+        INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.member_id = #{memberId}
+        AND p.is_deleted = 0
+        AND gl.base_time >= CURDATE()
+        AND gl.base_time <![CDATA[ < ]]> DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+        <if test="region != null and region != '' and region != 'all'">
+            AND p.address = #{region}
+        </if>
+        GROUP BY HOUR(gl.base_time), DATE_FORMAT(gl.base_time, '%H:00')
+        ORDER BY HOUR(gl.base_time)
+    </select>
+
+</mapper>
