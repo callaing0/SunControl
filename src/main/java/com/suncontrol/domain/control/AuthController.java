@@ -39,9 +39,9 @@ public class AuthController {
                                  Model model){
         String result = myPageService.changePassword(principal.getName(), passwordChangeForm);
 
-        // 비밀번호 변경 성공시 -> 대시보드 , 실패시 -> 비밀번호 변경 페이지
+        // 비밀번호 변경 성공시 -> 자산 등록 안내 페이지 , 실패시 -> 비밀번호 변경 페이지
         if ("success".equals(result)) {
-            return "redirect:/dashboard";
+            return "redirect:/registration";
         } else {
             model.addAttribute("errorMessage", result);
             model.addAttribute("passwordChangeForm", passwordChangeForm);

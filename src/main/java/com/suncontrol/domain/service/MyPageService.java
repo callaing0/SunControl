@@ -82,7 +82,7 @@ public class MyPageService {
                 .map(dto -> new InverterDetailVo(parentPlant,dto))
                 .collect(Collectors.toList())
         );
-        log.info("{} 인버터", inverters.get(0).getSerial());
+        // log.info("{} 인버터", inverters.get(0).getSerial());
 
         // 패널의 조회정보를 삽입
         // 해당 맵의 0L 키에는 발전소 전체 패널에 대한 정보가 들어있다.

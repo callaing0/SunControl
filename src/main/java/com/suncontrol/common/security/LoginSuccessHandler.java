@@ -39,7 +39,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         }
         // 발전소가 등록되어 있지 않으면 자산 안내 페이지로 이동
         if(!userDetails.hasPlant()){
-            response.sendRedirect("/error/assets");
+            response.sendRedirect("/registration");
             return;
         }
         // 그 외 정상 사용자는 대시보드로 이동
