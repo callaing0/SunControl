@@ -30,4 +30,13 @@ public interface chartRepository {
 
     List<chartDto> selectWeatherEfficiency(@Param("plantId") Long plantId,
                                            @Param("selectedDate") LocalDate selectedDate);
+
+    BigDecimal selectPreviousGeneration(@Param("plantId") Long plantId,
+                                        @Param("selectedDate") LocalDate selectedDate);
+
+    BigDecimal selectAverageGeneration(@Param("plantId") Long plantId,
+                                       @Param("selectedDate") LocalDate selectedDate);
+
+    Integer selectStoppedTime(@Param("plantId") Long plantId,
+                              @Param("selectedDate") LocalDate selectedDate);
 }
