@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Getter
 @Setter
@@ -15,7 +16,11 @@ public class MainSummaryDto {
     private BigDecimal accumTotal;
     private int collectInterval;
 
+    public String getAccumTotalFormatted (){
+        return accumTotal.setScale(2, RoundingMode.HALF_UP).toString() + " kWh";
+    }
+
     public MainSummaryDto (int count, BigDecimal accumTotal) {
-        this(count,  accumTotal, 60);
+        this(count, accumTotal, 60);
     }
 }

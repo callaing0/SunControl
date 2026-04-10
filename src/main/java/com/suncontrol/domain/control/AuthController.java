@@ -1,5 +1,7 @@
 package com.suncontrol.domain.control;
 
+import com.suncontrol.core.dto.asset.MainSummaryDto;
+import com.suncontrol.core.service.asset.PlantService;
 import com.suncontrol.domain.form.PasswordChangeForm;
 import com.suncontrol.domain.service.MyPageService;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +20,13 @@ import java.security.Principal;
 public class AuthController {
 
     private final MyPageService myPageService;
+    private final PlantService plantService;
 
     // 로그인 페이지 조회
     @GetMapping("/login")
-    public String loginPage(){
+    public String loginPage(Model model){
+        MainSummaryDto mainSummaryDto = plantService.getMainSummary();
+        model.addAttribute("summary", mainSummaryDto);
         return "auth/login";
     }
 

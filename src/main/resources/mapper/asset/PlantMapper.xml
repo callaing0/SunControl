@@ -38,7 +38,7 @@
             resultType="com.suncontrol.core.dto.asset.MainSummaryDto">
         SELECT
         COUNT(*) AS count,
-        SUM(accum_total) AS accumTotal
+        COALESCE(SUM(accum_total), 0) AS accumTotal
         FROM plant_info_view
     </select>
 </mapper>
