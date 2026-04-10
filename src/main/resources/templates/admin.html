@@ -174,8 +174,8 @@
                                     class="w-full text-xs font-black text-gray-800 outline-none bg-transparent uppercase italic cursor-pointer">
                                 <option value="" disabled selected>발전소를 선택해주세요.</option>
                                 <option th:each="plant : ${plantList}"
-                                        th:value="${plant.plantId}"
-                                        th:text="${plant.plantName}">
+                                        th:value="${plant.id}"
+                                        th:text="${plant.name}">
                                     발전소 명칭
                                 </option>
                             </select>
