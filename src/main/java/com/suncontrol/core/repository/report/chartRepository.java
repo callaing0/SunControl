@@ -11,23 +11,24 @@ import java.util.List;
 @Mapper
 public interface chartRepository {
 
-    BigDecimal selectTotalGeneration(@Param("memberId") Long memberId,
+    BigDecimal selectTotalGeneration(@Param("plantId") Long plantId,
                                      @Param("selectedDate") LocalDate selectedDate);
 
-    BigDecimal selectExpectedGeneration(@Param("memberId") Long memberId,
+    BigDecimal selectExpectedGeneration(@Param("plantId") Long plantId,
                                         @Param("selectedDate") LocalDate selectedDate);
 
-    BigDecimal selectAverageEfficiency(@Param("memberId") Long memberId,
-                                       @Param("selectedDate") LocalDate selectedDate);
-
-    int selectInverterCount(@Param("memberId") Long memberId);
-
-    int selectAlertCount(@Param("memberId") Long memberId,
-                         @Param("selectedDate") LocalDate selectedDate);
-
-    List<chartDto> selectGenerationTrend(@Param("memberId") Long memberId,
+    List<chartDto> selectGenerationTrend(@Param("plantId") Long plantId,
                                          @Param("selectedDate") LocalDate selectedDate);
 
-    List<chartDto> selectWeatherEfficiency(@Param("memberId") Long memberId,
+    List<chartDto> selectWeatherEfficiency(@Param("plantId") Long plantId,
                                            @Param("selectedDate") LocalDate selectedDate);
+
+    BigDecimal selectPreviousGeneration(@Param("plantId") Long plantId,
+                                        @Param("selectedDate") LocalDate selectedDate);
+
+    BigDecimal selectAverageGeneration(@Param("plantId") Long plantId,
+                                       @Param("selectedDate") LocalDate selectedDate);
+
+    Integer selectStoppedTime(@Param("plantId") Long plantId,
+                              @Param("selectedDate") LocalDate selectedDate);
 }
