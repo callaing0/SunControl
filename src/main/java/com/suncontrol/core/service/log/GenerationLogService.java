@@ -1,5 +1,6 @@
 package com.suncontrol.core.service.log;
 
+import com.suncontrol.core.constant.util.GenerationStatus;
 import com.suncontrol.core.dto.log.GenerationLogDto;
 import com.suncontrol.core.dto.log.LastGeneratedTime;
 import com.suncontrol.core.entity.log.GenerationLog;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,5 +42,14 @@ public class GenerationLogService {
                 results.stream().map(GenerationLog::new).toList());
 
         log.info("Save {} results to DB", result);
+    }
+
+    /// 기록의 상태별로 모든 데이터를 가져오는 메서드
+    /// 예 ) "PENDING" 인 기록을 모두 가져온다
+    public List<GenerationLogDto> findAllByStatus(GenerationStatus status) {
+        return repository.findAllByStatus(status.getStatus())
+                .stream()
+                .map(GenerationLogDto::new)
+                .toList();
     }
 }

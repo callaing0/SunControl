@@ -12,5 +12,7 @@ public interface GenerationLogRepository {
     int saveAll(@Param("list") List<GenerationLog> list);
 
     List<LastGeneratedTime> findLastsOf();
+
+    List<GenerationLog> findAllByStatus(String status);
     //todo
 }
