@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 @Getter
 @AllArgsConstructor
@@ -20,15 +21,18 @@ public enum Weather {
     private final String description; // UI에 표시될 문자열
     private final double efficiencyFactor; // 발전량 통계 분석을 위한 기상 가중치
 
-    public static Weather fromCode(String code) {
-        if (code == null || code.isBlank()) {
+    public static Weather fromCode(Integer code) {
+        if (code == null) {
             return CLEAR_SKY;
         }
 
         try {
-            int wmoInt = Integer.parseInt(code.trim());
             return Arrays.stream(Weather.values())
-                    .filter(wc -> wc.wmo == wmoInt)
+                    .sorted(Comparator
+                            .comparingInt((Weather w) -> w.wmo)
+                            .reversed()
+                    )
+                    .filter(wc -> wc.wmo <= code)
                     .findFirst()
                     .orElse(CLEAR_SKY);
         } catch (NumberFormatException e) {
@@ -36,7 +40,7 @@ public enum Weather {
         }
     }
 
-    public String getWeatherCode() {
-        return String.format("%02d", this.wmo);
+    public Integer getWeatherCode() {
+        return this.wmo;
     }
 }

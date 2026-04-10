@@ -164,11 +164,12 @@ public class GenerationEnergyService {
     private GenerationResultSet getResult
             (LocalDateTime start, LocalDateTime end, InverterGenerationDto inv,
              WeatherContext context, int termSecond) {
+        log.info("{}인버터 {}부터 {}까지의 기록생성", inv.getId(), start, end);
         List<GenerationResultDto> resultList = new ArrayList<>();
         LocalDateTime current = start;
 
         BigDecimal lastAccumEnergy = inv.getLastAccumEnergy();
-        while(current.isBefore(end)) {
+        while(!current.isAfter(end)) {
             /// 날씨조회 기준시각 설정, 날씨정보 가져오기
             LocalDateTime baseTime =
                     TimeTruncater.truncateToTerm(current, 3600);

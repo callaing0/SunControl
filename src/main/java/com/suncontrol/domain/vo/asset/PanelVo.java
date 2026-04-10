@@ -23,4 +23,8 @@ public class PanelVo {
         this.count = dto.getCount();
         this.manufacturer = dto.getModel().getManufacturer();
     }
+
+    public String getName() {
+        return model.getName();
+    }
 }

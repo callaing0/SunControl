@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<div layout:fragment="content">
+    <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 flex-1 flex flex-col min-h-[82vh]">
+        <div class="mb-10 px-2 flex justify-between items-end">
+            <div>
+                <h2 class="text-3xl font-[900] text-gray-800 tracking-tighter italic uppercase">알람 이력</h2>
+                <p class="text-sm text-gray-400 font-bold mt-1 tracking-tight">실시간 장애 추적 시스템</p>
+            </div>
+            <div th:if="${alerts != null and !#lists.isEmpty(alerts)}" class="text-right">
+                <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-5 py-2.5 rounded-full border border-blue-100 uppercase tracking-widest shadow-sm">
+                    Total Logs: <span th:text="${#lists.size(alerts)}">0</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="rounded-[35px] border border-gray-100 overflow-hidden flex flex-col flex-1 bg-white">
+            <div class="bg-gray-900 text-white flex text-[13px] font-black py-6 px-12 items-center uppercase tracking-tighter">
+                <div class="w-32 text-center">Log ID</div>
+                <div class="flex-1 text-center border-l border-gray-700">장애 감지 시간</div>
+                <div class="flex-1 text-center border-l border-gray-700">조치 완료 시간</div>
+                <div class="w-40 text-center border-l border-gray-700">위치</div>
+                <div class="w-32 text-center border-l border-gray-700">상태</div>
+            </div>
+
+            <div class="flex-1 flex flex-col relative divide-y divide-gray-50 overflow-y-auto custom-scroll">
+                <th:block th:if="${alerts == null or #lists.isEmpty(alerts)}">
+                    <div class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/30 backdrop-blur-[2px]">
+                        <div class="bg-white px-8 py-5 rounded-[35px] shadow-2xl border border-gray-100 flex flex-col items-center space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="flex h-3 w-3 rounded-full bg-green-500 animate-pulse"></span>
+                                <span class="text-gray-800 font-black tracking-widest text-sm uppercase">System Status: Optimal</span>
+                            </div>
+                            <p class="text-gray-400 text-[11px] font-bold">현재 보고된 시스템 장애 이력이 없습니다.</p>
+                        </div>
+                    </div>
+                    <div th:each="i : ${#numbers.sequence(1, 8)}" class="flex py-8 px-12 text-center items-center text-xl font-black text-gray-100 grayscale opacity-10">
+                        <div class="w-32 text-base font-bold italic">L-0000</div>
+                        <div class="flex-1 text-base">0000-00-00 00:00:00</div>
+                        <div class="flex-1 text-base">--</div>
+                        <div class="w-40 text-sm font-bold tracking-widest uppercase">STATION</div>
+                        <div class="w-32 text-xs font-black uppercase text-gray-200">CLEAN</div>
+                    </div>
+                </th:block>
+
+                <th:block th:if="${alerts != null and !#lists.isEmpty(alerts)}">
+                    <div th:each="alert : ${alerts}" class="flex py-8 px-12 text-center items-center text-xl font-black text-gray-700 hover:bg-gray-50 transition-all cursor-default group">
+                        <div class="w-32 text-base font-bold text-gray-400 group-hover:text-gray-600" th:text="${alert.id}">L-0000</div>
+                        <div class="flex-1 text-base text-gray-800" th:text="${#temporals.format(alert.createdAt, 'yyyy-MM-dd HH:mm:ss')}">Time</div>
+                        <div class="flex-1 text-base text-gray-400 font-medium" th:text="${alert.resolvedAt != null ? #temporals.format(alert.resolvedAt, 'yyyy-MM-dd HH:mm:ss') : '진행 중...'}">--</div>
+                        <div class="w-40 text-sm font-bold text-gray-600 uppercase" th:text="${alert.location}">Location</div>
+                        <div class="w-32">
+                            <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border"
+                                  th:classappend="${alert.severity >= 3 ? 'bg-red-50 text-red-500 border-red-100' : 'bg-green-50 text-green-500 border-green-100'}"
+                                  th:text="${alert.message}">정상</span>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+        <div class="mt-8 text-center">
+            <p class="text-[11px] font-black text-gray-300 uppercase tracking-widest">SolarGuard Smart Monitoring v2.0</p>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="script"></th:block>
+</html>

@@ -4,11 +4,13 @@ import com.suncontrol.core.constant.common.Province;
 import com.suncontrol.core.entity.view.PlantInfoView;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class PlantDetailVo extends PlantInfoVo {
     /// 마이페이지용
     private String address;
@@ -31,5 +33,9 @@ public class PlantDetailVo extends PlantInfoVo {
 
     public PlantVo toPlantVo() {
         return new PlantVo(this);
+    }
+
+    public String getName() {
+        return super.getName();
     }
 }

@@ -292,6 +292,8 @@
 
         async function updateAccount() {
             const id = document.getElementById('editMemberId').value;
+            const name = document.getElementById('editName').value.trim();
+            const affiliation = document.getElementById('editAffiliation').value.trim();
             const role = document.getElementById('editRole').value;
             const status = document.getElementById('editStatus').value;
 
@@ -300,11 +302,16 @@
                 return;
             }
 
+            if (!name || !affiliation) {
+                showToast('이름과 소속을 입력해 주세요.', true);
+                return;
+            }
+
             try {
                 const response = await fetch(`${API}/members/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ role, status })
+                    body: JSON.stringify({ name, affiliation, role, status })
                 });
 
                 await parseResponse(response);

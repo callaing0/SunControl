@@ -55,13 +55,13 @@ public class chartServiceImpl implements chartService {
     }
 
     @Override
-    public List<chartDto> getGenerationTrend(Long memberId, LocalDate selectedDate) {
-        return chartRepository.selectGenerationTrend(memberId, selectedDate);
+    public List<chartDto> getGenerationTrend(Long plantId, LocalDate selectedDate) {
+        return chartRepository.selectGenerationTrend(plantId, selectedDate);
     }
 
     @Override
-    public List<chartDto> getWeatherEfficiency(Long memberId, LocalDate selectedDate) {
-        return chartRepository.selectWeatherEfficiency(memberId, selectedDate);
+    public List<chartDto> getWeatherEfficiency(Long plantId, LocalDate selectedDate) {
+        return chartRepository.selectWeatherEfficiency(plantId, selectedDate);
     }
 
     private chartSummaryDto createSummary(String title, String value) {

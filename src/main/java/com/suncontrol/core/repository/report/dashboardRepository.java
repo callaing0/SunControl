@@ -15,7 +15,8 @@ import java.util.List;
 @Mapper
 public interface dashboardRepository {
 
-    DashboardPlantDto selectMainPlant(@Param("memberId") Long memberId);
+    DashboardPlantDto selectPlantById(@Param("memberId") Long memberId,
+                                      @Param("plantId") Long plantId);
 
     DashboardRealtimeDto selectPlantRealtime(@Param("plantId") Long plantId);
 
@@ -27,7 +28,8 @@ public interface dashboardRepository {
 
     DashboardGenerationDto selectTodayGeneration(@Param("plantId") Long plantId);
 
-    List<DashboardInverterDto> selectInverters(@Param("memberId") Long memberId);
+    List<DashboardInverterDto> selectInvertersByPlant(@Param("memberId") Long memberId,
+                                                      @Param("plantId") Long plantId);
 
     List<DashboardHourlyValueDto> selectHourlyPower(@Param("plantId") Long plantId);
 
