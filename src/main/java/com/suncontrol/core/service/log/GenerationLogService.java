@@ -45,7 +45,7 @@ public class GenerationLogService {
     }
 
     /// 기록의 상태별로 모든 데이터를 가져오는 메서드
-    /// 예 ) "PENDING" 인 기록을 모두 가져온다
+    /// 예 ) "GenerationStatus.PENDING" 인 기록을 모두 가져온다
     public List<GenerationLogDto> findAllByStatus(GenerationStatus status) {
         return repository.findAllByStatus(status.getStatus())
                 .stream()
