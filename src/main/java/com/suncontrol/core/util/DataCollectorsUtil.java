@@ -27,7 +27,8 @@ public class DataCollectorsUtil {
                 );
     }
 
-    public static <T, R extends PlantIdProvider> Map<Long, List<R>> groupByPlantId(List<T> list, Function<T, R> mapper) {
+    public static <T, R extends PlantIdProvider> Map<
+            Long, List<R>> groupByPlantId(List<T> list, Function<T, R> mapper) {
         return list.stream()
                 .map(mapper)
                 .collect(
