@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 public enum GenerationStatus {
     PENDING("PENDING"),
     NORMAL("NORMAL"),
-    ERROR("ERROR");
+    ERROR("FAULT");
 
     private final String status;
 

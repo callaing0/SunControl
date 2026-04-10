@@ -42,4 +42,15 @@
         SELECT * FROM generation_log
         WHERE status = #{status}
     </select>
+
+    <update id="updateStatus"
+            parameterType="com.suncontrol.core.dto.log.GenerationLogUpdateStatusDto">
+
+        <foreach collection="list" item="item" separator=";">
+            UPDATE generation_log
+            SET status = #{item.status}
+            WHERE inverter_id = #{item.inverterId}
+            AND base_time = #{item.baseTime}
+        </foreach>
+    </update>
 </mapper>
