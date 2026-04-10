@@ -2,6 +2,8 @@ package com.suncontrol.core.dto.log;
 
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
+import com.suncontrol.core.constant.generic.BaseTimeProvider;
+import com.suncontrol.core.constant.generic.DistrictProvider;
 import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.entity.log.WeatherLog;
 import lombok.*;
@@ -11,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class WeatherLogDto {
+public class WeatherLogDto implements BaseTimeProvider, DistrictProvider {
 
     /// List<WeatherLogDto>를 이용하여 DB저장
     /// Map<D.Code,Map<L.D.T,WeatherLogDto>>를 이용하여 발전데이터 생성

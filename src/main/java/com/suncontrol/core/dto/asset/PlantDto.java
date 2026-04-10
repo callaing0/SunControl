@@ -2,6 +2,8 @@ package com.suncontrol.core.dto.asset;
 
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Province;
+import com.suncontrol.core.constant.generic.DistrictProvider;
+import com.suncontrol.core.constant.generic.PlantIdProvider;
 import com.suncontrol.core.entity.asset.Plant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PlantDto {
+public class PlantDto implements DistrictProvider, PlantIdProvider {
     /// PlantService 파라미터, 반환 전용 DTO
     /// Form -> (Dto -> Entity -> Dto) -> Dto, Vo 형식으로 구성하고
     /// core 패키지의 데이터 객체를 줄이기 위함
@@ -29,6 +31,10 @@ public class PlantDto {
     private int azimuth;
     private int tilt;
     private LocalDateTime createdAt;
+
+    public Long getPlantId() {
+        return this.id;
+    }
 
     /// 발전소 DB 조회용 생성자
     public PlantDto(Plant entity) {

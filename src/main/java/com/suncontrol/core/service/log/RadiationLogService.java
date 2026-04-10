@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,23 +31,14 @@ public class RadiationLogService {
         log.info("{}건 저장 완료", result);
     }
 
-    public Map<Long, Map<LocalDateTime, RadiationLogDto>> getMapByPlantIdAndTime
-            (LocalDateTime start, LocalDateTime end) {
+    public List<RadiationLogDto> findLatest(LocalDateTime start, LocalDateTime end) {
         List<RadiationLog> entities = findLatestLog(start, end);
         /// DB가 비어있으면 null이 아닌 빈 맵으로 반환
         if(entities.isEmpty()) {
-            return Collections.emptyMap();
+            return Collections.emptyList();
         }
 
-        return entities.stream().collect(
-                Collectors.groupingBy(
-                        RadiationLog::getPlantId,
-                        Collectors.toMap(
-                                RadiationLog::getBaseTime,
-                                RadiationLogDto::new
-                        )
-                )
-        );
+        return entities.stream().map(RadiationLogDto::new).toList();
     }
 
     private List<RadiationLog> findLatestLog(LocalDateTime start, LocalDateTime end) {
