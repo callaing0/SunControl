@@ -18,6 +18,7 @@ import lombok.ToString;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,10 +47,13 @@ public class WeatherResponseDto {
     /// 각 날씨 컬럼의 created_at이나 updated_at을 강제로 이것으로 주입하기 위함
 
     @JsonIgnore
-    private Integer getDayOffset(LocalDateTime targetTime) {
+    private Integer getDayOffset(LocalDate target) {
         /// 들어오는 baseTime 이 responseTime 보다 미래시점 -> dayOffset > 0
         /// 들어오는 baseTime 이 responseTime 보다 과거시점 -> "실측"으로 처리
-        return Math.max(targetTime.compareTo(responseTime), 0);
+        return (int) Math.max(
+                ChronoUnit.DAYS.between(
+                        responseTime.toLocalDate(), target),
+                0);
     }
 
     @JsonIgnore
@@ -58,8 +62,8 @@ public class WeatherResponseDto {
     }
 
     @JsonIgnore
-    private ReportDataType getReportDataType(LocalDateTime targetTime) {
-        return getReportDataType(getDayOffset(targetTime));
+    private ReportDataType getReportDataType(LocalDate target) {
+        return getReportDataType(getDayOffset(target));
     }
 
     @JsonIgnore
@@ -76,7 +80,7 @@ public class WeatherResponseDto {
             /// 이미 꺼내둔 객체를 이용하는 게 리소스 낭비를 줄이는 법
             dto.setDistrict(plant.getDistrict());
             dto.setBaseTime(timeList.get(i));
-            dto.setDataType(getReportDataType(timeList.get(i)));
+            dto.setDataType(getReportDataType(timeList.get(i).toLocalDate()));
 
             /// 다음은 UK가 아닌 파트들
             dto.setTemperature(hourly.getTemperature().get(i));
@@ -105,7 +109,7 @@ public class WeatherResponseDto {
             /// UK 파트
             dto.setPlantId(plant.getId());
             dto.setBaseTime(timeList.get(i));
-            dto.setDataType(getReportDataType(timeList.get(i)));
+            dto.setDataType(getReportDataType(timeList.get(i).toLocalDate()));
 
             /// UK 아닌 파트
             dto.setGti(hourly.getGti().get(i));
@@ -131,7 +135,7 @@ public class WeatherResponseDto {
             dto.setDistrict(plant.getDistrict());
             dto.setBaseDate(dateList.get(i));
             /// 당일의 예보는 0시 0분으로 해둬야 "당일실측" 을 강제할 수 있다.
-            dto.setDataType(getReportDataType(dateList.get(i).atStartOfDay()));
+            dto.setDataType(getReportDataType(dateList.get(i)));
 
             /// UK 아닌 파트
             dto.setTempMax(daily.getTempMax().get(i));

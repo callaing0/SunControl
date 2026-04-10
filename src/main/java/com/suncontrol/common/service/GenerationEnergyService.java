@@ -197,7 +197,7 @@ public class GenerationEnergyService {
             inv.setCurrentPower(dto.getValueActual());
 
             GenerationResultDto result = new GenerationResultDto(
-                    inv.getId(), current, dto, lastAccumEnergy ,base.weather());
+                    inv.getId(), current, dto, lastAccumEnergy ,base.weatherCode());
             /// 테스트 데이터 출력
             log.debug("Generation result: {}", result);
 

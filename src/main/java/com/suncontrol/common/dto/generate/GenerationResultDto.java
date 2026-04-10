@@ -21,21 +21,23 @@ public class GenerationResultDto {
     private LocalDateTime baseTime;
     private GenerateValueDto values; /// 이 친구도 ToString 가지고 있어야 함
     private BigDecimal accumEnergy;
-    private Weather weather;
+    private Integer weatherCode;
 
     /// GenerationLogDto
     public GenerationLogDto getGenerationLogDto() {
-        return GenerationLogDto.builder()
-                .inverterId(inverterId)
-                .baseTime(baseTime)
-                .valueExpected(values.getValueExpected())
-                .valueActual(values.getValueActual())
-                .performanceRatio(values.getPerformanceRatio())
-                .expectedRatio(values.getExpectedRatio())
-                .capacityFactor(values.getCapacityFactor())
-                .accumEnergy(accumEnergy)
-                .weather(weather)
-                .generationStatus(GenerationStatus.PENDING)
-                .build();
+        GenerationLogDto dto = new GenerationLogDto();
+
+        dto.setInverterId(inverterId);
+        dto.setBaseTime(baseTime);
+        dto.setValueExpected(values.getValueExpected());
+        dto.setValueActual(values.getValueActual());
+        dto.setPerformanceRatio(values.getPerformanceRatio());
+        dto.setExpectedRatio(values.getExpectedRatio());
+        dto.setCapacityFactor(values.getCapacityFactor());
+        dto.setAccumEnergy(accumEnergy);
+        dto.setWeatherCode(weatherCode);
+        dto.setGenerationStatus(GenerationStatus.PENDING);
+
+        return dto;
     }
 }
