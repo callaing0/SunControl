@@ -3,7 +3,6 @@ package com.suncontrol.core.service.log;
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
 import com.suncontrol.core.entity.log.DailyWeather;
-import com.suncontrol.core.entity.log.WeatherLog;
 import com.suncontrol.core.repository.log.DailyWeatherRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,24 +35,15 @@ public class DailyWeatherService {
         log.info("{}건의 일일 기상데이터 저장 완료", result);
     }
 
-    public Map<District, Map<LocalDate, DailyWeatherDto>> getMapByDistrictAndDate
-            (LocalDate start, LocalDate end) {
+    public List<DailyWeatherDto> findLatest(LocalDate start, LocalDate end) {
         /// DB 결과값이 없으면 빈 맵으로 반환
         List<DailyWeather> entities = findLatestLogs(start, end);
 
         if(entities.isEmpty()) {
-            return Collections.emptyMap();
+            return Collections.emptyList();
         }
 
-        /// 나온 결과값을 이중 맵으로 매핑
-        return entities.stream().collect(
-                Collectors.groupingBy(DailyWeather::getDistrict,
-                        Collectors.toMap(
-                                DailyWeather::getBaseDate,
-                                DailyWeatherDto::new
-                        )
-                )
-        );
+        return entities.stream().map(DailyWeatherDto::new).toList();
     }
 
     private List<DailyWeather> findLatestLogs(LocalDate start, LocalDate end) {

@@ -1,5 +1,7 @@
 package com.suncontrol.core.dto.log;
 
+import com.suncontrol.core.constant.generic.BaseTimeProvider;
+import com.suncontrol.core.constant.generic.PlantIdProvider;
 import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.entity.log.RadiationLog;
 import lombok.*;
@@ -9,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RadiationLogDto {
+public class RadiationLogDto implements PlantIdProvider, BaseTimeProvider {
     /// List<RadLogDto> - 저장
     /// Map<발전소ID,Map<시간,RadLogDto>> - 데이터생성
     private Long plantId;

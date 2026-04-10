@@ -2,6 +2,8 @@ package com.suncontrol.core.dto.asset;
 
 import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
+import com.suncontrol.core.constant.generic.BaseTimeProvider;
+import com.suncontrol.core.constant.generic.PlantIdProvider;
 import com.suncontrol.core.dto.asset.component.InverterBaseDto;
 import com.suncontrol.core.entity.asset.Inverter;
 import lombok.*;
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @SuperBuilder
-public class InverterDto extends InverterBaseDto {
+public class InverterDto extends InverterBaseDto implements PlantIdProvider, BaseTimeProvider {
     private String serial;
     private BigDecimal ratedCapacity;
     private BigDecimal efficiency;
@@ -23,6 +25,10 @@ public class InverterDto extends InverterBaseDto {
     private InverterType inverterType;
     private DeviceStatus status;
     private LocalDateTime createdAt;
+
+    public LocalDateTime getBaseTime() {
+        return this.createdAt;
+    }
 
     public InverterDto(Inverter inverter) {
         super(inverter.getId(), inverter.getPlantId());
