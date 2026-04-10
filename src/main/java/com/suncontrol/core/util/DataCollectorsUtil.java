@@ -31,6 +31,30 @@ public class DataCollectorsUtil {
                 );
     }
 
+    public static <K1, K2, T> Map<K1, Map<K2, T>> groupToMap(
+            List<T> list,
+            Function<T, K1> keymap1,
+            Function<T, K2> keymap2) {
+        return groupToMap(list, keymap1, keymap2, Function.identity());
+    }
+
+    public static <K1, K2, T, R> Map<K1, Map<K2, R>> groupToMap(
+            List<T> list,
+            Function<T, K1> keymap1,
+            Function<T, K2> keymap2,
+            Function<T, R> valueMapper) {
+        return list.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                keymap1,
+                                Collectors.toMap(
+                                        keymap2,
+                                        valueMapper
+                                )
+                        )
+                );
+    }
+
     public static <T, R extends PlantIdProvider> Map<
             Long, List<R>> groupByPlantId(List<T> list, Function<T, R> mapper) {
         return list.stream()
@@ -89,7 +113,7 @@ public class DataCollectorsUtil {
         );
     }
 
-    public static <K, T> List<T> flatMapping(Map<K, Collection<T>> map) {
+    public static <T> List<T> flatMapping(Map<?, ? extends Collection<T>> map) {
         return map.values().stream()
                 .flatMap(Collection::stream)
                 .toList();

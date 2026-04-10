@@ -1,6 +1,7 @@
 package com.suncontrol.core.dto.report;
 
 import com.suncontrol.core.constant.common.Weather;
+import com.suncontrol.core.constant.generic.BaseTimeProvider;
 import com.suncontrol.core.constant.util.GenerationStatus;
 import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.constant.generic.InverterIdProvider;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class HourlyReportDto implements InverterIdProvider {
+public class HourlyReportDto implements InverterIdProvider, BaseTimeProvider {
     private Long inverterId;
     private LocalDateTime baseTime;
     private BigDecimal valueExpected;
@@ -44,5 +45,12 @@ public class HourlyReportDto implements InverterIdProvider {
         this.weather = Weather.fromCode(entity.getWeatherCode());
         this.reportDataType = ReportDataType.findByDayOffset(entity.getDayOffset());
         this.generationStatus = GenerationStatus.fromStatus(entity.getStatus());
+    }
+
+    public HourlyReportDto(Long inverterId, LocalDateTime baseTime, HourlyReportDto previous, ReportDataType reportDataType) {
+        this.inverterId = inverterId;
+        this.baseTime = baseTime;
+        this.valuePrevious = previous != null ? previous.valueActual : null;
+        this.reportDataType = reportDataType;
     }
 }

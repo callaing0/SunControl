@@ -6,6 +6,7 @@ import com.suncontrol.core.dto.log.GenerationLogUpdateStatusDto;
 import com.suncontrol.core.dto.log.LastGeneratedTime;
 import com.suncontrol.core.entity.log.GenerationLog;
 import com.suncontrol.core.repository.log.GenerationLogRepository;
+import com.suncontrol.core.util.DataCollectorsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,10 +49,28 @@ public class GenerationLogService {
     /// 기록의 상태별로 모든 데이터를 가져오는 메서드
     /// 예 ) "GenerationStatus.PENDING" 인 기록을 모두 가져온다
     public List<GenerationLogDto> findAllByStatus(GenerationStatus status) {
-        return repository.findAllByStatus(status.getStatus())
-                .stream()
-                .map(GenerationLogDto::new)
-                .toList();
+        return findAllByStatus(status, true);
+    }
+
+    public List<GenerationLogDto> findAllByStatus(GenerationStatus status, boolean isTrue) {
+        return DataCollectorsUtil.toDtoList(
+                isTrue ? repository.findAllByStatus(status.getStatus())
+                        : repository.findAllByNotStatus(status.getStatus()),
+                GenerationLogDto::new);
+    }
+
+    public List<GenerationLogDto> findAllbyStatus(
+            LocalDateTime start,
+            LocalDateTime end,
+            GenerationStatus status,
+            boolean isTrue) {
+        return DataCollectorsUtil.toDtoList(
+                isTrue ?
+                        repository.findAllBetweenTimeByStatus(
+                                start, end, status.getStatus())
+                        : repository.findAllBetweenTimeByNotStatus(
+                                start, end, status.getStatus()),
+                GenerationLogDto::new);
     }
 
     public int updateStatus(List<GenerationLogUpdateStatusDto> dtoList) {
