@@ -38,8 +38,8 @@ public class PlantService {
     }
 
     public List<PlantDto> findAllByMemberId(Long memberId) {
-        return repository.findAllByMemberIdAndIsDeletedFalse(memberId)
-                .stream().map(PlantDto::new).collect(Collectors.toList());
+        return DataCollectorsUtil.toDtoList(
+                repository.findAllByMemberIdAndIsDeletedFalse(memberId), PlantDto::new);
     }
 
     public PlantInfoView getInfoViewById(Long id) {
@@ -49,8 +49,8 @@ public class PlantService {
     }
 
     public List<PlantDto> findAllActive () {
-        return repository.findAllByIsDeletedFalse()
-                .stream().map(PlantDto::new).collect(Collectors.toList());
+        return DataCollectorsUtil.toDtoList(
+                repository.findAllByIsDeletedFalse(), PlantDto::new);
     }
 
     public Map<District, List<Long>> getPlantMapByDistrict() {

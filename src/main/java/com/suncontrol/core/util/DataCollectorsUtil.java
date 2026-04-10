@@ -15,14 +15,18 @@ public class DataCollectorsUtil {
 
     public static <T extends DistrictProvider & PlantIdProvider> Map
             <District, List<Long>> groupIdsByDistrict(List<T> list) {
+        return groupBy(list, DistrictProvider::getDistrict, PlantIdProvider::getPlantId);
+    }
+
+    public static <K, T, R> Map<K, List<R>>
+    groupBy(
+            List<T> list, Function<T, K> keymap, Function<T, R> valueMapper
+    ) {
         return list.stream()
                 .collect(
                         Collectors.groupingBy(
-                                T::getDistrict,
-                                Collectors.mapping(
-                                        T::getPlantId,
-                                        Collectors.toList()
-                                )
+                                keymap,
+                                Collectors.mapping(valueMapper, Collectors.toList())
                         )
                 );
     }
