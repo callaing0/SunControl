@@ -34,17 +34,20 @@
         <result property="totalGeneration" column="total_generation"/>
     </resultMap>
 
-    <select id="findRegionListByMemberId" resultType="string">
-        SELECT DISTINCT p.address
+    <select id="findRegionList" resultType="string">
+        SELECT DISTINCT CONCAT(
+        SUBSTRING_INDEX(p.address, ' ', 1),
+        ' ',
+        SUBSTRING_INDEX(SUBSTRING_INDEX(p.address, ' ', 2), ' ', -1)
+        ) AS region
         FROM plant p
-        WHERE p.member_id = #{memberId}
-        AND p.is_deleted = 0
+        WHERE p.is_deleted = 0
         AND p.address IS NOT NULL
         AND TRIM(p.address) != ''
-        ORDER BY p.address ASC
+        ORDER BY region ASC
     </select>
 
-    <select id="findPlantInfoViewListByMemberIdAndRegion" resultMap="plantInfoViewMap">
+    <select id="findPlantInfoViewListByRegion" resultMap="plantInfoViewMap">
         SELECT
         pi.id,
         pi.member_id,
@@ -65,26 +68,26 @@
         pi.status_code,
         pi.updated_at
         FROM plant_info_view pi
-        WHERE pi.member_id = #{memberId}
-        <if test="region != null and region != '' and region != 'all'">
-            AND pi.address = #{region}
-        </if>
+        <where>
+            <if test="region != null and region != '' and region != 'all'">
+                AND pi.address LIKE CONCAT(#{region}, '%')
+            </if>
+        </where>
         ORDER BY pi.created_at DESC, pi.id DESC
     </select>
 
-    <select id="findHourlyGenerationByMemberIdAndRegion" resultMap="stationHourlyGenerationMap">
+    <select id="findHourlyGenerationByRegion" resultMap="stationHourlyGenerationMap">
         SELECT
         DATE_FORMAT(gl.base_time, '%H:00') AS hour_label,
         COALESCE(SUM(gl.value_actual), 0) AS total_generation
         FROM generation_log gl
         INNER JOIN inverter i ON gl.inverter_id = i.id
         INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.member_id = #{memberId}
-        AND p.is_deleted = 0
+        WHERE p.is_deleted = 0
         AND gl.base_time >= CURDATE()
         AND gl.base_time <![CDATA[ < ]]> DATE_ADD(CURDATE(), INTERVAL 1 DAY)
         <if test="region != null and region != '' and region != 'all'">
-            AND p.address = #{region}
+            AND p.address LIKE CONCAT(#{region}, '%')
         </if>
         GROUP BY HOUR(gl.base_time), DATE_FORMAT(gl.base_time, '%H:00')
         ORDER BY HOUR(gl.base_time)
