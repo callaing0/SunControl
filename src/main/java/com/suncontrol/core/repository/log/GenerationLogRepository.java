@@ -1,5 +1,6 @@
 package com.suncontrol.core.repository.log;
 
+import com.suncontrol.core.dto.log.GenerationLogUpdateStatusDto;
 import com.suncontrol.core.dto.log.LastGeneratedTime;
 import com.suncontrol.core.entity.log.GenerationLog;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,5 +15,7 @@ public interface GenerationLogRepository {
     List<LastGeneratedTime> findLastsOf();
 
     List<GenerationLog> findAllByStatus(String status);
+
+    int updateStatus(List<GenerationLogUpdateStatusDto> dtoList);
     //todo
 }

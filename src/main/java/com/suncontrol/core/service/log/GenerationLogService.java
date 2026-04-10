@@ -2,6 +2,7 @@ package com.suncontrol.core.service.log;
 
 import com.suncontrol.core.constant.util.GenerationStatus;
 import com.suncontrol.core.dto.log.GenerationLogDto;
+import com.suncontrol.core.dto.log.GenerationLogUpdateStatusDto;
 import com.suncontrol.core.dto.log.LastGeneratedTime;
 import com.suncontrol.core.entity.log.GenerationLog;
 import com.suncontrol.core.repository.log.GenerationLogRepository;
@@ -51,5 +52,13 @@ public class GenerationLogService {
                 .stream()
                 .map(GenerationLogDto::new)
                 .toList();
+    }
+
+    public int updateStatus(List<GenerationLogUpdateStatusDto> dtoList) {
+        int result = repository.updateStatus(dtoList);
+
+        log.info("Update {} results to DB", result);
+
+        return result;
     }
 }
