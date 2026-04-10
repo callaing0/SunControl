@@ -1,9 +1,8 @@
 package com.suncontrol.common.service;
 
-import com.suncontrol.core.constant.generic.BaseTimeProvider;
-import com.suncontrol.core.constant.generic.InverterIdProvider;
 import com.suncontrol.core.constant.util.GenerationStatus;
 import com.suncontrol.core.constant.util.ReportDataType;
+import com.suncontrol.core.constant.util.StaticValues;
 import com.suncontrol.core.dto.log.GenerationLogDto;
 import com.suncontrol.core.dto.report.DailyReportDto;
 import com.suncontrol.core.dto.report.HourlyReportDto;
@@ -20,9 +19,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 @Service
 public class ActualGenerationReportService extends AbstractGenerationReportService{
@@ -32,12 +31,15 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
     }
 
     @Override
-    protected Map<Long, Map<LocalDateTime, GenerationLogDto>> getRawSource(LocalDateTime start, LocalDateTime end) {
-        return DataCollectorsUtil.groupToMap(
+    protected Map<LocalDateTime, Map<Long, List<GenerationLogDto>>> getRawSource(LocalDateTime start, LocalDateTime end) {
+        return DataCollectorsUtil.groupToNestedListMap(
+                /// TODO 상태와 상관없이 모든 데이터 가져올 것
+                /// findAllByBaseTimeBetween(start, end)
                 getGenerationLogService()
                         .findAllbyStatus(start, end, GenerationStatus.PENDING, false),
-                InverterIdProvider::getInverterId,
-                BaseTimeProvider::getBaseTime
+                (GenerationLogDto log) ->
+                        log.truncateBaseTime(StaticValues.HOUR_SECONDS),
+                GenerationLogDto::getInverterId
         );
     }
 
@@ -54,29 +56,35 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
     @Override
     protected List<HourlyReportDto> hourlyReport(
             LocalDateTime start, LocalDateTime end, ReportDataType reportDataType) {
-        Map<Long, Map<LocalDateTime, GenerationLogDto>> generationInvMap =
+        Map<LocalDateTime, Map<Long, List<GenerationLogDto>>> generationInvMap =
                 getRawSource(start, end);
         Map<LocalDateTime, Map<Long, HourlyReportDto>> previousMap
                 = DataCollectorsUtil.groupToMap(
                         getHourlyReportService().findAllByBaseTimeBetweenStartAndEnd(
                                 start.minusDays(1), end.minusDays(1)
                         ),
-                        BaseTimeProvider::getBaseTime,
-                        InverterIdProvider::getInverterId
+                        HourlyReportDto::getBaseTime,
+                        HourlyReportDto::getInverterId
         );
-        LocalDateTime currentTime = TimeTruncater.truncateToTerm(start, super.HOUR_SECONDS);
+        LocalDateTime currentTime = TimeTruncater.truncateToTerm(start, StaticValues.HOUR_SECONDS);
         // 통계 생성은 인버터별로 '별도처리'를 할 필요가 없다.
         while(currentTime.isBefore(
-                TimeTruncater.truncateToNextTerm(end, super.HOUR_SECONDS))) {
+                TimeTruncater.truncateToNextTerm(end, StaticValues.HOUR_SECONDS))) {
             Map<Long, HourlyReportDto> prevInnerMap =
-                    previousMap.get(currentTime.minusDays(1));
+                    previousMap.getOrDefault
+                            (currentTime.minusDays(1), Collections.emptyMap());
+            Map<Long, List<GenerationLogDto>> genLogInnverMap =
+                    generationInvMap.getOrDefault
+                            (currentTime, Collections.emptyMap());
             // 상세로직
-            for(Long inverterId : generationInvMap.keySet()) {
+            for(Long inverterId : genLogInnverMap.keySet()) {
                 HourlyReportDto previous = prevInnerMap.get(inverterId);
+                List<GenerationLogDto> genList = genLogInnverMap.get(inverterId);
 
+                /// TODO 시간당 데이터 계산로직
             }
 
-            currentTime.plusHours(1);
+            currentTime = currentTime.plusHours(1);
         }
         return List.of();
     }

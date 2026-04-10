@@ -1,10 +1,9 @@
 package com.suncontrol.core.dto.log;
 
 import com.suncontrol.core.constant.common.Weather;
-import com.suncontrol.core.constant.generic.BaseTimeProvider;
 import com.suncontrol.core.constant.util.GenerationStatus;
-import com.suncontrol.core.constant.generic.InverterIdProvider;
 import com.suncontrol.core.entity.log.GenerationLog;
+import com.suncontrol.core.util.TimeTruncater;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class GenerationLogDto implements InverterIdProvider, BaseTimeProvider {
+public class GenerationLogDto {
     private Long inverterId;
     private LocalDateTime baseTime;
     private BigDecimal valueExpected; /// 기대값
@@ -44,5 +43,9 @@ public class GenerationLogDto implements InverterIdProvider, BaseTimeProvider {
         this.weatherCode = entity.getWeatherCode();
         this.generationStatus = GenerationStatus.fromStatus(entity.getStatus());
         this.updatedAt = entity.getUpdatedAt();
+    }
+
+    public LocalDateTime truncateBaseTime(int termSeconds) {
+        return TimeTruncater.truncateToTerm(this.baseTime, termSeconds);
     }
 }

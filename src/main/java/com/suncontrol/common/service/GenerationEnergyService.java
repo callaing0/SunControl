@@ -3,6 +3,7 @@ package com.suncontrol.common.service;
 import com.suncontrol.common.dto.generate.*;
 import com.suncontrol.common.util.GenerateUtil;
 import com.suncontrol.core.constant.common.District;
+import com.suncontrol.core.constant.util.StaticValues;
 import com.suncontrol.core.dto.asset.InverterDto;
 import com.suncontrol.core.dto.asset.InverterUpdateDto;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
@@ -27,8 +28,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -55,8 +54,9 @@ public class GenerationEnergyService {
         /// 살아있는 인버터 정보 가져와서 발전용 정보만 가진 객체로 변환
         List<InverterDto> inverterList = inverterService.findAllActive();
         Map<Long, List<InverterGenerationDto>> invertersMap =
-                DataCollectorsUtil.groupByPlantId(
+                DataCollectorsUtil.groupBy(
                         inverterList,
+                        InverterDto::getPlantId,
                         InverterGenerationDto::new
                 );
     // endregion
@@ -66,44 +66,49 @@ public class GenerationEnergyService {
         Map<Long, LocalDateTime> recentGenerated =
                 generationLogService.getLastGeneratedTimeByAllInverters();
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime defaultStart =
-                DataCollectorsUtil.getLastGeneratedTime(
-                        inverterList, now);
-        LocalDateTime start = recentGenerated.values().stream()
-                .min(LocalDateTime::compareTo)
-                .orElse(defaultStart);
+        LocalDateTime defaultStart = TimeTruncater.getOldestTimeOrDefault
+                (inverterList, now, InverterDto::getBaseTime);
+        LocalDateTime start = TimeTruncater
+                .getOldestTimeOrDefault(recentGenerated, defaultStart);
         /// 시작시간을 발전량 생성 기준으로 "평탄화" (당시 시각의 다음 시간대)
         start = TimeTruncater.truncateToNextTerm(start, termSeconds);
         /// 끝시간 : 시작시간 1달 후 또는 현재 중 적은 값
         LocalDateTime monthLater = start.plusMonths(1);
-        LocalDateTime end = Stream.of(monthLater, now)
-                .min(LocalDateTime::compareTo)
-                .orElse(now);
+        LocalDateTime end = TimeTruncater.getOldestTimeOrDefault(
+                List.of(monthLater, now), now);
         /// 끝시간을 발전량 생성 기준으로 "평탄화" (당시 시각의 이전 시간대)
         end = TimeTruncater.truncateToTerm(end, termSeconds);
     // endregion
 
     // region 3. 재료준비 3 - 기준시각을 토대로 한 날씨정보
         Map<District, Map<LocalDateTime, WeatherLogDto>> weatherLogMap =
-                DataCollectorsUtil.getMapByDistrictAndTime(
-                        weatherLogService.findLatest(start, end));
+                DataCollectorsUtil.groupToMap(
+                        weatherLogService.findLatest(start, end),
+                        WeatherLogDto::getDistrict,
+                        WeatherLogDto::getBaseTime
+                );
 
         Map<District, Map<LocalDate, DailyWeatherDto>> dailyWeatherMap =
-                DataCollectorsUtil.getMapByDistrictAndDate(
+                DataCollectorsUtil.groupToMap(
                         dailyWeatherService.findLatest(
-                                start.toLocalDate(), end.toLocalDate()));
+                                start.toLocalDate(), end.toLocalDate()),
+                        DailyWeatherDto::getDistrict,
+                        DailyWeatherDto::getBaseDate
+                );
 
         Map<Long, Map<LocalDateTime, RadiationLogDto>> radiationLogMap =
-                DataCollectorsUtil.getMapByPlantIdAndTime(
-                        radiationLogService.findLatest(start, end));
+                DataCollectorsUtil.groupToMap(
+                        radiationLogService.findLatest(start, end),
+                        RadiationLogDto::getPlantId,
+                        RadiationLogDto::getBaseTime
+                );
     // endregion
         /// 결과용 맵
         List<GenerationLogDto> results = new ArrayList<>();
         List<InverterUpdateDto> inverterUpdateList = new ArrayList<>();
 
-        log.info("collect datas at  {}", LocalDateTime.now());
+        log.info("collect data at  {}", LocalDateTime.now());
         log.info("collect data from {} to {}", start, end);
-        long count = 0;
         for(District district : District.LIST) {
             // region 4. 1차 : 지역 key로 가공재료 꺼내기
             /// 시간별 날씨, 일간 날씨, 발전소 리스트
@@ -142,9 +147,10 @@ public class GenerationEnergyService {
                                     termSeconds);
                 // endregion
                     results.addAll(
-                            DataCollectorsUtil.toDtoList(
+                            DataCollectorsUtil.toDataList(
                                     result.getResults(),
-                                    GenerationResultDto::getGenerationLogDto)
+                                    GenerationResultDto::getGenerationLogDto
+                            )
                     );
                     inverterUpdateList.add(result.getInverter().getUpdateSet());
 
@@ -152,8 +158,8 @@ public class GenerationEnergyService {
                 }
             }
         }
-        count = results.size();
-        log.info("calculated {} datas at {}", count, LocalDateTime.now());
+        int count = results.size();
+        log.info("calculated {} data at {}", count, LocalDateTime.now());
         /// 전체 결과를 LogDto 리스트로 뜯어서 DB 저장
         saveAll(results, inverterUpdateList);
     }
@@ -168,6 +174,7 @@ public class GenerationEnergyService {
 
     public Map<Long, List<GenerationResultDto>> getPredict
             (LocalDateTime start, LocalDateTime end) {
+        /// TODO
         return Collections.emptyMap();
     }
 
@@ -186,9 +193,10 @@ public class GenerationEnergyService {
             GenerateCalcBase base = context.getGenerateCalcBase(baseTime);
 
             /// 사용할 생성 엔진 정하기
-            GenerateUtil expStrategy = utilMap.get(base.expStrategy().getLabel());
-            GenerateUtil actStrategy = utilMap.get(
-                    inv.getInverterType().getStrategy().getLabel());
+            GenerateUtil expStrategy = utilMap.get
+                    (base.expStrategy().getLabel());
+            GenerateUtil actStrategy = utilMap.get
+                    (inv.getInverterType().getStrategy().getLabel());
 
             /// 전문 계산로직으로 연산 처리
             GenerateDataContext gContext = new GenerateDataContext(
@@ -197,7 +205,8 @@ public class GenerationEnergyService {
             gContext = expStrategy.generateEnergy(gContext);
             gContext = actStrategy.generateEnergy(gContext);
             /// 계산이 끝난 값은 capacity 기준으로 클리핑
-            gContext.getDto().setCapacity(inv.getRatedCapacity(), inv.getMeasuredCapacity());
+            gContext.getDto().setCapacity
+                    (inv.getRatedCapacity(), inv.getMeasuredCapacity());
             GenerateValueDto dto = gContext.getDto();
 
             lastAccumEnergy = calculateAccumEnergy(
@@ -206,8 +215,14 @@ public class GenerationEnergyService {
             inv = gContext.getInv();
             inv.setCurrentPower(dto.getValueActual());
 
-            GenerationResultDto result = new GenerationResultDto(
-                    inv.getId(), current, dto, lastAccumEnergy ,base.weatherCode());
+            GenerationResultDto result =
+                    new GenerationResultDto(
+                            inv.getId(),
+                            current,
+                            dto,
+                            lastAccumEnergy,
+                            base.weatherCode()
+                    );
             /// 테스트 데이터 출력
             log.debug("Generation result: {}", result);
 
@@ -220,8 +235,6 @@ public class GenerationEnergyService {
         return new GenerationResultSet(resultList, inv);
     }
 
-    private static final BigDecimal SECONDS_PER_HOUR = BigDecimal.valueOf(3600);
-
     private BigDecimal calculateAccumEnergy(
             BigDecimal currentEnergy, BigDecimal valueActual, int termSecond) {
         /// 누적발전량 집계
@@ -229,7 +242,7 @@ public class GenerationEnergyService {
         return currentEnergy.add(
                 valueActual.multiply(
                         BigDecimal.valueOf(termSecond)
-                                .divide(SECONDS_PER_HOUR,10,
+                                .divide(StaticValues.SECONDS_PER_HOUR,10,
                                         RoundingMode.HALF_UP)));
     }
 }

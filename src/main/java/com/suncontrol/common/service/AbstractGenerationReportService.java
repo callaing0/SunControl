@@ -1,27 +1,22 @@
 package com.suncontrol.common.service;
 
 import com.suncontrol.core.constant.util.ReportDataType;
-import com.suncontrol.core.constant.generic.InverterIdProvider;
 import com.suncontrol.core.dto.log.GenerationLogDto;
 import com.suncontrol.core.dto.report.*;
 import com.suncontrol.core.service.asset.PlantService;
 import com.suncontrol.core.service.log.DailyWeatherService;
 import com.suncontrol.core.service.log.GenerationLogService;
 import com.suncontrol.core.service.report.*;
-import com.suncontrol.core.util.DataCollectorsUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Getter
@@ -35,9 +30,6 @@ public abstract class AbstractGenerationReportService {
     private final PlantService plantService;
     private final DailyWeatherService dailyWeatherService;
     private final GenerationEnergyService generationEnergyService;
-
-    protected final int HOUR_SECONDS = 3600;
-    protected final int DAY_SECONDS = 86400;
 
     /// 통계 작성하는 프로세스 메서드
     /// 파라미터 예시 ) ReportDataType.ACTUAL_SNAPSHOT 등
@@ -76,7 +68,7 @@ public abstract class AbstractGenerationReportService {
 //        }
     }
 
-    protected abstract Map<Long, Map<LocalDateTime, GenerationLogDto>> getRawSource(LocalDateTime start, LocalDateTime end);
+    protected abstract Map<LocalDateTime, Map<Long, List<GenerationLogDto>>> getRawSource(LocalDateTime start, LocalDateTime end);
 
     protected abstract Map<Long, List<HourlyReportDto>> getHourlySource(LocalDateTime start, LocalDateTime end);
 

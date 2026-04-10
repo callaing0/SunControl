@@ -53,7 +53,7 @@ public class GenerationLogService {
     }
 
     public List<GenerationLogDto> findAllByStatus(GenerationStatus status, boolean isTrue) {
-        return DataCollectorsUtil.toDtoList(
+        return DataCollectorsUtil.toDataList(
                 isTrue ? repository.findAllByStatus(status.getStatus())
                         : repository.findAllByNotStatus(status.getStatus()),
                 GenerationLogDto::new);
@@ -64,7 +64,7 @@ public class GenerationLogService {
             LocalDateTime end,
             GenerationStatus status,
             boolean isTrue) {
-        return DataCollectorsUtil.toDtoList(
+        return DataCollectorsUtil.toDataList(
                 isTrue ?
                         repository.findAllBetweenTimeByStatus(
                                 start, end, status.getStatus())

@@ -2,8 +2,6 @@ package com.suncontrol.core.dto.asset;
 
 import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
-import com.suncontrol.core.constant.generic.BaseTimeProvider;
-import com.suncontrol.core.constant.generic.PlantIdProvider;
 import com.suncontrol.core.dto.asset.component.InverterBaseDto;
 import com.suncontrol.core.entity.asset.Inverter;
 import lombok.*;
@@ -15,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @SuperBuilder
-public class InverterDto extends InverterBaseDto implements PlantIdProvider, BaseTimeProvider {
+public class InverterDto extends InverterBaseDto {
     private String serial;
     private BigDecimal ratedCapacity;
     private BigDecimal efficiency;

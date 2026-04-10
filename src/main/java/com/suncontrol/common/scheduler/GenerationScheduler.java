@@ -2,6 +2,7 @@ package com.suncontrol.common.scheduler;
 
 import com.suncontrol.common.service.GenerationEnergyService;
 import com.suncontrol.common.service.WeatherApiService;
+import com.suncontrol.core.constant.util.StaticValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,7 +20,6 @@ public class GenerationScheduler {
     private final WeatherApiService weatherApiService;
     private final GenerationEnergyService generationEnergyService;
 
-    private final Integer GENERATE_INTERVAL = 3600;
     @Scheduled(cron = "0 0 * * * *")
     private void realtimeBatch() {
         log.info("Realtime batch start at {}", LocalDateTime.now());
@@ -41,7 +41,7 @@ public class GenerationScheduler {
 
     private void collectGenerateData() {
         log.info("generate energy data at {}", LocalDateTime.now());
-        generationEnergyService.generateEnergy(GENERATE_INTERVAL);
+        generationEnergyService.generateEnergy(StaticValues.HOUR_SECONDS);
         log.info("발전데이터 생성 완료");
     }
 
