@@ -34,4 +34,6 @@ public interface dashboardRepository {
     List<DashboardHourlyValueDto> selectHourlyPower(@Param("plantId") Long plantId);
 
     List<DashboardHourlyValueDto> selectHourlyInsolation(@Param("plantId") Long plantId);
+
+    BigDecimal selectTotalGeneration(Long plantId);
 }

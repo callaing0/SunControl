@@ -80,6 +80,21 @@
         GROUP BY i.plant_id
     </select>
 
+    <!-- 전체 누적 발전량 / 인버터별 최신 누적값을 합산 -->
+    <select id="selectTotalGeneration" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(t.latest_accum), 0)
+        FROM (
+                 SELECT
+                     gl.inverter_id,
+                     MAX(gl.accum_energy) AS latest_accum
+                 FROM generation_log gl
+                          INNER JOIN inverter i
+                                     ON gl.inverter_id = i.id
+                 WHERE i.plant_id = #{plantId}
+                 GROUP BY gl.inverter_id
+             ) t
+    </select>
+
     <!-- 선택된 발전소 인버터 목록 조회 -->
     <select id="selectInvertersByPlant" resultType="com.suncontrol.domain.dto.DashboardInverterDto">
         SELECT

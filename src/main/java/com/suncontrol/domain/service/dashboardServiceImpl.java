@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class dashboardServiceImpl implements dashboardService {
 
-    private static final BigDecimal UNIT_PRICE = new BigDecimal("160");
+    private static final BigDecimal UNIT_PRICE = new BigDecimal("201");
     private static final BigDecimal CO2_FACTOR = new BigDecimal("0.424");
     private static final BigDecimal TREE_DIVISOR = new BigDecimal("6.6");
 
@@ -43,6 +43,7 @@ public class dashboardServiceImpl implements dashboardService {
         BigDecimal temperature = dashboardRepository.selectLatestTemperature(plant.getDistrictCode());
         BigDecimal insolation = dashboardRepository.selectTodayInsolation(targetPlantId);
         DashboardGenerationDto generation = dashboardRepository.selectTodayGeneration(targetPlantId);
+        BigDecimal totalGeneration = dashboardRepository.selectTotalGeneration(targetPlantId);
 
         dashboardSummaryDto summary = new dashboardSummaryDto();
 
@@ -61,8 +62,13 @@ public class dashboardServiceImpl implements dashboardService {
         summary.setWeatherStatus(formatTemperature(temperature));
 
         summary.setUnitPrice(UNIT_PRICE);
-        summary.setTotalProfit(summary.getDailyAccumulation().multiply(UNIT_PRICE));
 
+        // 수익예측 = 예상 발전량 X 판매 단가
+        summary.setTotalProfit(summary.getPredGen()
+                                .multiply(UNIT_PRICE)
+                                .setScale(2, RoundingMode.HALF_UP));
+
+        // 환경기여도 = 전체 누적 발전량 기준
         BigDecimal co2Reduction = summary.getDailyAccumulation()
                 .multiply(CO2_FACTOR)
                 .setScale(2, RoundingMode.HALF_UP);
