@@ -136,7 +136,9 @@
                         <div class="flex justify-between items-end mb-6 italic uppercase">
                             <span class="text-xl font-black text-gray-800">수익 예측</span>
                             <span class="text-2xl font-black text-blue-600">
-                                <span th:text="${summary != null and summary.totalProfit != null ? summary.totalProfit : '--'}">--</span>
+                                <span th:text="${summary != null and summary.totalProfit != null
+                                                ? #numbers.formatDecimal(summary.totalProfit, 1, 2)
+                                                : '--'}">--</span>
                                 <span class="text-sm font-bold text-gray-400 ml-1">원</span>
                             </span>
                         </div>
@@ -160,13 +162,15 @@
                             <div class="flex items-center justify-between font-black text-[11px] text-gray-400 uppercase">
                                 <span>CO2 절감</span>
                                 <span class="text-base text-gray-800 font-black"
-                                      th:text="${summary != null and summary.co2Reduction != null ? summary.co2Reduction + ' kg' : '--'}">--</span>
+                                      th:text="${summary != null and summary.co2Reduction != null
+                                                ? #numbers.formatDecimal(summary.co2Reduction, 1, 2) + ' kg'
+                                                : '--'}">--</span>
                             </div>
                             <div class="bg-green-50/50 py-6 rounded-[35px] border border-green-100 text-center">
                                 <span class="text-2xl tracking-[0.2em]"
                                       th:text="${summary != null and summary.treeCount != null ? '🌲🌲🌲🌲🌲' : '⚪⚪⚪⚪⚪'}">🌲🌲🌲🌲🌲</span>
                                 <p class="mt-2 text-[10px] font-black text-green-700 uppercase tracking-widest italic"
-                                   th:text="${summary != null and summary.treeCount != null ? summary.treeCount + '그루의 나무가 심어지고 있어요!' : '데이터 집계 중입니다'}"></p>
+                                   th:text="${summary != null and summary.treeCount != null ? summary.treeCount + '그루의 나무를 심은 것과 같은 효과!' : '데이터 집계 중입니다'}"></p>
                             </div>
                         </div>
                     </div>
