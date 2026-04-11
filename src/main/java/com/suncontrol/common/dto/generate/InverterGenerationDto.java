@@ -6,7 +6,7 @@ import com.suncontrol.core.constant.generic.BaseTimeProvider;
 import com.suncontrol.core.constant.generic.PlantIdProvider;
 import com.suncontrol.core.dto.asset.InverterDto;
 import com.suncontrol.core.dto.asset.InverterUpdateDto;
-import com.suncontrol.core.dto.asset.component.InverterBaseDto;
+import com.suncontrol.core.dto.component.InverterBaseDto;
 import lombok.Getter;
 import lombok.Setter;
 

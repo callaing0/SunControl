@@ -1,24 +1,27 @@
 package com.suncontrol.common.service;
 
+import com.suncontrol.common.dto.report.ReportCalcDto;
 import com.suncontrol.core.constant.util.GenerationStatus;
 import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.constant.util.StaticValues;
+import com.suncontrol.core.dto.asset.InverterDto;
+import com.suncontrol.core.dto.component.GenerationValuesDto;
+import com.suncontrol.core.dto.component.InverterBaseDto;
 import com.suncontrol.core.dto.log.GenerationLogDto;
-import com.suncontrol.core.dto.report.DailyReportDto;
-import com.suncontrol.core.dto.report.HourlyReportDto;
-import com.suncontrol.core.dto.report.MonthlyReportDto;
+import com.suncontrol.core.dto.report.*;
+import com.suncontrol.core.service.asset.InverterService;
 import com.suncontrol.core.service.asset.PlantService;
 import com.suncontrol.core.service.log.DailyWeatherService;
 import com.suncontrol.core.service.log.GenerationLogService;
-import com.suncontrol.core.service.report.DailyReportService;
-import com.suncontrol.core.service.report.HourlyReportService;
-import com.suncontrol.core.service.report.MonthlyReportService;
+import com.suncontrol.core.service.report.*;
 import com.suncontrol.core.util.DataCollectorsUtil;
 import com.suncontrol.core.util.TimeTruncater;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +29,8 @@ import java.util.Map;
 @Service
 public class ActualGenerationReportService extends AbstractGenerationReportService{
 
-    public ActualGenerationReportService(GenerationLogService generationLogService, HourlyReportService hourlyReportService, DailyReportService dailyReportService, MonthlyReportService monthlyReportService, PlantService plantService, DailyWeatherService dailyWeatherService, GenerationEnergyService generationEnergyService) {
-        super(generationLogService, hourlyReportService, dailyReportService, monthlyReportService, plantService, dailyWeatherService, generationEnergyService);
+    public ActualGenerationReportService(GenerationLogService generationLogService, HourlyReportService hourlyReportService, DailyReportService dailyReportService, MonthlyReportService monthlyReportService, PlantService plantService, InverterService inverterService, DailyWeatherService dailyWeatherService, GenerationEnergyService generationEnergyService) {
+        super(generationLogService, hourlyReportService, dailyReportService, monthlyReportService, plantService, inverterService, dailyWeatherService, generationEnergyService);
     }
 
     @Override
@@ -61,11 +64,20 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
         Map<LocalDateTime, Map<Long, HourlyReportDto>> previousMap
                 = DataCollectorsUtil.groupToMap(
                         getHourlyReportService().findAllByBaseTimeBetweenStartAndEnd(
-                                start.minusDays(1), end.minusDays(1)
+                                start.minusDays(1), end.minusDays(1), reportDataType.getDayOffset()
                         ),
                         HourlyReportDto::getBaseTime,
                         HourlyReportDto::getInverterId
         );
+        Map<Long, BigDecimal> inverterCapacityMap =
+                DataCollectorsUtil.mapBy(
+                        getInverterService().findAllActive(),
+                        InverterBaseDto::getInverterId,
+                        InverterDto::getCapacity
+                );
+
+        List<HourlyReportDto> resultList = new ArrayList<>();
+
         LocalDateTime currentTime = TimeTruncater.truncateToTerm(start, StaticValues.HOUR_SECONDS);
         // 통계 생성은 인버터별로 '별도처리'를 할 필요가 없다.
         while(currentTime.isBefore(
@@ -77,16 +89,33 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                     generationInvMap.getOrDefault
                             (currentTime, Collections.emptyMap());
             // 상세로직
-            for(Long inverterId : genLogInnverMap.keySet()) {
+            for(Long inverterId : inverterCapacityMap.keySet()) {
                 HourlyReportDto previous = prevInnerMap.get(inverterId);
                 List<GenerationLogDto> genList = genLogInnverMap.get(inverterId);
 
-                /// TODO 시간당 데이터 계산로직
+                GenerationValuesDto result =
+                        new ReportCalcDto(
+                                currentTime,
+                                (previous != null) ? previous.getValuesDto() : null,
+                                DataCollectorsUtil.toDataList(
+                                        genList,
+                                        GenerationLogDto::getValuesDto
+                                        ),
+                                StaticValues.HOUR_SECONDS)
+                                .getValues();
+                resultList.add(
+                        new HourlyReportDto(
+                                result,
+                                inverterCapacityMap.get(inverterId),
+                                genList.get(genList.size() - 1).getWeatherCode(),
+                                reportDataType
+                        )
+                );
             }
 
             currentTime = currentTime.plusHours(1);
         }
-        return List.of();
+        return resultList;
     }
 
     @Override
@@ -97,5 +126,38 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
     @Override
     protected List<MonthlyReportDto> monthlyReport(LocalDateTime start, LocalDateTime end, ReportDataType reportDataType) {
         return List.of();
+    }
+
+    @Override
+    protected LocalDateTime getStartTime(LocalDateTime defaultTime,ReportDataType reportDataType) {
+
+        /// 가장 오래된 통계의 최신기록 구하기
+        List<HourlyReportDto> dtoList =
+                getHourlyReportService().findAllLatestByInverter
+                        (reportDataType.getDayOffset());
+
+        /// 가장 오래된 인버터의 등록시간 구하기
+        if(dtoList.isEmpty()) {
+            return TimeTruncater.getOldestTimeOrDefault(
+                    getInverterService().findAllActive(),
+                    defaultTime,
+                    InverterDto::getCreatedAt
+            );
+        }
+        return TimeTruncater.getOldestTimeOrDefault(
+                dtoList,
+                defaultTime,
+                HourlyReportDto::getBaseTime
+        );
+    }
+
+    @Override
+    protected LocalDateTime getEndTime(LocalDateTime start, ReportDataType reportDataType) {
+        LocalDateTime nowPlusDayOffset = LocalDateTime.now()
+                .plusDays(reportDataType.getDayOffset());
+        return TimeTruncater.getOldestTimeOrDefault(
+                List.of(start.plusMonths(1), nowPlusDayOffset),
+                nowPlusDayOffset
+        );
     }
 }

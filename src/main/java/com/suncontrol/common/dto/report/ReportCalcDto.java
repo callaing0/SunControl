@@ -1,0 +1,49 @@
+package com.suncontrol.common.dto.report;
+
+import com.suncontrol.core.dto.component.GenerationValuesDto;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Getter
+@RequiredArgsConstructor
+public class ReportCalcDto {
+    private final LocalDateTime baseTime;
+    private final GenerationValuesDto previous;
+    private final List<GenerationValuesDto> list;
+    private final int baseTerm;
+
+    public GenerationValuesDto getValues() {
+        GenerationValuesDto dto = new GenerationValuesDto();
+
+        // previous는 null 일 수 있으므로 list의 0번 인덱스에서 inverterId를 꺼낸다.
+        dto.setInverterId(list.get(0).getInverterId());
+        dto.setBaseTime(baseTime);
+        dto.setValuePrevious(previous != null ?
+                previous.getValueActual() : BigDecimal.ZERO);
+        dto.setAccumEnergy(list.get(list.size() - 1).getAccumEnergy());
+        BigDecimal actual = BigDecimal.ZERO;
+        BigDecimal expected = BigDecimal.ZERO;
+        LocalDateTime prevTime = baseTime;
+
+        for(GenerationValuesDto value : list) {
+            long term = Duration.between(prevTime, value.getBaseTime()).getSeconds();
+            BigDecimal weight = BigDecimal.valueOf(term)
+                    .divide(BigDecimal.valueOf(baseTerm), 10, RoundingMode.HALF_UP);
+
+            actual = actual.add(value.getValueActual().multiply(weight));
+            expected = expected.add(value.getValueExpected().multiply(weight));
+
+            prevTime = value.getBaseTime();
+        }
+        dto.setValueActual(actual.setScale(4, RoundingMode.HALF_UP));
+        dto.setValueExpected(expected.setScale(4, RoundingMode.HALF_UP));
+
+        return dto;
+    }
+}

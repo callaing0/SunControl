@@ -8,6 +8,21 @@ import java.util.stream.Collectors;
 
 public class DataCollectorsUtil {
 
+
+    public static <K, T> Map<K, T> mapBy
+            (List<T> list, Function<T, K> keymap) {
+        return mapBy(list, keymap, Function.identity());
+    }
+
+    public static <K, T, R> Map<K, R> mapBy
+            (List<T> list, Function<T, K> keymap, Function<T, R> valueMapper) {
+        return list.stream()
+                .collect(Collectors.toMap(
+                        keymap,
+                        valueMapper
+                ));
+    }
+
     // List<Generic> list 를 Map<Key, List<Result>> 로
     // 데이터 형 변환과 맵으로 만드는 메서드
     public static <K, T, R> Map<K, List<R>> groupBy

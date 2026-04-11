@@ -2,7 +2,7 @@ package com.suncontrol.core.dto.asset;
 
 import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
-import com.suncontrol.core.dto.asset.component.InverterBaseDto;
+import com.suncontrol.core.dto.component.InverterBaseDto;
 import com.suncontrol.core.entity.asset.Inverter;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -39,5 +39,13 @@ public class InverterDto extends InverterBaseDto {
         this.inverterType = inverter.getInverterType();
         this.status = inverter.getStatus();
         this.createdAt = inverter.getCreatedAt();
+    }
+
+    public BigDecimal getCapacity() {
+        if(ratedCapacity == null)
+            return measuredCapacity == null ? BigDecimal.ZERO : measuredCapacity;
+        if(measuredCapacity == null)
+            return ratedCapacity;
+        return ratedCapacity.min(measuredCapacity);
     }
 }

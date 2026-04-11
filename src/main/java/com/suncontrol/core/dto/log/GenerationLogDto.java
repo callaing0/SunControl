@@ -2,6 +2,7 @@ package com.suncontrol.core.dto.log;
 
 import com.suncontrol.core.constant.common.Weather;
 import com.suncontrol.core.constant.util.GenerationStatus;
+import com.suncontrol.core.dto.component.GenerationValuesDto;
 import com.suncontrol.core.entity.log.GenerationLog;
 import com.suncontrol.core.util.TimeTruncater;
 import lombok.Getter;
@@ -47,5 +48,11 @@ public class GenerationLogDto {
 
     public LocalDateTime truncateBaseTime(int termSeconds) {
         return TimeTruncater.truncateToTerm(this.baseTime, termSeconds);
+    }
+
+    public GenerationValuesDto getValuesDto() {
+        return new GenerationValuesDto
+                (inverterId, baseTime,
+                        valueExpected, valueActual, BigDecimal.ZERO, accumEnergy);
     }
 }

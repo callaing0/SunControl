@@ -4,6 +4,7 @@ import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.dto.log.GenerationLogDto;
 import com.suncontrol.core.dto.report.*;
 import com.suncontrol.core.service.asset.PlantService;
+import com.suncontrol.core.service.asset.InverterService;
 import com.suncontrol.core.service.log.DailyWeatherService;
 import com.suncontrol.core.service.log.GenerationLogService;
 import com.suncontrol.core.service.report.*;
@@ -11,7 +12,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,25 +28,29 @@ public abstract class AbstractGenerationReportService {
     private final DailyReportService dailyReportService;
     private final MonthlyReportService monthlyReportService;
     private final PlantService plantService;
+    private final InverterService inverterService;
     private final DailyWeatherService dailyWeatherService;
     private final GenerationEnergyService generationEnergyService;
 
     /// 통계 작성하는 프로세스 메서드
     /// 파라미터 예시 ) ReportDataType.ACTUAL_SNAPSHOT 등
-    @Transactional
-    public void process(LocalDateTime start, LocalDateTime end, ReportDataType reportDataType){
+    /// TODO : 시간 파라미터를 받을 게 아니고 process가 돌릴 시간을 결정해야 할거같은데?
+    public void process(ReportDataType reportDataType){
         /// 잘못된 파라미터 요청이 들어오면 뱉어버린다.
-        if(reportDataType == ReportDataType.UNKNOWN || start.isAfter(end)) {
-            log.error("Report data type not found or bad Request");
+        if(reportDataType == ReportDataType.UNKNOWN) {
+            log.error("Report data type not found");
             return;
         }
+        /// 시작시간, 끝 시간을 구하기 위해 "마지막 생성 시간 중 가장 오래된 기록 가져오기"
+        LocalDateTime defaultStartTime = LocalDateTime.now();
+        LocalDateTime start = getStartTime(defaultStartTime, reportDataType);
+        LocalDateTime end = getEndTime(start, reportDataType);
         /// 시간 통계 구하기
         try {
-            List<HourlyReportDto> hourlyReports = hourlyReport(start, end, reportDataType);
-            //TODO : 저장로직은 구현체 메서드 안에서 호출할 예정임
-//            hourlyReportService.saveAll(DataCollectorsUtil.flatMapping(hourlyReports));
+            hourlyProcess(start, end, reportDataType);
         } catch (Exception e){
             log.error("{} : error with hourly reports", e.getMessage());
+            throw e;
         }
 //
 //        /// 일간 통계 구하기
@@ -74,27 +78,32 @@ public abstract class AbstractGenerationReportService {
 
     protected abstract Map<Long, List<DailyReportDto>> getDailySource(LocalDate start, LocalDate end);
 
-    @Transactional
     protected abstract List<HourlyReportDto> hourlyReport(LocalDateTime start, LocalDateTime end, ReportDataType reportDataType);
 
-    @Transactional
     protected abstract List<DailyReportDto> dailyReport(LocalDateTime start, LocalDateTime end, ReportDataType reportDataType);
 
-    @Transactional
     protected abstract List<MonthlyReportDto> monthlyReport(LocalDateTime start, LocalDateTime end, ReportDataType reportDataType);
 
-    @Transactional
-    protected void saveHourly(List<HourlyReportDto> hourlyReportDtoList) {
-        hourlyReportService.saveAll(hourlyReportDtoList);
+    private void hourlyProcess(
+            LocalDateTime start,
+            LocalDateTime end,
+            ReportDataType reportDataType
+    ) {
+        List<HourlyReportDto> hourlyReports =
+                hourlyReport(start, end, reportDataType);
+
+        int result =  hourlyReportService.saveAll(hourlyReports);
+        log.info("{} : hourly reports saved", result);
     }
 
-    @Transactional
-    protected void saveDaily(List<DailyReportDto> dailyReportDtoList) {
+    private void dailyProcess(List<DailyReportDto> dailyReportDtoList) {
         dailyReportService.saveAll(dailyReportDtoList);
     }
 
-    @Transactional
-    protected void saveMonthly(List<MonthlyReportDto> monthlyReportDtoList) {
+    private void monthlyProcess(List<MonthlyReportDto> monthlyReportDtoList) {
         monthlyReportService.saveAll(monthlyReportDtoList);
     }
+
+    protected abstract LocalDateTime getStartTime(LocalDateTime defaultTime, ReportDataType reportDataType);
+    protected abstract LocalDateTime getEndTime(LocalDateTime start, ReportDataType reportDataType);
 }
