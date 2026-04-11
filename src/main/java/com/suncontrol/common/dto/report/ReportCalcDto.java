@@ -1,6 +1,7 @@
 package com.suncontrol.common.dto.report;
 
 import com.suncontrol.core.dto.component.GenerationValuesDto;
+import com.suncontrol.core.util.TimeTruncater;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +30,7 @@ public class ReportCalcDto {
         dto.setAccumEnergy(list.get(list.size() - 1).getAccumEnergy());
         BigDecimal actual = BigDecimal.ZERO;
         BigDecimal expected = BigDecimal.ZERO;
-        LocalDateTime prevTime = baseTime;
+        LocalDateTime prevTime = TimeTruncater.truncateToPreviousTerm(baseTime, baseTerm);
 
         for(GenerationValuesDto value : list) {
             long term = Duration.between(prevTime, value.getBaseTime()).getSeconds();

@@ -12,8 +12,18 @@ import java.util.function.Function;
 @Component
 public class TimeTruncater {
 
+    public static LocalDateTime truncateToPreviousTerm(LocalDateTime time, int termSecond) {
+        return truncateToTerm(time, termSecond).minusSeconds(termSecond).withNano(0);
+    }
+
     public static LocalDateTime truncateToNextTerm(LocalDateTime time, int termSecond) {
-        return truncateToTerm(time,termSecond).plusSeconds(termSecond).withNano(0);
+        LocalDateTime truncated = truncateToTerm(time, termSecond);
+
+        if(time.isEqual(truncated)) {
+            return truncated.withNano(0);
+        }
+
+        return truncated.plusSeconds(termSecond).withNano(0);
     }
 
     public static LocalDateTime truncateToTerm(LocalDateTime time, int termSecond) {
@@ -25,7 +35,7 @@ public class TimeTruncater {
         return dayStart.plusSeconds(nextTermSeconds).withNano(0);
     }
 
-    ///
+
     public static <T> LocalDateTime getOldestTimeOrDefault(
             Collection<T> collection,
             LocalDateTime defaultValue,

@@ -78,10 +78,10 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
 
         List<HourlyReportDto> resultList = new ArrayList<>();
 
-        LocalDateTime currentTime = TimeTruncater.truncateToTerm(start, StaticValues.HOUR_SECONDS);
+        LocalDateTime currentTime =
+                TimeTruncater.truncateToTerm(start, StaticValues.HOUR_SECONDS);
         // 통계 생성은 인버터별로 '별도처리'를 할 필요가 없다.
-        while(currentTime.isBefore(
-                TimeTruncater.truncateToNextTerm(end, StaticValues.HOUR_SECONDS))) {
+        while(!currentTime.isAfter(end)) {
             Map<Long, HourlyReportDto> prevInnerMap =
                     previousMap.getOrDefault
                             (currentTime.minusDays(1), Collections.emptyMap());
@@ -152,9 +152,11 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
     }
 
     @Override
-    protected LocalDateTime getEndTime(LocalDateTime start, ReportDataType reportDataType) {
-        LocalDateTime nowPlusDayOffset = LocalDateTime.now()
-                .plusDays(reportDataType.getDayOffset());
+    protected LocalDateTime getEndTime(LocalDateTime start, ReportDataType reportDataType, int termSeconds) {
+        LocalDateTime nowPlusDayOffset =
+                TimeTruncater.truncateToTerm(
+                        LocalDateTime.now().plusDays(
+                                reportDataType.getDayOffset()), termSeconds);
         return TimeTruncater.getOldestTimeOrDefault(
                 List.of(start.plusMonths(1), nowPlusDayOffset),
                 nowPlusDayOffset

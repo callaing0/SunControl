@@ -47,7 +47,7 @@ public class GenerationLogDto {
     }
 
     public LocalDateTime truncateBaseTime(int termSeconds) {
-        return TimeTruncater.truncateToTerm(this.baseTime, termSeconds);
+        return TimeTruncater.truncateToNextTerm(this.baseTime, termSeconds);
     }
 
     public GenerationValuesDto getValuesDto() {
