@@ -90,8 +90,8 @@ public class WeatherApiService {
                 ResponseEntity<WeatherResponseDto> responseEntity =
                         restTemplate.getForEntity(requestUrl, WeatherResponseDto.class);
 
-                log.info("수집 데이터 코드 : {}", responseEntity.getStatusCode());
-                log.info("원본 JSON 확인: {}", responseEntity.getBody());
+                log.debug("수집 데이터 코드 : {}", responseEntity.getStatusCode());
+                log.debug("원본 JSON 확인: {}", responseEntity.getBody());
 
                 if (responseEntity.getStatusCode().is2xxSuccessful()) {
                     WeatherResponseDto response = responseEntity.getBody();

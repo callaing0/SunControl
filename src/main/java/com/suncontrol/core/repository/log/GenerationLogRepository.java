@@ -31,5 +31,9 @@ public interface GenerationLogRepository {
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
             @Param("status") String status);
+
+    List<GenerationLog> findAllByTimeBetween(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
     //todo
 }

@@ -64,6 +64,12 @@
         AND base_time BETWEEN #{start} AND #{end}
     </select>
 
+    <select id="findAllByTimeBetween"
+            resultType="com.suncontrol.core.entity.log.GenerationLog">
+        SELECT * FROM generation_log
+        WHERE base_time BETWEEN #{start} and #{end}
+    </select>
+
     <update id="updateStatus"
             parameterType="com.suncontrol.core.dto.log.GenerationLogUpdateStatusDto">
 

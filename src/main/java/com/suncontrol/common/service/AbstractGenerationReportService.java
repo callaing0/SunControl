@@ -93,8 +93,7 @@ public abstract class AbstractGenerationReportService {
         List<HourlyReportDto> hourlyReports =
                 hourlyReport(start, end, reportDataType);
 
-        int result =  hourlyReportService.saveAll(hourlyReports);
-        log.info("{} : hourly reports saved", result);
+        hourlyReportService.saveAll(hourlyReports);
     }
 
     private void dailyProcess(List<DailyReportDto> dailyReportDtoList) {

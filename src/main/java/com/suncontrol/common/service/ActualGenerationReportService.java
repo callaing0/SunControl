@@ -16,6 +16,7 @@ import com.suncontrol.core.service.log.GenerationLogService;
 import com.suncontrol.core.service.report.*;
 import com.suncontrol.core.util.DataCollectorsUtil;
 import com.suncontrol.core.util.TimeTruncater;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class ActualGenerationReportService extends AbstractGenerationReportService{
 
     public ActualGenerationReportService(GenerationLogService generationLogService, HourlyReportService hourlyReportService, DailyReportService dailyReportService, MonthlyReportService monthlyReportService, PlantService plantService, InverterService inverterService, DailyWeatherService dailyWeatherService, GenerationEnergyService generationEnergyService) {
@@ -39,7 +41,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                 /// TODO 상태와 상관없이 모든 데이터 가져올 것
                 /// findAllByBaseTimeBetween(start, end)
                 getGenerationLogService()
-                        .findAllbyStatus(start, end, GenerationStatus.PENDING, false),
+                        .findAllByTimeBetween(start, end),
                 (GenerationLogDto log) ->
                         log.truncateBaseTime(StaticValues.HOUR_SECONDS),
                 GenerationLogDto::getInverterId
@@ -59,6 +61,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
     @Override
     protected List<HourlyReportDto> hourlyReport(
             LocalDateTime start, LocalDateTime end, ReportDataType reportDataType) {
+        log.info("{}에서 {}까지의 {} 통계생성", start, end, reportDataType.getReportDescription());
         Map<LocalDateTime, Map<Long, List<GenerationLogDto>>> generationInvMap =
                 getRawSource(start, end);
         Map<LocalDateTime, Map<Long, HourlyReportDto>> previousMap
@@ -79,7 +82,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
         List<HourlyReportDto> resultList = new ArrayList<>();
 
         LocalDateTime currentTime =
-                TimeTruncater.truncateToTerm(start, StaticValues.HOUR_SECONDS);
+                TimeTruncater.truncateToNextTerm(start, StaticValues.HOUR_SECONDS);
         // 통계 생성은 인버터별로 '별도처리'를 할 필요가 없다.
         while(!currentTime.isAfter(end)) {
             Map<Long, HourlyReportDto> prevInnerMap =
@@ -92,6 +95,10 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
             for(Long inverterId : inverterCapacityMap.keySet()) {
                 HourlyReportDto previous = prevInnerMap.get(inverterId);
                 List<GenerationLogDto> genList = genLogInnverMap.get(inverterId);
+                if(genList == null || genList.isEmpty()) {
+                    log.warn("{} inverter 의 {} 기록없음", inverterId, currentTime);
+                    continue;
+                }
 
                 GenerationValuesDto result =
                         new ReportCalcDto(
@@ -113,7 +120,8 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                 );
             }
 
-            currentTime = currentTime.plusHours(1);
+            currentTime = TimeTruncater.truncateToNextTerm(
+                    currentTime.plusHours(1), StaticValues.HOUR_SECONDS);
         }
         return resultList;
     }

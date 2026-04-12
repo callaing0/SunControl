@@ -1,5 +1,6 @@
 package com.suncontrol.core.dto.component;
 
+import com.suncontrol.core.constant.util.GenerationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,4 +21,6 @@ public class GenerationValuesDto {
     private BigDecimal valueActual;
     private BigDecimal valuePrevious;
     private BigDecimal accumEnergy;
+    private BigDecimal performanceRatio;
+    private GenerationStatus generationStatus;
 }

@@ -53,6 +53,7 @@ public class GenerationLogDto {
     public GenerationValuesDto getValuesDto() {
         return new GenerationValuesDto
                 (inverterId, baseTime,
-                        valueExpected, valueActual, BigDecimal.ZERO, accumEnergy);
+                        valueExpected, valueActual, accumEnergy, performanceRatio,
+                        accumEnergy, generationStatus);
     }
 }

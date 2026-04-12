@@ -228,7 +228,8 @@ public class GenerationEnergyService {
 
             resultList.add(result);
 
-            current = TimeTruncater.truncateToNextTerm(current, termSecond);
+            current = TimeTruncater.truncateToNextTerm
+                    (current.plusHours(1), termSecond);
         }
         /// 최종 누적발전량 업데이트
         inv.setLastAccumEnergy(lastAccumEnergy);

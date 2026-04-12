@@ -71,7 +71,9 @@ public class HourlyReportDto{
         this.valuePrevious = dto.getValuePrevious();
         this.accumEnergy = dto.getAccumEnergy();
 
-        this.performanceRatio = SafeDivider.ratioDivide(valueActual, valueExpected);
+        this.performanceRatio = dto.getPerformanceRatio();
+        this.generationStatus = dto.getGenerationStatus();
+
         this.expectedRatio = SafeDivider.ratioDivide(valueExpected, capacity);
         this.capacityFactor = SafeDivider.ratioDivide(valueActual, capacity);
     }
@@ -79,6 +81,7 @@ public class HourlyReportDto{
     public GenerationValuesDto getValuesDto() {
         return new GenerationValuesDto
                 (inverterId, baseTime,
-                        valueExpected, valueActual, BigDecimal.ZERO, accumEnergy);
+                        valueExpected, valueActual, accumEnergy, performanceRatio,
+                        accumEnergy, generationStatus);
     }
 }

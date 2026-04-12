@@ -3,6 +3,7 @@ package com.suncontrol.core.constant.util;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -28,5 +29,9 @@ public enum GenerationStatus {
 
     public static GenerationStatus fromStatus(String status) {
         return STATUS_MAP.get(status);
+    }
+
+    public static GenerationStatus fromRatio(BigDecimal ratio, BigDecimal baseRatio) {
+        return ratio.compareTo(baseRatio) >=0 ? NORMAL : ERROR;
     }
 }

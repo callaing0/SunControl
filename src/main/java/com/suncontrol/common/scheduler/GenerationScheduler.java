@@ -1,7 +1,9 @@
 package com.suncontrol.common.scheduler;
 
+import com.suncontrol.common.service.ActualGenerationReportService;
 import com.suncontrol.common.service.GenerationEnergyService;
 import com.suncontrol.common.service.WeatherApiService;
+import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.constant.util.StaticValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +17,8 @@ import java.time.LocalDateTime;
 @Slf4j
 public class GenerationScheduler {
     /// todo 예측모델 구현
-//    private final ActualReportService actualReportService;
-//    private final PredictReportService predictReportService;
+    private final ActualGenerationReportService actualReportService;
+//    private final PredictGenerationReportService predictReportService;
     private final WeatherApiService weatherApiService;
     private final GenerationEnergyService generationEnergyService;
 
@@ -25,6 +27,7 @@ public class GenerationScheduler {
         log.info("Realtime batch start at {}", LocalDateTime.now());
         collectWeatherInfo();
         collectGenerateData();
+        collectReportData();
     }
 
     private void collectWeatherInfo() {
@@ -45,9 +48,16 @@ public class GenerationScheduler {
         log.info("발전데이터 생성 완료");
     }
 
+    private void collectReportData() {
+        log.info("report data at {}", LocalDateTime.now());
+        actualReportService.process(ReportDataType.ACTUAL_SNAPSHOT);
+        log.info("실측 통계 생성 완료");
+    }
+
     public void init() {
         log.info("server initializing process starts at {}", LocalDateTime.now());
         collectWeatherInfo();
         collectGenerateData();
+        collectReportData();
     }
 }

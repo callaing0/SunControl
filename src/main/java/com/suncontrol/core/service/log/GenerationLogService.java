@@ -73,6 +73,15 @@ public class GenerationLogService {
                 GenerationLogDto::new);
     }
 
+    public List<GenerationLogDto> findAllByTimeBetween(LocalDateTime start,
+                                                       LocalDateTime end) {
+        List<GenerationLog> entities = repository.findAllByTimeBetween(start, end);
+        if(entities.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return DataCollectorsUtil.toDataList(entities, GenerationLogDto::new);
+    }
+
     public int updateStatus(List<GenerationLogUpdateStatusDto> dtoList) {
         int result = repository.updateStatus(dtoList);
 

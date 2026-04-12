@@ -1,6 +1,9 @@
 package com.suncontrol.common.dto.report;
 
+import com.suncontrol.core.constant.util.GenerationStatus;
+import com.suncontrol.core.constant.util.StaticValues;
 import com.suncontrol.core.dto.component.GenerationValuesDto;
+import com.suncontrol.core.util.SafeDivider;
 import com.suncontrol.core.util.TimeTruncater;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +47,12 @@ public class ReportCalcDto {
         }
         dto.setValueActual(actual.setScale(4, RoundingMode.HALF_UP));
         dto.setValueExpected(expected.setScale(4, RoundingMode.HALF_UP));
+
+        BigDecimal performanceRatio = SafeDivider.ratioDivide(actual, expected);
+
+        dto.setPerformanceRatio(performanceRatio);
+
+        dto.setGenerationStatus(GenerationStatus.fromRatio(performanceRatio, StaticValues.BASE_RATIO));
 
         return dto;
     }
