@@ -2,8 +2,6 @@ package com.suncontrol.core.dto.log;
 
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Weather;
-import com.suncontrol.core.constant.generic.BaseDateProvider;
-import com.suncontrol.core.constant.generic.DistrictProvider;
 import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.entity.log.DailyWeather;
 import lombok.AccessLevel;
@@ -17,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class DailyWeatherDto implements BaseDateProvider, DistrictProvider {
+public class DailyWeatherDto {
     /// 발전 데이터 "통계" 생성용 일별 데이터
     /// List<DailyWeatherDto> 를 통해 DB저장,
     /// Map<지역, Map<날짜, DailyWeatherDto>> 로

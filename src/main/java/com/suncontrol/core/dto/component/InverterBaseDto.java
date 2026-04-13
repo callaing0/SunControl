@@ -1,4 +1,4 @@
-package com.suncontrol.core.dto.asset.component;
+package com.suncontrol.core.dto.component;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;

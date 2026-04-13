@@ -37,7 +37,7 @@ public class PanelService {
                 PanelDto::new
         );
 
-        panelMap.put(0L, DataCollectorsUtil.toDtoList(
+        panelMap.put(0L, DataCollectorsUtil.toDataList(
                 repository.findAllofInverters(inverters),
                 PanelDto::new
                 ));

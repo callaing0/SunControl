@@ -2,11 +2,9 @@ package com.suncontrol.common.dto.generate;
 
 import com.suncontrol.core.constant.asset.DeviceStatus;
 import com.suncontrol.core.constant.asset.InverterType;
-import com.suncontrol.core.constant.generic.BaseTimeProvider;
-import com.suncontrol.core.constant.generic.PlantIdProvider;
 import com.suncontrol.core.dto.asset.InverterDto;
 import com.suncontrol.core.dto.asset.InverterUpdateDto;
-import com.suncontrol.core.dto.asset.component.InverterBaseDto;
+import com.suncontrol.core.dto.component.InverterBaseDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
-public class InverterGenerationDto extends InverterBaseDto implements PlantIdProvider {
+public class InverterGenerationDto extends InverterBaseDto {
     @Setter
     private DeviceStatus status;
     @Setter
