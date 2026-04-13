@@ -11,6 +11,7 @@ public class DataCollectorsUtil {
         return nullFilteredStream(list.stream()).collect(Collectors.toList());
     }
 
+    /// NPE 방어용 필터링
     public static <T> Stream<T> nullFilteredStream(Stream<T> stream) {
         return stream.filter(Objects::nonNull);
     }
