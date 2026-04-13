@@ -35,9 +35,8 @@ public class AssetRestService {
     public String savePlant(String userId, PlantSaveForm form)
             throws AccessDeniedException {
         Member member = getMember(userId);
-        if(!form.getMemberId().equals(member.getId())) {
-            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE_PLANT);
-        }
+
+        form.setMemberId(member.getId());
 
         plantService.save(form.toDto());
 
@@ -49,7 +48,7 @@ public class AssetRestService {
     public String saveInverter(String userId, InverterSaveForm form)
             throws AccessDeniedException {
         Member member = getMember(userId);
-        if(plantService.isOwnPlant(member.getId(), form.getPlantId())) {
+        if(!plantService.isOwnPlant(member.getId(), form.getPlantId())) {
             throw new AccessDeniedException(ACCESS_DENIED_MESSAGE_ASSETS);
         }
         inverterService.save(form.toDto());
@@ -62,7 +61,7 @@ public class AssetRestService {
     public String savePanel(String userId, PanelSaveForm form)
             throws AccessDeniedException {
         Member member = getMember(userId);
-        if(plantService.isOwnPlant(member.getId(), form.getPlantId())) {
+        if(!plantService.isOwnPlant(member.getId(), form.getPlantId())) {
             throw new AccessDeniedException(ACCESS_DENIED_MESSAGE_ASSETS);
         }
 

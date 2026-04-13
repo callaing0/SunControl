@@ -233,6 +233,8 @@
 
 <th:block th:fragment="script">
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3997d3c523acf019e06829961c57b93e&libraries=services"></script>
     <script th:inline="javascript">
         function openModal(id) {
             const m = document.getElementById(id);
@@ -277,25 +279,32 @@
         function execDaumPostcode() {
             new daum.Postcode({
                 oncomplete: function (data) {
+                    const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+
                     const addressDisplayField = document.getElementById('addressDisplay');
                     const addressField = document.getElementById('address');
                     const districtCodeDisplayField = document.getElementById('districtCodeDisplay');
                     const districtCodeField = document.getElementById('districtCode');
-                    const provinceCodeField = document.getElementById('provinceCode');
+                    const latitudeField = document.getElementById('latitude');
+                    const longitudeField = document.getElementById('longitude');
 
-                    const districtCode = (data.hcode || data.bcode || '').substring(0, 5);
-                    const provinceCode = districtCode.substring(0, 2);
+                    if (addressDisplayField) addressDisplayField.value = addr || '';
+                    if (addressField) addressField.value = addr || '';
 
-                    if (addressDisplayField) addressDisplayField.value = data.address;
-                    if (addressField) addressField.value = data.address;
+                    if (districtCodeDisplayField) districtCodeDisplayField.value = data.sigunguCode || '';
+                    if (districtCodeField) districtCodeField.value = data.sigunguCode || '';
 
-                    if (districtCodeDisplayField) {
-                        districtCodeDisplayField.value = districtCode;
-                        districtCodeDisplayField.classList.add('bg-yellow-50');
+                    if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.services) {
+                        const geocoder = new kakao.maps.services.Geocoder();
+
+                        geocoder.addressSearch(addr, function (results, status) {
+                            if (status === kakao.maps.services.Status.OK) {
+                                if (latitudeField) latitudeField.value = results[0].y;
+                                if (longitudeField) longitudeField.value = results[0].x;
+                                console.log('좌표:', results[0].y, results[0].x);
+                            }
+                        });
                     }
-
-                    if (districtCodeField) districtCodeField.value = districtCode;
-                    if (provinceCodeField) provinceCodeField.value = provinceCode;
                 }
             }).open();
         }
@@ -307,23 +316,139 @@
         });
 
         document.addEventListener('DOMContentLoaded', function () {
+
+            // 발전소 등록
             const plantForm = document.getElementById('plantForm');
             if (plantForm) {
-                plantForm.addEventListener('submit', function (e) {
+                plantForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    console.log("🔥 발전소 fetch 실행");
+
+                    const name = plantForm.querySelector('[name="name"]')?.value?.trim();
                     const address = document.getElementById('address')?.value?.trim();
+                    const latitude = document.getElementById('latitude')?.value?.trim();
+                    const longitude = document.getElementById('longitude')?.value?.trim();
                     const districtCode = document.getElementById('districtCode')?.value?.trim();
+                    const azimuth = plantForm.querySelector('[name="azimuth"]')?.value?.trim();
+                    const tilt = plantForm.querySelector('[name="tilt"]')?.value?.trim();
+
+                    if (!name) {
+                        alert('발전소명을 입력해 주세요.');
+                        return;
+                    }
 
                     if (!address || !districtCode) {
-                        e.preventDefault();
                         alert('주소 검색을 완료해 주세요.');
+                        return;
+                    }
+
+                    if (!latitude || !longitude) {
+                        alert('좌표값이 없습니다. 주소를 다시 검색해 주세요.');
+                        return;
+                    }
+
+                    const payload = {
+                        name: name,
+                        address: address,
+                        latitude: Number(latitude),
+                        longitude: Number(longitude),
+                        districtCode: districtCode,
+                        azimuth: Number(azimuth),
+                        tilt: Number(tilt)
+                    };
+
+                    try {
+                        const response = await fetch('/api/assets/plants', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok || !result.success) {
+                            alert(result.message || '발전소 등록에 실패했습니다.');
+                            return;
+                        }
+
+                        alert(result.message || '발전소가 등록되었습니다.');
+                        closeModal('plantModal');
+                        window.location.reload();
+                    } catch (error) {
+                        console.error(error);
+                        alert('발전소 등록 중 오류가 발생했습니다.');
                     }
                 });
             }
 
+            // 인버터 등록
+            const inverterForm = document.getElementById('inverterForm');
+            if (inverterForm) {
+                inverterForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    console.log("🔥 인버터 fetch 실행");
+
+                    const plantId = inverterForm.querySelector('[name="plantId"]')?.value?.trim();
+                    const type = inverterForm.querySelector('[name="type"]')?.value?.trim();
+                    const ratedCapacity = inverterForm.querySelector('[name="ratedCapacity"]')?.value?.trim();
+                    const efficiency = inverterForm.querySelector('[name="efficiency"]')?.value?.trim();
+                    const serial = inverterForm.querySelector('[name="serial"]')?.value?.trim();
+
+                    if (!plantId) {
+                        alert('발전소를 먼저 등록하거나 선택해 주세요.');
+                        return;
+                    }
+
+                    if (!ratedCapacity) {
+                        alert('용량을 입력해 주세요.');
+                        return;
+                    }
+
+                    const payload = {
+                        plantId: Number(plantId),
+                        type: type,
+                        ratedCapacity: Number(ratedCapacity),
+                        efficiency: Number(efficiency),
+                        serial: serial
+                    };
+
+                    try {
+                        const response = await fetch('/api/assets/inverters', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok || !result.success) {
+                            alert(result.message || '인버터 등록에 실패했습니다.');
+                            return;
+                        }
+
+                        alert(result.message || '인버터가 등록되었습니다.');
+                        closeModal('inverterModal');
+                        window.location.reload();
+                    } catch (error) {
+                        console.error(error);
+                        alert('인버터 등록 중 오류가 발생했습니다.');
+                    }
+                });
+            }
+
+            // 패널 등록
             const panelForm = document.getElementById('panelForm');
             if (panelForm) {
                 panelForm.addEventListener('submit', async function (e) {
                     e.preventDefault();
+
+                    console.log("🔥 패널 fetch 실행");
 
                     const plantId = document.getElementById('panelPlantId')?.value?.trim();
                     const inverterId = document.getElementById('panelInverterId')?.value?.trim();
@@ -351,11 +476,10 @@
                     }
 
                     const payload = {
-                        inverter: {
-                            plantId: Number(plantId),
-                            inverterId: Number(inverterId)
-                        },
+                        plantId: Number(plantId),
+                        inverterId: Number(inverterId),
                         modelName: modelName,
+                        manufacturer: "DUMMY",
                         count: Number(count)
                     };
 
@@ -371,7 +495,11 @@
                         const result = await response.json();
 
                         if (!response.ok || !result.success) {
-                            alert(result.message || '패널 등록에 실패했습니다.');
+                            console.log(result);
+                            alert(
+                                (result.message || '패널 등록에 실패했습니다.') + '\n' +
+                                JSON.stringify(result.data, null, 2)
+                            );
                             return;
                         }
 

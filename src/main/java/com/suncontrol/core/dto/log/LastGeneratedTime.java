@@ -8,6 +8,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class LastGeneratedTime {
-    private Long plantId;
+    private Long InverterId;
     private LocalDateTime baseTime;
 }

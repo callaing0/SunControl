@@ -30,7 +30,7 @@ public class GenerationLogService {
     public Map<Long, LocalDateTime> getLastGeneratedTimeByAllInverters() {
         return DataCollectorsUtil.mapBy(
                 repository.findLastsOf(),
-                LastGeneratedTime::getPlantId,
+                LastGeneratedTime::getInverterId,
                 LastGeneratedTime::getBaseTime
         );
     }
