@@ -52,7 +52,7 @@ public class ReportCalcDto {
 
         dto.setPerformanceRatio(performanceRatio);
 
-        dto.setGenerationStatus(GenerationStatus.fromRatio(performanceRatio, StaticValues.BASE_RATIO));
+        dto.setGenerationStatus(GenerationStatus.fromRatio(expected, performanceRatio, StaticValues.BASE_RATIO));
 
         return dto;
     }

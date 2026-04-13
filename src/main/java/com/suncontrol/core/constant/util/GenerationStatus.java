@@ -17,7 +17,8 @@ import java.util.stream.Stream;
 public enum GenerationStatus {
     PENDING("PENDING"),
     NORMAL("NORMAL"),
-    ERROR("FAULT");
+    ERROR("FAULT"),
+    IDLE("IDLE");
 
     private final String status;
 
@@ -31,7 +32,12 @@ public enum GenerationStatus {
         return STATUS_MAP.get(status);
     }
 
-    public static GenerationStatus fromRatio(BigDecimal ratio, BigDecimal baseRatio) {
+    public static GenerationStatus fromRatio
+            (BigDecimal expected, BigDecimal ratio, BigDecimal baseRatio) {
+        if(expected.compareTo(BigDecimal.ZERO) <= 0) {
+            return IDLE;
+        }
+
         return ratio.compareTo(baseRatio) >=0 ? NORMAL : ERROR;
     }
 }

@@ -8,6 +8,12 @@ public class StaticValues {
 
     public static final BigDecimal BASE_RATIO = BigDecimal.valueOf(0.7);
 
+    /// DUMMY 발전량을 위한 상수
+    public static final double DISABLE_RATE = 0.05;
+    public static final double NORMALIZE_RATE = 0.05;
+    public static double NOISE_SCALE = 0.05;
+    public static double NOISE_BASE = 0.87;
+
     /// term 계산을 위한 int 상수
     public static final int HOUR_SECONDS = 3600;
     public static final int DAY_SECONDS = 86400;

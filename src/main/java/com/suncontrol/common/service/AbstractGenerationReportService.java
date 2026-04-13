@@ -42,13 +42,9 @@ public abstract class AbstractGenerationReportService {
             log.error("Report data type not found");
             return;
         }
-        /// 시작시간, 끝 시간을 구하기 위해 "마지막 생성 시간 중 가장 오래된 기록 가져오기"
-        LocalDateTime defaultStartTime = LocalDateTime.now();
-        LocalDateTime startTime = getStartTime(defaultStartTime, reportDataType);
-        LocalDateTime endTime = getEndTime(startTime, reportDataType, StaticValues.HOUR_SECONDS);
         /// 시간 통계 구하기
         try {
-            hourlyProcess(startTime, endTime, reportDataType);
+            hourlyProcess(reportDataType);
         } catch (Exception e){
             log.error("{} : error with hourly reports", e.getMessage());
             throw e;
@@ -85,13 +81,18 @@ public abstract class AbstractGenerationReportService {
 
     protected abstract List<MonthlyReportDto> monthlyReport(LocalDateTime start, LocalDateTime end, ReportDataType reportDataType);
 
-    private void hourlyProcess(
-            LocalDateTime start,
-            LocalDateTime end,
-            ReportDataType reportDataType
-    ) {
+    private void hourlyProcess(ReportDataType reportDataType) {
+        /// 시작시간, 끝 시간을 구하기 위해 "마지막 생성 시간 중 가장 오래된 기록 가져오기"
+        LocalDateTime defaultStartTime = LocalDateTime.now();
+        LocalDateTime startTime = getStartTime(defaultStartTime, reportDataType);
+        LocalDateTime endTime = getEndTime(startTime, reportDataType, StaticValues.HOUR_SECONDS);
+
+        if(startTime.isAfter(endTime)) {
+            return;
+        }
+
         List<HourlyReportDto> hourlyReports =
-                hourlyReport(start, end, reportDataType);
+                hourlyReport(startTime, endTime, reportDataType);
 
         hourlyReportService.saveAll(hourlyReports);
     }
