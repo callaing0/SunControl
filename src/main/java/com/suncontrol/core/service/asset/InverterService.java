@@ -47,14 +47,14 @@ public class InverterService {
     }
 
     public List<InverterDto> findAllByPlant(Long plantId) {
-        return DataCollectorsUtil.toDtoList(
+        return DataCollectorsUtil.toDataList(
                 repository.findAllByPlantId(plantId), InverterDto::new);
     }
 
     public List<InverterDto> findAllActive() {
         /// 발전데이터 생성을 위해 시스템에 등록된 모든 활성 인버터를
         /// InverterDto로 변환하여 반환
-        return DataCollectorsUtil.toDtoList(
+        return DataCollectorsUtil.toDataList(
                 repository.findAllByStatusCodeBetween(
                         DeviceStatus.INVERTER_NORMAL.getCode(),
                         DeviceStatus.INVERTER_END.getCode()

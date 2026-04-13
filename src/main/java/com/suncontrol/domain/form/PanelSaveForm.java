@@ -4,7 +4,7 @@ import com.suncontrol.core.constant.asset.PanelManufacturer;
 import com.suncontrol.core.constant.asset.PanelModel;
 import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
 import com.suncontrol.core.dto.asset.PanelDto;
-import com.suncontrol.core.dto.asset.component.InverterBaseDto;
+import com.suncontrol.core.dto.component.InverterBaseDto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
