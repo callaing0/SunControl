@@ -4,22 +4,32 @@
 <mapper namespace="com.suncontrol.mapper.Repository">
 
     <resultMap id="AlertMap" type="com.suncontrol.domain.dto.AlertResponseDTO">
-        <id property="id" column="alert_id" />
-        <result property="detectTime" column="detect_time" />
-        <result property="location" column="location" />
-        <result property="status" column="message" />
+        <id property="id" column="id" />
+        <result property="inverterId" column="inverter_id" />
+        <result property="location" column="inverter_id" /> <result property="status" column="status"
+                                                                    typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result property="alertType" column="alert_type" />
+        <result property="severity" column="severity" />
+        <result property="message" column="message" />
+        <result property="createdAt" column="created_at" />
+        <result property="resolvedAt" column="resolved_at" />
+        <result property="durationSeconds" column="duration_seconds" />
     </resultMap>
 
-    <select id="findAll" resultType="com.suncontrol.domain.dto.AlertResponseDTO">
-        SELECT
-            id,
-            inverter_id AS inverterId,
-            status,           -- 여긴 숫자(Integer)가 들어가야 함!
-            alert_type AS alertType,
-            severity,
-            message,          -- 여기에 'DB연결 테스트'가 들어감!
-            created_at AS createdAt,
-            resolved_at AS resolvedAt
-        FROM alert_log
+    <select id="findAll" resultMap="AlertMap">
+        SELECT * FROM alert_log ORDER BY created_at DESC
     </select>
+
+    <update id="updateStatus">
+        UPDATE alert_log
+        SET
+            status = #{status},
+            resolved_at = CASE WHEN #{status} = 2 THEN NOW() ELSE resolved_at END,
+            duration_seconds = CASE
+                                   WHEN #{status} = 2 THEN TIMESTAMPDIFF(SECOND, created_at, NOW())
+                                   ELSE duration_seconds
+                END
+        WHERE id = #{id}
+    </update>
+
 </mapper>

@@ -2,6 +2,7 @@ package com.suncontrol.mapper;
 
 import com.suncontrol.domain.dto.AlertResponseDTO;
 import com.suncontrol.domain.dto.AlertSaveRequestDTO;
+import com.suncontrol.domain.dto.AlertUpdateStatusDto;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
@@ -16,4 +17,8 @@ public interface Repository {
 
     // 3. 데이터 삽입 (API 저장용)
     void insertAlert(AlertSaveRequestDTO dto);
+
+    int updateStatus(Long id, int status);
+
+    void updateAlertStatuses(List<AlertUpdateStatusDto> updateList);
 }
