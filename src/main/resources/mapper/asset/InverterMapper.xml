@@ -35,7 +35,6 @@
                 updated_at = NOW()
             WHERE id = #{id}
     </update>
-    -->
     <update id="updateLastAccumAndStatus">
         <foreach collection="list" item="item" separator=";">
             UPDATE inverter
