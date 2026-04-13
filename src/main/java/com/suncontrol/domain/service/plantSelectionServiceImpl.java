@@ -38,7 +38,13 @@ public class plantSelectionServiceImpl implements plantSelectionService {
 
     @Override
     public Long resolveSelectedPlantId(Long memberId, Long selectedPlantId) {
-        PlantSelectDto selectedPlant = getSelectedPlant(memberId, selectedPlantId);
-        return selectedPlant != null ? selectedPlant.getId() : null;
+
+        if (memberId == null || selectedPlantId == null) {
+            return null;
+        }
+
+        PlantSelectDto plant = plantSelectionRepository.selectPlantById(memberId, selectedPlantId);
+
+        return (plant != null) ? plant.getId() : null;
     }
 }
