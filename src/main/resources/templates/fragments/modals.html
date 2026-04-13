@@ -36,7 +36,6 @@
         </header>
 
         <form class="space-y-6" id="plantForm" method="post">
-            <!-- provinceCode는 districtCode의 앞 두자리이므로 불필요정보 삭제 -->
             <input type="hidden" name="latitude" id="latitude">
             <input type="hidden" name="longitude" id="longitude">
             <input type="hidden" name="isMain" value="0">
@@ -62,7 +61,6 @@
             </div>
 
             <div class="grid grid-cols-2 gap-6 pt-2">
-                <!-- azimuth의 기본값 value=0 범위-90~90, tilt의 기본값 value=30 범위 20~40 추가 -->
                 <input type="number" name="azimuth" placeholder="방향 0°" value="0" min="-90" max="90" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 text-center font-black italic" required>
                 <input type="number" name="tilt" placeholder="각도 30°" value="30" min="20" max="40" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 text-center font-black italic text-blue-600" required>
             </div>
@@ -115,7 +113,6 @@
         </form>
     </div>
 </div>
-
 
 <!-- 패널 등록 -->
 <div th:fragment="panelModal" id="panelModal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-bg">
@@ -322,158 +319,71 @@
                     }
                 });
             }
-        });
-
-            function openModal(id) {
-            const m = document.getElementById(id);
-            if (m) {
-            m.classList.remove('hidden');
-            m.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-        }
-        }
-
-            function closeModal(id) {
-            const m = document.getElementById(id);
-            if (m) {
-            m.classList.remove('flex');
-            m.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-        }
-
-            function openConfirmModal(message, onConfirm, title = '확인', buttonText = '진행') {
-            const titleEl = document.getElementById('confirmTitle');
-            const messageEl = document.getElementById('confirmMessage');
-            const actionButton = document.getElementById('confirmActionButton');
-
-            if (titleEl) titleEl.textContent = title;
-            if (messageEl) messageEl.textContent = message;
-
-            if (actionButton) {
-            actionButton.textContent = buttonText;
-            actionButton.onclick = async function () {
-            try {
-            await onConfirm();
-        } catch (e) {
-            console.error(e);
-        }
-        };
-        }
-
-            openModal('confirmModal');
-        }
-
-            function execDaumPostcode() {
-            new daum.Postcode({
-                oncomplete: function (data) {
-                    const addressDisplayField = document.getElementById('addressDisplay');
-                    const addressField = document.getElementById('address');
-                    const districtCodeDisplayField = document.getElementById('districtCodeDisplay');
-                    const districtCodeField = document.getElementById('districtCode');
-                    const provinceCodeField = document.getElementById('provinceCode');
-
-                    const districtCode = (data.hcode || data.bcode || '').substring(0, 5);
-                    const provinceCode = districtCode.substring(0, 2);
-
-                    if (addressDisplayField) addressDisplayField.value = data.address;
-                    if (addressField) addressField.value = data.address;
-
-                    if (districtCodeDisplayField) {
-                        districtCodeDisplayField.value = districtCode;
-                        districtCodeDisplayField.classList.add('bg-yellow-50');
-                    }
-
-                    if (districtCodeField) districtCodeField.value = districtCode;
-                    if (provinceCodeField) provinceCodeField.value = provinceCode;
-                }
-            }).open();
-        }
-
-            window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal-bg')) {
-            closeModal(e.target.id);
-        }
-        });
-
-            document.addEventListener('DOMContentLoaded', function () {
-            const plantForm = document.getElementById('plantForm');
-            if (plantForm) {
-            plantForm.addEventListener('submit', function (e) {
-            const address = document.getElementById('address')?.value?.trim();
-            const districtCode = document.getElementById('districtCode')?.value?.trim();
-
-            if (!address || !districtCode) {
-            e.preventDefault();
-            alert('주소 검색을 완료해 주세요.');
-        }
-        });
-        }
 
             const panelForm = document.getElementById('panelForm');
             if (panelForm) {
-            panelForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
+                panelForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
 
-            const plantId = document.getElementById('panelPlantId')?.value?.trim();
-            const inverterId = document.getElementById('panelInverterId')?.value?.trim();
-            const modelName = document.getElementById('panelModelName')?.value?.trim();
-            const count = document.getElementById('panelCount')?.value?.trim();
+                    const plantId = document.getElementById('panelPlantId')?.value?.trim();
+                    const inverterId = document.getElementById('panelInverterId')?.value?.trim();
+                    const modelName = document.getElementById('panelModelName')?.value?.trim();
+                    const count = document.getElementById('panelCount')?.value?.trim();
 
-            if (!plantId) {
-            alert('발전소를 먼저 선택해 주세요.');
-            return;
-        }
+                    if (!plantId) {
+                        alert('발전소를 먼저 선택해 주세요.');
+                        return;
+                    }
 
-            if (!inverterId) {
-            alert('인버터를 선택해 주세요.');
-            return;
-        }
+                    if (!inverterId) {
+                        alert('인버터를 선택해 주세요.');
+                        return;
+                    }
 
-            if (!modelName) {
-            alert('패널 모델명을 입력해 주세요.');
-            return;
-        }
+                    if (!modelName) {
+                        alert('패널 모델명을 입력해 주세요.');
+                        return;
+                    }
 
-            if (!count || Number(count) < 1) {
-            alert('패널 수량을 올바르게 입력해 주세요.');
-            return;
-        }
+                    if (!count || Number(count) < 1) {
+                        alert('패널 수량을 올바르게 입력해 주세요.');
+                        return;
+                    }
 
-            const payload = {
-            inverter: {
-            plantId: Number(plantId),
-            inverterId: Number(inverterId)
-        },
-            modelName: modelName,
-            count: Number(count)
-        };
+                    const payload = {
+                        inverter: {
+                            plantId: Number(plantId),
+                            inverterId: Number(inverterId)
+                        },
+                        modelName: modelName,
+                        count: Number(count)
+                    };
 
-            try {
-            const response = await fetch('/api/assets/panels', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-        },
-            body: JSON.stringify(payload)
-        });
+                    try {
+                        const response = await fetch('/api/assets/panels', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
 
-            const result = await response.json();
+                        const result = await response.json();
 
-            if (!response.ok || !result.success) {
-            alert(result.message || '패널 등록에 실패했습니다.');
-            return;
-        }
+                        if (!response.ok || !result.success) {
+                            alert(result.message || '패널 등록에 실패했습니다.');
+                            return;
+                        }
 
-            alert(result.message || '패널이 등록되었습니다.');
-            closeModal('panelModal');
-            window.location.reload();
-        } catch (error) {
-            console.error(error);
-            alert('패널 등록 중 오류가 발생했습니다.');
-        }
-        });
-        }
+                        alert(result.message || '패널이 등록되었습니다.');
+                        closeModal('panelModal');
+                        window.location.reload();
+                    } catch (error) {
+                        console.error(error);
+                        alert('패널 등록 중 오류가 발생했습니다.');
+                    }
+                });
+            }
         });
     </script>
 </th:block>
