@@ -1,7 +1,6 @@
 package com.suncontrol.common.service;
 
 import com.suncontrol.common.dto.report.ReportCalcDto;
-import com.suncontrol.core.constant.util.GenerationStatus;
 import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.constant.util.StaticValues;
 import com.suncontrol.core.dto.asset.InverterDto;
@@ -137,7 +136,8 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
     }
 
     @Override
-    protected LocalDateTime getStartTime(LocalDateTime defaultTime,ReportDataType reportDataType) {
+    protected LocalDateTime getStartTime
+            (LocalDateTime defaultTime,ReportDataType reportDataType) {
 
         /// 가장 오래된 통계의 최신기록 구하기
         List<HourlyReportDto> dtoList =
@@ -155,16 +155,16 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
         return TimeTruncater.getOldestTimeOrDefault(
                 dtoList,
                 defaultTime,
-                HourlyReportDto::getBaseTime
+                dto -> dto.getBaseTime().plusSeconds(StaticValues.HOUR_SECONDS)
         );
     }
 
     @Override
-    protected LocalDateTime getEndTime(LocalDateTime start, ReportDataType reportDataType, int termSeconds) {
+    protected LocalDateTime getEndTime(LocalDateTime start, ReportDataType reportDataType) {
         LocalDateTime nowPlusDayOffset =
                 TimeTruncater.truncateToTerm(
                         LocalDateTime.now().plusDays(
-                                reportDataType.getDayOffset()), termSeconds);
+                                reportDataType.getDayOffset()), StaticValues.HOUR_SECONDS);
         return TimeTruncater.getOldestTimeOrDefault(
                 List.of(start.plusMonths(1), nowPlusDayOffset),
                 nowPlusDayOffset

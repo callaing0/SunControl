@@ -1,7 +1,6 @@
 package com.suncontrol.common.service;
 
 import com.suncontrol.core.constant.util.ReportDataType;
-import com.suncontrol.core.constant.util.StaticValues;
 import com.suncontrol.core.dto.log.GenerationLogDto;
 import com.suncontrol.core.dto.report.*;
 import com.suncontrol.core.service.asset.PlantService;
@@ -85,7 +84,7 @@ public abstract class AbstractGenerationReportService {
         /// 시작시간, 끝 시간을 구하기 위해 "마지막 생성 시간 중 가장 오래된 기록 가져오기"
         LocalDateTime defaultStartTime = LocalDateTime.now();
         LocalDateTime startTime = getStartTime(defaultStartTime, reportDataType);
-        LocalDateTime endTime = getEndTime(startTime, reportDataType, StaticValues.HOUR_SECONDS);
+        LocalDateTime endTime = getEndTime(startTime, reportDataType);
 
         if(startTime.isAfter(endTime)) {
             return;
@@ -108,5 +107,5 @@ public abstract class AbstractGenerationReportService {
     protected abstract LocalDateTime getStartTime
             (LocalDateTime defaultTime, ReportDataType reportDataType);
     protected abstract LocalDateTime getEndTime
-            (LocalDateTime start, ReportDataType reportDataType, int termSeconds);
+            (LocalDateTime start, ReportDataType reportDataType);
 }
