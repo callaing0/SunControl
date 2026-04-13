@@ -5,9 +5,11 @@ import com.suncontrol.domain.service.chartService;
 import com.suncontrol.domain.service.plantSelectionService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,9 +22,18 @@ public class chartController {
     private final plantSelectionService plantSelectionService;
 
     @GetMapping("/chart")
-    public String chart(Model model, HttpSession session) {
+    public String chart(
+            @RequestParam(value = "selectedDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
+            Model model,
+            HttpSession session
+    ) {
         Long memberId = (Long) session.getAttribute("memberId");
-        LocalDate selectedDate = LocalDate.now();
+        System.out.println("memberId = " + memberId);
+
+        if (selectedDate == null) {
+            selectedDate = LocalDate.now();
+        }
 
         if (memberId == null) {
             model.addAttribute("statsSummary", List.of());
@@ -35,6 +46,7 @@ public class chartController {
 
         Long selectedPlantId = (Long) session.getAttribute("selectedPlantId");
         Long resolvedPlantId = plantSelectionService.resolveSelectedPlantId(memberId, selectedPlantId);
+        System.out.println("resolvedPlantId = " + resolvedPlantId);
 
         if (resolvedPlantId == null) {
             model.addAttribute("statsSummary", List.of());

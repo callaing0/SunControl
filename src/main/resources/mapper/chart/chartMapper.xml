@@ -43,23 +43,35 @@
 
     <!-- 기상 조건별 평균 효율 -->
     <select id="selectWeatherEfficiency" resultType="com.suncontrol.domain.dto.chartDto">
-        SELECT CASE gl.weather_code
-                   WHEN '01' THEN '맑음'
-                   WHEN '02' THEN '구름'
-                   WHEN '03' THEN '흐림'
-                   WHEN '04' THEN '비'
-                   WHEN '05' THEN '눈'
-                   ELSE '기타'
-                   END AS label,
-               ROUND(COALESCE(AVG(gl.performance_ratio), 0), 2) AS value
-        FROM generation_log gl
+        SELECT
+            CASE wc.weather_code
+                WHEN 1 THEN '맑음'
+                WHEN 2 THEN '구름'
+                WHEN 3 THEN '흐림'
+                WHEN 4 THEN '비'
+                WHEN 5 THEN '눈'
+                END AS label,
+            ROUND(COALESCE(AVG(g.performance_ratio), 0), 2) AS value
+        FROM (
+            SELECT 1 AS weather_code
+            UNION ALL SELECT 2
+            UNION ALL SELECT 3
+            UNION ALL SELECT 4
+            UNION ALL SELECT 5
+            ) wc
+            LEFT JOIN (
+            SELECT gl.weather_code, gl.performance_ratio
+            FROM generation_log gl
             INNER JOIN inverter i ON gl.inverter_id = i.id
             INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.id = #{plantId}
-          AND p.is_deleted = 0
-          AND DATE(gl.base_time) = #{selectedDate}
-        GROUP BY gl.weather_code
-        ORDER BY gl.weather_code
+            WHERE p.id = #{plantId}
+            AND p.is_deleted = 0
+            AND DATE(gl.base_time) = #{selectedDate}
+            AND gl.weather_code IN (1, 2, 3, 4, 5)
+            ) g
+        ON wc.weather_code = g.weather_code
+        GROUP BY wc.weather_code
+        ORDER BY wc.weather_code
     </select>
 
     <!-- 증감률 -->
