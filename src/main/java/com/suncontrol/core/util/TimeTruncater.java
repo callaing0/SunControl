@@ -12,11 +12,7 @@ import java.util.function.Function;
 @Component
 public class TimeTruncater {
 
-    public static LocalDateTime truncateToPreviousTerm(LocalDateTime time, int termSecond) {
-        return truncateToTerm(time, termSecond).minusSeconds(termSecond).withNano(0);
-    }
-
-    public static LocalDateTime truncateToNextTerm(LocalDateTime time, int termSecond) {
+    public static LocalDateTime toReportCeiling(LocalDateTime time, int termSecond) {
         LocalDateTime truncated = truncateToTerm(time, termSecond);
 
         if(time.isEqual(truncated)) {
@@ -26,13 +22,21 @@ public class TimeTruncater {
         return truncated.plusSeconds(termSecond).withNano(0);
     }
 
+    public static LocalDateTime truncateToPreviousTerm(LocalDateTime time, int termSecond) {
+        return truncateToTerm(time, termSecond).minusSeconds(termSecond).withNano(0);
+    }
+
+    public static LocalDateTime truncateToNextTerm(LocalDateTime time, int termSecond) {
+        return truncateToTerm(time, termSecond).plusSeconds(termSecond).withNano(0);
+    }
+
     public static LocalDateTime truncateToTerm(LocalDateTime time, int termSecond) {
         LocalDateTime dayStart = time.truncatedTo(ChronoUnit.DAYS);
         long secondsOfDay = ChronoUnit.SECONDS.between(dayStart, time);
 
-        long nextTermSeconds = (secondsOfDay / termSecond) * termSecond;
+        long currentTermSeconds = (secondsOfDay / termSecond) * termSecond;
 
-        return dayStart.plusSeconds(nextTermSeconds).withNano(0);
+        return dayStart.plusSeconds(currentTermSeconds).withNano(0);
     }
 
 
