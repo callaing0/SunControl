@@ -35,8 +35,15 @@ public class InverterService {
 
     @Transactional
     public void updateAccumAndStatus(List<InverterUpdateDto> list) {
-        int result = repository.updateLastAccumAndStatus(list);
-        log.debug("{}건 저장",result);
+
+        int count = 0;
+
+        for (InverterUpdateDto dto : list) {
+            repository.updateLastAccumAndStatus(dto);
+            count++;
+        }
+
+        log.debug("{}건 저장", count);
     }
 
     public List<InverterDto> findAllByPlant(Long plantId) {

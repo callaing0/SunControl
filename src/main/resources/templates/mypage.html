@@ -170,52 +170,7 @@
 </div>
 
 <th:block layout:fragment="script">
-    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <script type="text/javascript"
-            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3997d3c523acf019e06829961c57b93e&libraries=services"></script>
-    <script th:inline="javascript">
-        function execDaumPostcode() {
-            new daum.Postcode({
-                oncomplete: function(data) {
-                    console.log("주소 검색 함수 호출됨.")
-                    const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
-
-                    const addressInput = document.getElementById('address');
-                    const addressDisplayInput = document.getElementById('addressDisplay')
-                    const districtCodeInput = document.getElementById('districtCode');
-                    const districtCodeDisplayInput = document.getElementById('districtCodeDisplay')
-
-                    let geocoder = new kakao.maps.services.Geocoder();
-                    if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.services) {
-                        const geocoder = new kakao.maps.services.Geocoder();
-                        const latitudeInput = document.getElementById('latitude');
-                        const longitudeInput = document.getElementById('longitude');
-
-                        geocoder.addressSearch(addr, function (results, status) {
-                            if(status === kakao.maps.services.Status.OK) {
-                                latitudeInput.value = results[0].y;
-                                longitudeInput.value = results[0].x;
-                                console.log('좌표 : ', results[0].y, results[0].x);
-                            }
-                        });
-                    }
-
-                    if (addressInput) addressInput.value = addr || '';
-                    if (addressDisplayInput) addressDisplayInput.value = addr || '';
-                    if (districtCodeInput) districtCodeInput.value = data.sigunguCode || '';
-                    if (districtCodeDisplayInput) districtCodeDisplayInput.value = data.sigunguCode || '';
-                }
-            }).open();
-        }
-
-        const mypageModals = ['passwordModal', 'plantModal', 'panelModal', 'inverterModal'];
-
-        window.addEventListener('click', (e) => {
-            if (mypageModals.includes(e.target.id)) {
-                closeModal(e.target.id);
-            }
-        });
-
+    <script>
         function showPanels(key, clickedButton) {
             document.querySelectorAll('.panel-group').forEach(group => {
                 group.classList.add('hidden');
@@ -240,12 +195,8 @@
         window.addEventListener('DOMContentLoaded', () => {
             const defaultButton = document.querySelector('.panel-filter-btn');
             showPanels(0, defaultButton);
-
-            const shouldOpenPasswordModal = /*[[${openPasswordModal}]]*/ false;
-            if (shouldOpenPasswordModal) {
-                openModal('passwordModal');
-            }
         });
     </script>
 </th:block>
+
 </html>

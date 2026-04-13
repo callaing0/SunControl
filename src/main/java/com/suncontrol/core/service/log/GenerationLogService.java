@@ -28,9 +28,11 @@ public class GenerationLogService {
     ///  인버터 별 최근 발전 생성시각 찾아오기
     public Map<Long, LocalDateTime> getLastGeneratedTimeByAllInverters() {
         return repository.findLastsOf().stream()
+                .filter(t -> t.getInverterId() !=null)
                 .collect(Collectors.toMap(
-                        LastGeneratedTime::getPlantId,
-                        LastGeneratedTime::getBaseTime
+                        LastGeneratedTime::getInverterId,
+                        LastGeneratedTime::getBaseTime,
+                        (existing, replacement) -> existing
                 ));
     }
 
