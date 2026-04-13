@@ -65,11 +65,19 @@ public class GenerationEnergyService {
         /// 시작시간 : 인버터 별 가장 최신 발전시각 중에서 "가장 오래된 시각"
         Map<Long, LocalDateTime> recentGenerated =
                 generationLogService.getLastGeneratedTimeByAllInverters();
+        Map<Long, LocalDateTime> nextStartTimes =
+                DataCollectorsUtil.transformValues(
+                        recentGenerated,
+                        value -> value.plusSeconds(termSeconds)
+                );
         LocalDateTime now = LocalDateTime.now();
+
+        log.info("collect data at  {}", now);
         LocalDateTime defaultStart = TimeTruncater.getOldestTimeOrDefault
                 (inverterList, now, InverterDto::getBaseTime);
         LocalDateTime start = TimeTruncater
-                .getOldestTimeOrDefault(recentGenerated, defaultStart);
+                .getOldestTimeOrDefault(nextStartTimes, defaultStart);
+        log.info("collect data from {}", start);
         /// 시작시간을 발전량 생성 기준으로 "평탄화" (당시 시각의 다음 시간대)
         start = TimeTruncater.truncateToNextTerm(start, termSeconds);
         /// 끝시간 : 시작시간 1달 후 또는 현재 중 적은 값
@@ -78,6 +86,12 @@ public class GenerationEnergyService {
                 List.of(monthLater, now), now);
         /// 끝시간을 발전량 생성 기준으로 "평탄화" (당시 시각의 이전 시간대)
         end = TimeTruncater.truncateToTerm(end, termSeconds);
+        log.info("collect data to {}", end);
+
+        if(start.isAfter(end)) {
+            log.info("생성할 발전데이터가 없습니다");
+            return;
+        }
     // endregion
 
     // region 3. 재료준비 3 - 기준시각을 토대로 한 날씨정보
@@ -107,8 +121,6 @@ public class GenerationEnergyService {
         List<GenerationLogDto> results = new ArrayList<>();
         List<InverterUpdateDto> inverterUpdateList = new ArrayList<>();
 
-        log.info("collect data at  {}", LocalDateTime.now());
-        log.info("collect data from {} to {}", start, end);
         for(District district : District.LIST) {
             // region 4. 1차 : 지역 key로 가공재료 꺼내기
             /// 시간별 날씨, 일간 날씨, 발전소 리스트

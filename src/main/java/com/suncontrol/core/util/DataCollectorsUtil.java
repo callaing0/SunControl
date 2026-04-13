@@ -8,6 +8,16 @@ import java.util.stream.Collectors;
 
 public class DataCollectorsUtil {
 
+    public static <K, V, R> Map<K, R> transformValues(
+            Map<K, V> sourceMap,
+            Function<V, R> valueMapper
+    ) {
+        return sourceMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> valueMapper.apply(entry.getValue())
+                ));
+    }
 
     public static <K, T> Map<K, T> mapBy
             (List<T> list, Function<T, K> keymap) {
