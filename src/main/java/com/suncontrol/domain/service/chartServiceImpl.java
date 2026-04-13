@@ -34,6 +34,11 @@ public class chartServiceImpl implements chartService {
                     .multiply(BigDecimal.valueOf(100));
         }
 
+        System.out.println("selectedDate = " + selectedDate);
+        System.out.println("totalGeneration = " + totalGeneration);
+        System.out.println("previousGeneration = " + previousGeneration);
+        System.out.println("changeRate = " + changeRate);
+
         List<chartSummaryDto> summaryList = new ArrayList<>();
 
         summaryList.add(createSummary("기간 누적 발전량",
