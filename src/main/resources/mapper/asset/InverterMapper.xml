@@ -25,16 +25,6 @@
         updated_at = NOW()
         WHERE id = #{id} AND plant_id = #{plantId}
     </update>
-    <update id="updateLastAccumAndStatus"
-            parameterType="com.suncontrol.core.dto.asset.InverterUpdateDto">
-        <foreach collection="list" item="item" separator=";">
-            UPDATE inverter SET
-                last_accum_energy = #{lastAccumEnergy},
-                current_power = #{currentPower},
-                status_code = #{statusCode},
-                updated_at = NOW()
-            WHERE id = #{id}
-    </update>
     <update id="updateLastAccumAndStatus">
         <foreach collection="list" item="item" separator=";">
             UPDATE inverter
