@@ -64,6 +64,8 @@ public class MemberService {
         // 수정 가능한 값
         member.setRole(form.getRole());
         member.setStatus(form.getStatus());
+        member.setName(form.getName());
+        member.setAffiliation(form.getAffiliation());
         member.setUpdatedAt(LocalDateTime.now());
 
         memberRepository.updateMember(member);
@@ -84,9 +86,7 @@ public class MemberService {
 
     // 비밀번호 변경 처리
     public void changePassword(Member member, String encodedPassword) {
-        member.setPassword(encodedPassword);
-        member.setTemporary(false);
-        member.setUpdatedAt(LocalDateTime.now());
-        memberRepository.updateMember(member);
+        memberRepository.updatePassword(member.getId(), encodedPassword);
+        memberRepository.updateFirstLogin(member.getId(), false);
     }
 }

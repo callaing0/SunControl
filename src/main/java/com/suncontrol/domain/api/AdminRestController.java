@@ -1,6 +1,8 @@
 package com.suncontrol.domain.api;
 
 import com.suncontrol.common.response.ResponseDto;
+import com.suncontrol.core.dto.asset.PlantDto;
+import com.suncontrol.core.service.asset.PlantService;
 import com.suncontrol.domain.form.MemberCreateForm;
 import com.suncontrol.domain.form.MemberUpdateForm;
 import com.suncontrol.domain.service.MemberService;
@@ -8,12 +10,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class AdminRestController {
 
     private final MemberService memberService;
+    private final PlantService plantService;
+
+    //관리자 페이지 발전 수동 데이터 발전소 선택을 위한 추가 코드
+    @GetMapping("/plants")
+    public ResponseDto<List<PlantDto>> getPlants() {
+        return ResponseDto.of(true, "성공", plantService.findAllActive());
+    }
+
 
     // 신규 회원 생성
     @PostMapping("/new")

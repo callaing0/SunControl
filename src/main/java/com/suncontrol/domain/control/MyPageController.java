@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 
@@ -50,8 +51,21 @@ public class MyPageController {
     // 마이페이지 내부 비밀번호 변경
     @PostMapping("/password")
     public String changePassword(@ModelAttribute PasswordChangeForm passwordChangeForm,
-                                 Principal principal) {
-        myPageService.changePassword(principal.getName(), passwordChangeForm);
-        return "redirect:/mypage/";
+                                 Principal principal,
+                                 RedirectAttributes redirectAttributes) {
+
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
+        String result = myPageService.changePassword(principal.getName(), passwordChangeForm);
+
+        if (!"success".equals(result)) {
+            redirectAttributes.addFlashAttribute("passwordError", result);
+            return "redirect:/mypage";
+        }
+
+        redirectAttributes.addFlashAttribute("passwordSuccess", "비밀번호가 변경되었습니다.");
+        return "redirect:/mypage";
     }
 }

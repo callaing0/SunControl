@@ -3,69 +3,140 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
+    <meta charset="UTF-8">
     <title>SolarGuard | Statistics</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <th:block layout:fragment="css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            .chart-container {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                min-height: 0;
+            }
+        </style>
+    </th:block>
 </head>
 
+<body>
 <div layout:fragment="content">
     <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 flex-1 flex flex-col min-h-[82vh]">
-        <div class="mb-10 px-2">
-            <h2 class="text-3xl font-black text-gray-800 tracking-tighter italic uppercase">발전 통계 분석</h2>
-            <p class="text-sm text-gray-400 font-bold mt-1 tracking-tight">기간별 발전량 추이 및 에너지 효율 트렌드를 심층 분석합니다.</p>
-        </div>
 
-        <div class="flex space-x-4 items-center px-2 mb-10">
-            <div class="bg-gray-50 p-1.5 rounded-2xl border border-gray-100 flex items-center shadow-sm transition-all">
-                <button class="px-10 py-3.5 bg-yellow-400 text-black rounded-xl font-[900] shadow-lg shadow-yellow-400/20 italic uppercase">일별</button>
-                <button class="px-10 py-3.5 text-gray-400 font-[900] hover:text-gray-600 transition-colors uppercase">월별</button>
+        <!-- 헤더 -->
+        <div class="mb-10 px-2 flex justify-between items-end">
+            <div>
+                <h2 class="text-3xl font-black text-gray-800 tracking-tighter italic uppercase">발전 통계 분석</h2>
+                <div class="flex items-center mt-1">
+                    <p class="text-sm text-gray-400 font-bold uppercase tracking-widest">
+                        기간 누적 발전량, 증감률, 평균 발전량, 기상보정기대값, 인버터 가동 중지 시간을 분석합니다.
+                    </p>
+                </div>
             </div>
-            <input type="date" th:value="${selectedDate}" class="bg-gray-50 px-8 py-3.5 rounded-2xl border border-gray-100 font-[900] text-gray-700 outline-none focus:ring-4 focus:ring-yellow-400/10 transition-all uppercase italic">
-            <button class="bg-gray-900 px-12 py-3.5 rounded-2xl text-white font-[900] hover:bg-black transition-all shadow-xl active:scale-95 uppercase italic">조회</button>
         </div>
 
+        <!-- 필터 영역 -->
+        <div class="mb-10 px-2 flex flex-wrap items-center gap-4">
+            <div class="bg-gray-50 p-1.5 rounded-2xl border border-gray-100 flex items-center shadow-sm">
+                <button type="button"
+                        class="px-10 py-3.5 bg-yellow-400 text-black rounded-xl font-black shadow-lg shadow-yellow-400/20 italic uppercase tracking-wide">
+                    일별
+                </button>
+                <button type="button"
+                        class="px-10 py-3.5 text-gray-400 font-black hover:text-gray-600 transition-colors italic uppercase tracking-wide">
+                    월별
+                </button>
+            </div>
+
+            <div class="bg-gray-50 rounded-2xl border border-gray-100 shadow-sm px-6 py-3.5 flex items-center">
+                <input type="date"
+                       th:value="${selectedDate}"
+                       class="bg-transparent font-black text-gray-700 outline-none italic uppercase">
+            </div>
+
+            <button type="button"
+                    class="bg-[#111827] px-12 py-3.5 rounded-2xl text-white font-black hover:bg-black transition-all shadow-sm active:scale-95 uppercase italic tracking-wide border border-[#1f2937]">
+                조회
+            </button>
+        </div>
+
+        <!-- 요약 카드 -->
         <div class="grid grid-cols-5 gap-6 mb-10">
             <th:block th:if="${statsSummary != null and !#lists.isEmpty(statsSummary)}">
                 <div th:each="stat : ${statsSummary}"
-                     class="bg-white p-8 rounded-[40px] border border-gray-100 text-center shadow-sm hover:translate-y-[-6px] transition-all group cursor-default">
-                    <p class="text-gray-400 text-[10px] font-black mb-3 uppercase tracking-[0.2em] group-hover:text-yellow-500"
-                       th:text="${stat.title}">Analysis Item</p>
-                    <p class="text-2xl font-[900] text-gray-800 italic" th:text="${stat.value}">0,000</p>
+                     class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[210px]">
+                    <div class="flex justify-between items-end mb-6 italic uppercase">
+                        <div class="flex items-center">
+                            <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
+                            <span class="text-lg font-black text-gray-800"
+                                  th:text="${stat.title}">Analysis Item</span>
+                        </div>
+                        <span></span>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-2xl min-h-[100px] px-6 py-6 flex items-center justify-center text-center">
+                        <span class="text-2xl font-black text-gray-900 leading-none italic"
+                              th:text="${stat.value}">0,000</span>
+                    </div>
                 </div>
             </th:block>
+
             <th:block th:if="${statsSummary == null or #lists.isEmpty(statsSummary)}">
                 <div th:each="i : ${#numbers.sequence(1, 5)}"
-                     class="bg-white p-8 rounded-[40px] border border-gray-100 text-center shadow-sm opacity-50">
-                    <p class="text-gray-400 text-[10px] font-black mb-3 uppercase tracking-[0.2em]">WAITING DATA</p>
-                    <p class="text-2xl font-black text-gray-300 italic">--</p>
+                     class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[210px]">
+                    <div class="flex justify-between items-end mb-6 italic uppercase">
+                        <div class="flex items-center">
+                            <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
+                            <span class="text-lg font-black text-gray-300">WAITING DATA</span>
+                        </div>
+                        <span></span>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-2xl min-h-[100px] px-6 py-6 flex items-center justify-center text-center">
+                        <span class="text-2xl font-black text-gray-300 leading-none italic">--</span>
+                    </div>
                 </div>
             </th:block>
         </div>
 
-        <div class="grid grid-cols-2 gap-10 flex-1 min-h-[500px]">
+        <!-- 차트 영역 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1 min-h-[520px]">
+            <!-- 발전량 추이 -->
             <div class="bg-white p-10 rounded-[45px] shadow-sm border border-gray-100 flex flex-col transition-all">
-                <h3 class="text-xl font-black mb-10 text-gray-800 flex items-center italic uppercase px-2">
-                    <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>발전량 추이
+                <h3 class="text-xl font-black text-gray-800 mb-6 flex items-center italic uppercase">
+                    <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
+                    발전량 추이
                 </h3>
-                <div class="flex-1 relative flex items-center justify-center">
+
+                <div class="flex-1 chart-container flex items-center justify-center min-h-0">
                     <canvas id="timeGenChart" th:if="${generationTrend != null and !#lists.isEmpty(generationTrend)}"></canvas>
-                    <div th:if="${generationTrend == null or #lists.isEmpty(generationTrend)}" class="text-center opacity-60">
-                        <div class="text-5xl mb-4">📈</div>
+
+                    <div th:if="${generationTrend == null or #lists.isEmpty(generationTrend)}" class="text-center">
+                        <div class="text-5xl mb-4 opacity-20">📈</div>
                         <p class="text-gray-400 font-bold italic uppercase">분석할 발전량 데이터가 없습니다.</p>
-                        <p class="text-[10px] text-gray-300 uppercase tracking-widest mt-2 italic">Daily generation logs needed</p>
+                        <p class="text-[10px] text-gray-300 uppercase tracking-widest mt-2">
+                            Waiting for generation statistics...
+                        </p>
                     </div>
                 </div>
             </div>
 
+            <!-- 기상 조건별 효율 -->
             <div class="bg-white p-10 rounded-[45px] shadow-sm border border-gray-100 flex flex-col transition-all">
-                <h3 class="text-xl font-black mb-10 text-gray-800 flex items-center italic uppercase px-2">
-                    <span class="w-1.5 h-6 bg-blue-500 rounded-full mr-3"></span>기상 조건별 발전 효율
+                <h3 class="text-xl font-black text-gray-800 mb-6 flex items-center italic uppercase">
+                    <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
+                    기상 조건별 발전 효율
                 </h3>
-                <div class="flex-1 relative flex items-center justify-center">
+
+                <div class="flex-1 chart-container flex items-center justify-center min-h-0">
                     <canvas id="weatherDistChart" th:if="${weatherEfficiency != null and !#lists.isEmpty(weatherEfficiency)}"></canvas>
-                    <div th:if="${weatherEfficiency == null or #lists.isEmpty(weatherEfficiency)}" class="text-center opacity-60">
-                        <div class="text-5xl mb-4">☁️</div>
+
+                    <div th:if="${weatherEfficiency == null or #lists.isEmpty(weatherEfficiency)}" class="text-center">
+                        <div class="text-5xl mb-4 opacity-20">☁️</div>
                         <p class="text-gray-400 font-bold italic uppercase">기상 조건 데이터가 집계되지 않았습니다.</p>
-                        <p class="text-[10px] text-gray-300 uppercase tracking-widest mt-2 italic">Weather-linked logs needed</p>
+                        <p class="text-[10px] text-gray-300 uppercase tracking-widest mt-2">
+                            Waiting for weather efficiency logs...
+                        </p>
                     </div>
                 </div>
             </div>
@@ -89,15 +160,50 @@
                         label: '발전량 (kWh)',
                         data: generationTrend.map(item => item.value),
                         borderColor: '#facc15',
-                        backgroundColor: 'rgba(250, 204, 21, 0.15)',
+                        backgroundColor: 'rgba(250, 204, 21, 0.12)',
                         fill: true,
                         tension: 0.35,
-                        borderWidth: 3
+                        borderWidth: 3,
+                        pointRadius: 0
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 8,
+                                font: {
+                                    weight: 'bold',
+                                    size: 11
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f8fafc' },
+                            ticks: {
+                                font: {
+                                    size: 10,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                font: {
+                                    size: 10,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -112,16 +218,52 @@
                         label: '평균 효율 (%)',
                         data: weatherEfficiency.map(item => item.value),
                         backgroundColor: '#3b82f6',
-                        borderRadius: 12
+                        borderRadius: 12,
+                        barPercentage: 0.55
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 8,
+                                font: {
+                                    weight: 'bold',
+                                    size: 11
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f8fafc' },
+                            ticks: {
+                                font: {
+                                    size: 10,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                font: {
+                                    size: 10,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
         /*]]>*/
     </script>
 </th:block>
+</body>
 </html>

@@ -1,9 +1,6 @@
 package com.suncontrol.core.entity.log;
 
-import com.suncontrol.core.constant.common.Weather;
-import com.suncontrol.core.constant.util.GenerationStatus;
 import com.suncontrol.core.dto.log.GenerationLogDto;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,32 +22,14 @@ public class GenerationLog {
     private BigDecimal capacityFactor; /// 실측값 / 인버터용량
     private BigDecimal accumEnergy; /// 인버터 계량기 수치
 
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    private Weather weather;
+
     private Integer weatherCode;
 
-    private GenerationStatus generationStatus;
+    private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     /// DB 저장 조회용 가상필드
-    public void setWeatherCode(Integer weatherCode) {
-        this.weather = Weather.fromCode(weatherCode);
-        this.weatherCode = weatherCode;
-    }
-    public Integer getWeatherCode() { /// DB에 null이 저장되었을 경우를 대비한 방어로직
-        return weatherCode == null ?
-                weather == null ? null : weather.getWeatherCode() : this.weatherCode;
-    }
-    public String getStatus() {
-        return generationStatus == null ?
-                null : generationStatus.getStatus();
-    }
-    public void setStatus(String status) {
-        this.generationStatus = GenerationStatus.fromStatus(status);
-    }
-
     public GenerationLog(GenerationLogDto dto) {
         this.inverterId = dto.getInverterId();
         this.baseTime = dto.getBaseTime();
@@ -60,7 +39,7 @@ public class GenerationLog {
         this.expectedRatio = dto.getExpectedRatio();
         this.capacityFactor = dto.getCapacityFactor();
         this.accumEnergy = dto.getAccumEnergy();
-        this.weather = dto.getWeather();
-        this.generationStatus = dto.getGenerationStatus();
+        this.weatherCode = dto.getWeatherCode();
+        this.status = dto.getGenerationStatus().getStatus();
     }
 }

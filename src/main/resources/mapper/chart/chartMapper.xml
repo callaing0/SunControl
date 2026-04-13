@@ -27,37 +27,6 @@
           AND dr.base_date = #{selectedDate}
     </select>
 
-    <!-- 평균 효율 -->
-    <select id="selectAverageEfficiency" resultType="java.math.BigDecimal">
-        SELECT ROUND(COALESCE(AVG(dr.performance_ratio), 0), 2)
-        FROM daily_report dr
-                 INNER JOIN inverter i ON dr.inverter_id = i.id
-                 INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.id = #{plantId}
-          AND p.is_deleted = 0
-          AND dr.base_date = #{selectedDate}
-    </select>
-
-    <!-- 인버터 수 -->
-    <select id="selectInverterCount" resultType="int">
-        SELECT COUNT(i.id)
-        FROM inverter i
-                 INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.id = #{plantId}
-          AND p.is_deleted = 0
-    </select>
-
-    <!-- 장애 건수 -->
-    <select id="selectAlertCount" resultType="int">
-        SELECT COUNT(al.id)
-        FROM alert_log al
-                 INNER JOIN inverter i ON al.inverter_id = i.id
-                 INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.id = #{plantId}
-          AND p.is_deleted = 0
-          AND DATE(al.created_at) = #{selectedDate}
-    </select>
-
     <!-- 시간대별 발전량 추이 -->
     <select id="selectGenerationTrend" resultType="com.suncontrol.domain.dto.chartDto">
         SELECT DATE_FORMAT(hr.base_time, '%H시') AS label,
@@ -91,6 +60,40 @@
           AND DATE(gl.base_time) = #{selectedDate}
         GROUP BY gl.weather_code
         ORDER BY gl.weather_code
+    </select>
+
+    <!-- 증감률 -->
+    <select id="selectPreviousGeneration" resultType="java.math.BigDecimal">
+        SELECT ROUND(COALESCE(SUM(dr.value_actual), 0), 2)
+        FROM daily_report dr
+                 INNER JOIN inverter i ON dr.inverter_id = i.id
+                 INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
+          AND dr.base_date = DATE_SUB(#{selectedDate}, INTERVAL 1 DAY)
+    </select>
+
+    <!-- 평균 발전량 -->
+    <select id="selectAverageGeneration" resultType="java.math.BigDecimal">
+        SELECT ROUND(COALESCE(AVG(dr.value_actual), 0), 2)
+        FROM daily_report dr
+                 INNER JOIN inverter i ON dr.inverter_id = i.id
+                 INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
+          AND dr.base_date BETWEEN DATE_SUB(#{selectedDate}, INTERVAL 7 DAY)
+            AND #{selectedDate}
+    </select>
+
+    <!-- 인버터 가동 중지 시간 -->
+    <select id="selectStoppedTime" resultType="int">
+        SELECT COALESCE(SUM(dr.stopped_time), 0)
+        FROM daily_report dr
+                 INNER JOIN inverter i ON dr.inverter_id = i.id
+                 INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
+          AND dr.base_date = #{selectedDate}
     </select>
 
 </mapper>

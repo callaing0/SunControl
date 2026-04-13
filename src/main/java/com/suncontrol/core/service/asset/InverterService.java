@@ -5,6 +5,7 @@ import com.suncontrol.core.dto.asset.*;
 import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
 import com.suncontrol.core.entity.asset.Inverter;
 import com.suncontrol.core.repository.asset.InverterRepository;
+import com.suncontrol.core.util.DataCollectorsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,23 +40,17 @@ public class InverterService {
     }
 
     public List<InverterDto> findAllByPlant(Long plantId) {
-        return repository.findAllByPlantId(plantId)
-                .stream().map(InverterDto::new).collect(Collectors.toList());
+        return DataCollectorsUtil.toDataList(
+                repository.findAllByPlantId(plantId), InverterDto::new);
     }
 
     public List<InverterDto> findAllActive() {
         /// 발전데이터 생성을 위해 시스템에 등록된 모든 활성 인버터를
         /// InverterDto로 변환하여 반환
-        return repository.findAllByStatusCodeBetween(
-                DeviceStatus.INVERTER_NORMAL.getCode(),
-                DeviceStatus.INVERTER_END.getCode())
-                .stream().map(InverterDto::new).toList();
-    }
-
-    public Map<Long, List<InverterDto>> getInverterMapByPlantId() {
-        /// 검색의 편의성을 위해 발전소 ID를 기준으로 매핑
-        return findAllActive()
-                .stream()
-                .collect(Collectors.groupingBy(InverterDto::getPlantId));
+        return DataCollectorsUtil.toDataList(
+                repository.findAllByStatusCodeBetween(
+                        DeviceStatus.INVERTER_NORMAL.getCode(),
+                        DeviceStatus.INVERTER_END.getCode()
+                ), InverterDto::new);
     }
 }

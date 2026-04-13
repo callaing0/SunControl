@@ -18,23 +18,18 @@
         <span class="mr-2 text-[10px]">●</span> 정상 가동중
     </div>
 
-    <div onclick="location.href='/mypage'"
+    <div
          class="flex items-center justify-center bg-[#1e293b] text-white rounded-2xl font-[900] shadow-xl shadow-gray-200 cursor-pointer italic uppercase transition-all hover:bg-black active:scale-95 group"
          style="width: 160px; height: 44px; font-size: 12px; tracking-tighter">
 
         <!-- 아이콘 -->
         <span class="mr-2 opacity-50 group-hover:opacity-100 transition-opacity"
-              th:text="${session.user != null and session.user.role == 'ADMIN'} ? '🛠' : '👤'">
-        👤
-    </span>
+              th:text="${session.user != null and #strings.contains(session.user.role, 'ADMIN') ? '🛠' : '👤'}">
+        </span>
 
         <!-- 이름 + 역할 -->
-        <span th:text="
-    ${session.user == null} ? 'SYSTEM USER' :
-    (${session.user.role == 'ADMIN'} ? '관리자' : '일반 사용자')
-">
-    사용자
-</span>
+        <span th:text="${session.user == null ? 'SYSTEM USER' : (#strings.contains(session.user.role, 'ADMIN') ? '관리자' : '일반 사용자')}">
+        </span>
 
     </div>
 </header>

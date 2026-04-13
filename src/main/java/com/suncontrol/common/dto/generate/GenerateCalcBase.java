@@ -16,7 +16,7 @@ public record GenerateCalcBase(
         GenerationStrategy expStrategy,
         double sunriseHr,
         double sunsetHr,
-        Weather weather
+        Integer weatherCode
 ) {
     private static final double DEFAULT_ZERO = 0.0;
     private static final double DEFAULT_SUNRISE = 6.0;
@@ -27,7 +27,7 @@ public record GenerateCalcBase(
     public static GenerateCalcBase defaultValues() {
         return new GenerateCalcBase(DEFAULT_ZERO, DEFAULT_ZERO, DEFAULT_ZERO,
                 GenerationStrategy.VIRTUAL_EXP, DEFAULT_SUNRISE, DEFAULT_SUNSET,
-                Weather.CLEAR_SKY);
+                Weather.CLEAR_SKY.getWmo());
     }
 
     public GenerateCalcBase(WeatherLogDto weather,
@@ -43,7 +43,7 @@ public record GenerateCalcBase(
                         toHour(daily.getSunrise()) : DEFAULT_SUNRISE,
                 daily != null && daily.getSunset() != null ?
                         toHour(daily.getSunset()) : DEFAULT_SUNSET,
-                weather != null ? weather.getWeather() : Weather.CLEAR_SKY
+                weather != null ? weather.getWeatherCode() : Weather.CLEAR_SKY.getWmo()
         );
     }
 

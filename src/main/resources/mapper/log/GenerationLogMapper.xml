@@ -37,4 +37,47 @@
         FROM generation_log
         GROUP BY inverter_id
     </select>
+
+    <select id="findAllByStatus"
+            resultType="com.suncontrol.core.entity.log.GenerationLog">
+        SELECT * FROM generation_log
+        WHERE status = #{status}
+    </select>
+
+    <select id="findAllByNotStatus"
+            resultType="com.suncontrol.core.entity.log.GenerationLog">
+        SELECT * FROM generation_log
+        WHERE status != #{status}
+    </select>
+
+    <select id="findAllBetweenTimeByStatus"
+            resultType="com.suncontrol.core.entity.log.GenerationLog">
+        SELECT * FROM generation_log
+        WHERE status = #{status}
+        AND base_time BETWEEN #{start} AND #{end}
+    </select>
+
+    <select id="findAllBetweenTimeByNotStatus"
+            resultType="com.suncontrol.core.entity.log.GenerationLog">
+        SELECT * FROM generation_log
+        WHERE status != #{status}
+        AND base_time BETWEEN #{start} AND #{end}
+    </select>
+
+    <select id="findAllByTimeBetween"
+            resultType="com.suncontrol.core.entity.log.GenerationLog">
+        SELECT * FROM generation_log
+        WHERE base_time BETWEEN #{start} and #{end}
+    </select>
+
+    <update id="updateStatus"
+            parameterType="com.suncontrol.core.dto.log.GenerationLogUpdateStatusDto">
+
+        <foreach collection="list" item="item" separator=";">
+            UPDATE generation_log
+            SET status = #{item.status}
+            WHERE inverter_id = #{item.inverterId}
+            AND base_time = #{item.baseTime}
+        </foreach>
+    </update>
 </mapper>

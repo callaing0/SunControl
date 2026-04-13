@@ -20,7 +20,7 @@ public class DailyReport {
     private BigDecimal expectedRatio; /// 기대값 / 인버터용량
     private BigDecimal capacityFactor; /// 실측값 / 인버터용량
     private BigDecimal accumEnergy; /// 인버터 계량기 수치
-    private String weatherCode;
+    private Integer weatherCode;
     private int stoppedTime; /// 가동정지 시간(초)
     private int incidentCount; /// 가동정지 회수
     private Integer dayOffset; /// 0: 당일 1~7:N일전 예측 표시

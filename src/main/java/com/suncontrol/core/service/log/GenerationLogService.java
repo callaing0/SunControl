@@ -1,9 +1,12 @@
 package com.suncontrol.core.service.log;
 
+import com.suncontrol.core.constant.util.GenerationStatus;
 import com.suncontrol.core.dto.log.GenerationLogDto;
+import com.suncontrol.core.dto.log.GenerationLogUpdateStatusDto;
 import com.suncontrol.core.dto.log.LastGeneratedTime;
 import com.suncontrol.core.entity.log.GenerationLog;
 import com.suncontrol.core.repository.log.GenerationLogRepository;
+import com.suncontrol.core.util.DataCollectorsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,11 +28,11 @@ public class GenerationLogService {
 
     ///  인버터 별 최근 발전 생성시각 찾아오기
     public Map<Long, LocalDateTime> getLastGeneratedTimeByAllInverters() {
-        return repository.findLastsOf().stream()
-                .collect(Collectors.toMap(
-                        LastGeneratedTime::getPlantId,
-                        LastGeneratedTime::getBaseTime
-                ));
+        return DataCollectorsUtil.mapBy(
+                repository.findLastsOf(),
+                LastGeneratedTime::getPlantId,
+                LastGeneratedTime::getBaseTime
+        );
     }
 
     public void saveAll(List<GenerationLogDto> results) {
@@ -40,5 +44,49 @@ public class GenerationLogService {
                 results.stream().map(GenerationLog::new).toList());
 
         log.info("Save {} results to DB", result);
+    }
+
+    /// 기록의 상태별로 모든 데이터를 가져오는 메서드
+    /// 예 ) "GenerationStatus.PENDING" 인 기록을 모두 가져온다
+    public List<GenerationLogDto> findAllByStatus(GenerationStatus status) {
+        return findAllByStatus(status, true);
+    }
+
+    public List<GenerationLogDto> findAllByStatus(GenerationStatus status, boolean isTrue) {
+        return DataCollectorsUtil.toDataList(
+                isTrue ? repository.findAllByStatus(status.getStatus())
+                        : repository.findAllByNotStatus(status.getStatus()),
+                GenerationLogDto::new);
+    }
+
+    public List<GenerationLogDto> findAllbyStatus(
+            LocalDateTime start,
+            LocalDateTime end,
+            GenerationStatus status,
+            boolean isTrue) {
+        return DataCollectorsUtil.toDataList(
+                isTrue ?
+                        repository.findAllBetweenTimeByStatus(
+                                start, end, status.getStatus())
+                        : repository.findAllBetweenTimeByNotStatus(
+                                start, end, status.getStatus()),
+                GenerationLogDto::new);
+    }
+
+    public List<GenerationLogDto> findAllByTimeBetween(LocalDateTime start,
+                                                       LocalDateTime end) {
+        List<GenerationLog> entities = repository.findAllByTimeBetween(start, end);
+        if(entities.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return DataCollectorsUtil.toDataList(entities, GenerationLogDto::new);
+    }
+
+    public int updateStatus(List<GenerationLogUpdateStatusDto> dtoList) {
+        int result = repository.updateStatus(dtoList);
+
+        log.info("Update {} results to DB", result);
+
+        return result;
     }
 }

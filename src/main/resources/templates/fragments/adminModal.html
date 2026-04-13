@@ -56,7 +56,6 @@
                         class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 outline-none focus:border-yellow-400 transition-all font-bold text-gray-700">
                     <option value="ADMIN">ADMIN</option>
                     <option value="USER">USER</option>
-                    <option value="MANAGER">MANAGER</option>
                 </select>
             </div>
 
@@ -93,14 +92,16 @@
 
             <div class="space-y-2">
                 <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">이름</label>
-                <input type="text" id="editName" readonly
-                       class="w-full bg-gray-100 border-2 border-transparent rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+                <input type="text" id="editName"
+                       class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 font-bold text-gray-700
+              outline-none focus:border-yellow-400 transition-all">
             </div>
 
             <div class="space-y-2">
                 <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">소속</label>
-                <input type="text" id="editAffiliation" readonly
-                       class="w-full bg-gray-100 border-2 border-transparent rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+                <input type="text" id="editAffiliation"
+                       class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 font-bold text-gray-700
+              outline-none focus:border-yellow-400 transition-all">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -110,7 +111,6 @@
                             class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 outline-none focus:border-yellow-400 transition-all font-bold text-gray-700">
                         <option value="ADMIN">ADMIN</option>
                         <option value="USER">USER</option>
-                        <option value="MANAGER">MANAGER</option>
                     </select>
                 </div>
 
@@ -120,7 +120,6 @@
                             class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 outline-none focus:border-yellow-400 transition-all font-bold text-gray-700">
                         <option value="ACTIVE">ACTIVE</option>
                         <option value="LOCKED">LOCKED</option>
-                        <option value="INACTIVE">INACTIVE</option>
                     </select>
                 </div>
             </div>
@@ -171,6 +170,37 @@
                 m.classList.add('hidden');
                 document.body.style.overflow = 'auto';
             }
+        }
+
+        function openEditModal(member) {
+            document.getElementById("editMemberId").value = member.id;
+            document.getElementById("editUserId").value = member.userId;
+
+            // 🔥 이게 핵심 (지금 없음)
+            document.getElementById("editName").value = member.name ?? "";
+            document.getElementById("editAffiliation").value = member.affiliation ?? "";
+
+            document.getElementById("editRole").value = member.role;
+            document.getElementById("editStatus").value = member.status;
+
+            openModal('accountModal');
+        }
+
+        function updateAccount() {
+            const id = document.getElementById("editMemberId").value;
+
+            const data = {
+                name: document.getElementById("editName").value.trim(),
+                affiliation: document.getElementById("editAffiliation").value.trim(),
+                role: document.getElementById("editRole").value,
+                status: document.getElementById("editStatus").value
+            };
+
+            fetch(`/api/admin/members/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
         }
 
         function openConfirmModal(message, onConfirm, title = '확인', buttonText = '진행') {

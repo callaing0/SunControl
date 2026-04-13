@@ -19,18 +19,37 @@ public class chartServiceImpl implements chartService {
 
     @Override
     public List<chartSummaryDto> getStatsSummary(Long plantId, LocalDate selectedDate) {
+
         BigDecimal totalGeneration = nvl(chartRepository.selectTotalGeneration(plantId, selectedDate));
+        BigDecimal previousGeneration = nvl(chartRepository.selectPreviousGeneration(plantId, selectedDate));
+        BigDecimal averageGeneration = nvl(chartRepository.selectAverageGeneration(plantId, selectedDate));
         BigDecimal expectedGeneration = nvl(chartRepository.selectExpectedGeneration(plantId, selectedDate));
-        BigDecimal averageEfficiency = nvl(chartRepository.selectAverageEfficiency(plantId, selectedDate));
-        int inverterCount = chartRepository.selectInverterCount(plantId);
-        int alertCount = chartRepository.selectAlertCount(plantId, selectedDate);
+        Integer stoppedTime = chartRepository.selectStoppedTime(plantId, selectedDate);
+
+        BigDecimal changeRate = BigDecimal.ZERO;
+
+        if (previousGeneration.compareTo(BigDecimal.ZERO) > 0) {
+            changeRate = totalGeneration.subtract(previousGeneration)
+                    .divide(previousGeneration, 4, BigDecimal.ROUND_HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+        }
 
         List<chartSummaryDto> summaryList = new ArrayList<>();
-        summaryList.add(createSummary("총 발전량", totalGeneration.stripTrailingZeros().toPlainString() + " kWh"));
-        summaryList.add(createSummary("예상 발전량", expectedGeneration.stripTrailingZeros().toPlainString() + " kWh"));
-        summaryList.add(createSummary("평균 효율", averageEfficiency.stripTrailingZeros().toPlainString() + " %"));
-        summaryList.add(createSummary("인버터 수", inverterCount + " 대"));
-        summaryList.add(createSummary("장애 건수", alertCount + " 건"));
+
+        summaryList.add(createSummary("기간 누적 발전량",
+                totalGeneration.stripTrailingZeros().toPlainString() + " kWh"));
+
+        summaryList.add(createSummary("대비 증감률",
+                changeRate.setScale(2, BigDecimal.ROUND_HALF_UP) + " %"));
+
+        summaryList.add(createSummary("평균 발전량",
+                averageGeneration.stripTrailingZeros().toPlainString() + " kWh"));
+
+        summaryList.add(createSummary("기상보정기대값",
+                expectedGeneration.stripTrailingZeros().toPlainString() + " kWh"));
+
+        summaryList.add(createSummary("인버터 가동 중지 시간",
+                (stoppedTime == null ? 0 : stoppedTime) + " sec"));
 
         return summaryList;
     }

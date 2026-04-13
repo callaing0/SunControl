@@ -1,9 +1,7 @@
 package com.suncontrol.core.dto.asset;
 
-import com.suncontrol.core.dto.asset.component.InverterBaseDto;
-import lombok.AllArgsConstructor;
+import com.suncontrol.core.dto.component.InverterBaseDto;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 

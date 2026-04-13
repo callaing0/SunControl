@@ -3,6 +3,7 @@ package com.suncontrol.core.service.asset;
 import com.suncontrol.core.dto.asset.PanelDto;
 import com.suncontrol.core.entity.asset.Panel;
 import com.suncontrol.core.repository.asset.PanelRepository;
+import com.suncontrol.core.util.DataCollectorsUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,21 +31,16 @@ public class PanelService {
             return Map.of(); // 여기 없으면 또 터진다
         }
 
-        Map<Long, List<PanelDto>> panelMap =
-                repository.findAllByInverterIds(inverters)
-                        .stream()
-                        .collect(
-                                Collectors.groupingBy(
-                                        Panel::getInverterId,
-                                        Collectors.mapping(
-                                                PanelDto::new,
-                                                Collectors.toList()
-                                        )
-                                )
-                        );
+        Map<Long, List<PanelDto>> panelMap = DataCollectorsUtil.groupBy(
+                repository.findAllByInverterIds(inverters),
+                Panel::getInverterId,
+                PanelDto::new
+        );
 
-        panelMap.put(0L, repository.findAllofInverters(inverters)
-                .stream().map(PanelDto::new).toList());
+        panelMap.put(0L, DataCollectorsUtil.toDataList(
+                repository.findAllofInverters(inverters),
+                PanelDto::new
+                ));
 
         return panelMap;
     }

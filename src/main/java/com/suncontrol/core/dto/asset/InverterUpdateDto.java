@@ -1,7 +1,7 @@
 package com.suncontrol.core.dto.asset;
 
 import com.suncontrol.core.constant.asset.DeviceStatus;
-import com.suncontrol.core.dto.asset.component.InverterBaseDto;
+import com.suncontrol.core.dto.component.InverterBaseDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
