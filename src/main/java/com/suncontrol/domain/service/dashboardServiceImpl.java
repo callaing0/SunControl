@@ -105,7 +105,7 @@ public class dashboardServiceImpl implements dashboardService {
         List<BigDecimal> result = new ArrayList<>();
 
         for (int hour = startHour; hour <= endHour; hour++) {
-            result.add(BigDecimal.ZERO);
+            result.add(null);
         }
 
         if (source == null) {

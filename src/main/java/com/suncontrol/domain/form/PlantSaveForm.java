@@ -17,7 +17,7 @@ public class PlantSaveForm {
     private final String COORDINATE_INVALID = "잘못된 좌표 요청입니다.";
 
     /// 토큰에 사용자정보가 없을 경우 등록 차단
-    @NotNull
+
     private Long memberId;
 
     /// 사용자가 직접 입력하는 필드
@@ -46,6 +46,8 @@ public class PlantSaveForm {
     @Min(value = 20, message = "설치 각도가 너무 낮습니다.")
     @Max(value = 40, message = "설치 각도가 너무 높습니다.")
     private int tilt;
+
+    private boolean isMain;
 
     /// 입력된 문자열로 지역코드 검증
     public String getDistrictCode() {
@@ -80,6 +82,7 @@ public class PlantSaveForm {
                 district.getProvince() : null);
         dto.setAzimuth(this.azimuth);
         dto.setTilt(this.tilt);
+        dto.setMain(true);
 
         return dto;
     }
