@@ -21,20 +21,18 @@
     <update id="updateCap"
             parameterType="com.suncontrol.core.dto.asset.InverterCapSurplusDto">
         UPDATE inverter SET
-        measured_cap = measured_cap + #{measuredCapSurplus}
+        measured_capacity = measured_capacity + #{measuredCapSurplus},
         updated_at = NOW()
-        WHERE id = #{id} AND plant_id #{plantId}
+        WHERE id = #{id} AND plant_id = #{plantId}
     </update>
     <!-- 기존 쿼리 내용
     <update id="updateLastAccumAndStatus">
-        <foreach collection="list" item="item" separator=";">
             UPDATE inverter SET
-                last_accum_energy = #{item.lastAccumEnergy},
-                current_power = #{item.currentPower},
-                status_code = #{item.statusCode},
+                last_accum_energy = #{lastAccumEnergy},
+                current_power = #{currentPower},
+                status_code = #{statusCode},
                 updated_at = NOW()
-            WHERE id = #{item.id}
-        </foreach>
+            WHERE id = #{id}
     </update>
     -->
     <update id="updateLastAccumAndStatus">

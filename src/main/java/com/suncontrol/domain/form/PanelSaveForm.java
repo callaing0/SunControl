@@ -20,10 +20,12 @@ public class PanelSaveForm {
     /// 패널 등록 form
 
     @NotNull
-    private InverterBaseDto inverter;
+    private Long inverterId;
+    @NotNull
+    private Long plantId;
     @NotBlank(message = "패널 모델을 입력해주세요")
     private String modelName;
-    @NotBlank(message = "시스템에 등록된 패널 모델이 아닙니다")
+    @NotNull(message = "시스템에 등록된 패널 모델이 아닙니다")
     @Setter(AccessLevel.NONE)
     private PanelModel model;
     @NotBlank(message = "패널 제조사를 입력해주세요")
@@ -38,9 +40,6 @@ public class PanelSaveForm {
     private int count;
 
 /// InverterCapSurplusDto 용 가상필드
-    public Long getPlantId() {
-        return this.inverter.getPlantId();
-    }
     public BigDecimal getMeasuredCapSurplus() {
         /// 패널 용량 W 단위를 인버터 용량 kW 단위로 변환
         return model != null ? BigDecimal
@@ -50,10 +49,8 @@ public class PanelSaveForm {
                 : null; /// 모델을 못찾으면 null로 반환
     }
 /// InverterCapSurplusDto 및 PanelSaveDto 용 가상필드
-   public Long getInverterId() {
-        return this.inverter.getInverterId();
-    }
-    public void setModel(String modelName) {
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
         this.model = PanelModel.getByName(modelName);
     }
     private PanelManufacturer getManufacturer() {
@@ -95,8 +92,8 @@ public class PanelSaveForm {
     /// inverter 테이블에 업데이트 될 내용
     public InverterCapSurplusDto toInvCapDto() {
         return InverterCapSurplusDto.builder()
-                .plantId(getPlantId())
-                .inverterId(getInverterId())
+                .plantId(plantId)
+                .inverterId(inverterId)
                 .measuredCapSurplus(getMeasuredCapSurplus())
                 .build();
     }

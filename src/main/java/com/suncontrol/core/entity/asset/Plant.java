@@ -41,6 +41,7 @@ public class Plant {
         this.province = dto.getProvince();
         this.azimuth = dto.getAzimuth();
         this.tilt = dto.getTilt();
+        this.isMain = dto.isMain();
     }
 
     /**
