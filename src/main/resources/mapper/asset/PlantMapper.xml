@@ -6,9 +6,9 @@
 <mapper namespace="com.suncontrol.core.repository.asset.PlantRepository">
     <insert id="save" parameterType="com.suncontrol.core.entity.asset.Plant">
         INSERT INTO plant (member_id, name, address, latitude, longitude,
-            province_code, district_code, azimuth, tilt)
+            province_code, district_code, azimuth, tilt, is_main)
         values (#{memberId}, #{name}, #{address}, #{latitude}, #{longitude},
-            #{province.code}, #{district.code}, #{azimuth}, #{tilt})
+            #{province.code}, #{district.code}, #{azimuth}, #{tilt}, #{isMain})
     </insert>
     <update id="resetMain">
         UPDATE plant SET is_main = 0 WHERE member_id = #{memberId}

@@ -16,7 +16,7 @@ public interface InverterRepository {
 
     List<Inverter> findAllByStatusCodeBetween(@Param("start") int start,@Param("end") int end);
 
-    int updateLastAccumAndStatus(List<InverterUpdateDto> list);
+    int updateLastAccumAndStatus(List<InverterUpdateDto> dto);
 
     List<Inverter> findAllByPlantId(@Param("plantId") Long plantId);
 }

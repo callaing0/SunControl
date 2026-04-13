@@ -36,7 +36,7 @@
         </div>
 
         <!-- 필터 영역 -->
-        <div class="mb-10 px-2 flex flex-wrap items-center gap-4">
+        <form method="get" th:action="@{/chart}" class="mb-10 px-2 flex flex-wrap items-center gap-4">
             <div class="bg-gray-50 p-1.5 rounded-2xl border border-gray-100 flex items-center shadow-sm">
                 <button type="button"
                         class="px-10 py-3.5 bg-yellow-400 text-black rounded-xl font-black shadow-lg shadow-yellow-400/20 italic uppercase tracking-wide">
@@ -50,15 +50,17 @@
 
             <div class="bg-gray-50 rounded-2xl border border-gray-100 shadow-sm px-6 py-3.5 flex items-center">
                 <input type="date"
+                       name="selectedDate"
                        th:value="${selectedDate}"
+                       th:attr="max=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
                        class="bg-transparent font-black text-gray-700 outline-none italic uppercase">
             </div>
 
-            <button type="button"
+            <button type="submit"
                     class="bg-[#111827] px-12 py-3.5 rounded-2xl text-white font-black hover:bg-black transition-all shadow-sm active:scale-95 uppercase italic tracking-wide border border-[#1f2937]">
                 조회
             </button>
-        </div>
+        </form>
 
         <!-- 요약 카드 -->
         <div class="grid grid-cols-5 gap-6 mb-10">
@@ -150,6 +152,22 @@
         const generationTrend = /*[[${generationTrend}]]*/ [];
         const weatherEfficiency = /*[[${weatherEfficiency}]]*/ [];
 
+        const weatherMap = {
+            "맑음": "☀️ 맑음",
+            "구름": "⛅ 구름",
+            "흐림": "☁️ 흐림",
+            "비": "🌧️ 비",
+            "눈": "❄️ 눈"
+        };
+
+        const weatherColorMap = {
+            "맑음": "#facc15",
+            "구름": "#9ca3af",
+            "흐림": "#6b7280",
+            "비": "#3b82f6",
+            "눈": "#93c5fd"
+        };
+
         const timeGenCtx = document.getElementById('timeGenChart');
         if (timeGenCtx && generationTrend.length > 0) {
             new Chart(timeGenCtx, {
@@ -213,11 +231,11 @@
             new Chart(weatherCtx, {
                 type: 'bar',
                 data: {
-                    labels: weatherEfficiency.map(item => item.label),
+                    labels: weatherEfficiency.map(item => weatherMap[item.label] || item.label),
                     datasets: [{
                         label: '평균 효율 (%)',
                         data: weatherEfficiency.map(item => item.value),
-                        backgroundColor: '#3b82f6',
+                        backgroundColor: weatherEfficiency.map(item => weatherColorMap[item.label] || '#3b82f6'),
                         borderRadius: 12,
                         barPercentage: 0.55
                     }]
