@@ -10,6 +10,7 @@ import com.suncontrol.core.service.asset.PlantService;
 import com.suncontrol.core.service.log.DailyWeatherService;
 import com.suncontrol.core.service.log.RadiationLogService;
 import com.suncontrol.core.service.log.WeatherLogService;
+import com.suncontrol.core.util.DataCollectorsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +59,7 @@ public class WeatherApiService {
 
         List<PlantDto> plants = plantService.findAllActive();
         List<PlantWeatherApiDto> plantWeatherApiList =
-                plants.stream().map(PlantWeatherApiDto::new).toList();
+                DataCollectorsUtil.toDataList(plants, PlantWeatherApiDto::new);
         /// 기상 정보 요청해서 각 서비스의 필요정보 추출하여 저장
         List<WeatherResponseDto> responses = getWeatherResponses(plantWeatherApiList);
 
@@ -114,49 +115,21 @@ public class WeatherApiService {
         if(responses.isEmpty()) return;
         /// 응답객체 리스트를 각각의 리스트로 변환하여 저장
         weatherLogService.saveAll(
-                responses
-                        // List<WeatherResponseDto>를
-                        // Stream<T> 객체로 변환
-                        .stream()
-                        // WeatherResponseDto
-                        // 내부의 컬렉션 객체를
-                        // 바깥으로 꺼내기
-                        .flatMap(
-                                // WeatherResponseDto
-                                // 내부 메서드를 이용하기 위한
-                                // 익명함수
-                                res -> res
-                                        // WeatherLogDto 리스트를
-                                        // 반환한다
-                                        .getWeatherLogs()
-                                        // 변환이 용이하게
-                                        // Stream 객체로 바꾼다
-                                        .stream()
-                        )
-                        // 리스트로 바꾼다
-                        .toList()
+                DataCollectorsUtil.flatMapping(
+                        responses, WeatherResponseDto::getWeatherLogs
+                )
         );
 
         radiationLogService.saveAll(
-                responses
-                        .stream()
-                        .flatMap(
-                                res -> res
-                                        .getRadiationLogs()
-                                        .stream()
-                        )
-                        .toList()
+                DataCollectorsUtil.flatMapping(
+                        responses, WeatherResponseDto::getRadiationLogs
+                )
         );
 
         dailyWeatherService.saveAll(
-                responses
-                        .stream()
-                        .flatMap(
-                                res -> res
-                                        .getDailyWeathers()
-                                        .stream()
-                        )
-                        .toList()
+                DataCollectorsUtil.flatMapping(
+                        responses, WeatherResponseDto::getDailyWeathers
+                )
         );
     }
 }
