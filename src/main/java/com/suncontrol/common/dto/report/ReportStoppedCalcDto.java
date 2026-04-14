@@ -4,6 +4,7 @@ import com.suncontrol.core.constant.util.GenerationStatus;
 import com.suncontrol.core.constant.util.StaticValues;
 import com.suncontrol.core.dto.component.GenerationValuesDto;
 import com.suncontrol.core.dto.component.StoppedDto;
+import com.suncontrol.core.util.SafeDivider;
 import lombok.Getter;
 
 import java.math.BigDecimal;
@@ -53,6 +54,28 @@ public class ReportStoppedCalcDto extends ReportCalcDto{
             }
             prevTime = value.getBaseTime();
         }
+
+        return dto;
+    }
+
+    @Override
+    public GenerationValuesDto getValues() {
+        GenerationValuesDto dto = getBaseValues();
+        BigDecimal actual = BigDecimal.ZERO;
+        BigDecimal expected = BigDecimal.ZERO;
+
+        for(GenerationValuesDto value : super.getList()) {
+            actual = actual.add(value.getValueActual());
+            expected = expected.add(value.getValueExpected());
+        }
+        dto.setValueActual(actual.setScale(4, RoundingMode.HALF_UP));
+        dto.setValueExpected(expected.setScale(4, RoundingMode.HALF_UP));
+
+        BigDecimal performanceRatio = SafeDivider.ratioDivide(actual, expected);
+
+        dto.setPerformanceRatio(performanceRatio);
+
+        dto.setGenerationStatus(GenerationStatus.fromRatio(expected, performanceRatio, StaticValues.BASE_RATIO));
 
         return dto;
     }

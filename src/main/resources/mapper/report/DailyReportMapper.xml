@@ -11,7 +11,7 @@
         value_expected, value_actual, value_previous,
         performance_ratio, expected_ratio, capacity_factor, accum_energy,
         stopped_time, incident_count,
-        weather_code, status
+        weather_code
         ) VALUES
         <foreach collection="list" item="item" separator=",">
             (
@@ -19,7 +19,7 @@
             #{item.valueExpected}, #{item.valueActual}, #{item.valuePrevious},
             #{item.performanceRatio}, #{item.expectedRatio}, #{item.capacityFactor}, #{item.accumEnergy},
             #{item.stoppedTime}, #{item.incidentCount},
-            #{item.weatherCode}, #{item.status}
+            #{item.weatherCode}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -33,7 +33,6 @@
         stopped_time = VALUES(stopped_time),
         incident_count = VALUES(incident_count),
         weather_code = VALUES(weather_code),
-        status = VALUES(status),
         updated_at = NOW()
     </insert>
 
@@ -46,5 +45,12 @@
         WHERE r2.inverter_id = r1.inverter_id
         AND r2.day_offset = #{dayOffset}
         )
+    </select>
+
+    <select id="findAllByDateBetween" resultType="com.suncontrol.core.entity.report.DailyReport">
+        SELECT * FROM daily_report
+        WHERE base_date
+        BETWEEN #{start} AND #{end}
+        AND day_offset = #{dayOffset}
     </select>
 </mapper>

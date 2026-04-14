@@ -82,8 +82,8 @@ public class HourlyReportDto{
     public GenerationValuesDto getValuesDto() {
         return new GenerationValuesDto
                 (inverterId, baseTime,
-                        valueExpected, valueActual, accumEnergy, performanceRatio,
-                        accumEnergy, generationStatus);
+                        valueExpected, valueActual, BigDecimal.ZERO, accumEnergy,
+                        performanceRatio, generationStatus);
     }
 
     public LocalDate truncateBaseDate() {

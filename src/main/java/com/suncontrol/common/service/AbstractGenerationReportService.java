@@ -50,6 +50,13 @@ public abstract class AbstractGenerationReportService {
             log.error("{} : error with hourly reports", e.getMessage());
             throw e;
         }
+
+        try {
+            dailyProcess(reportDataType);
+        } catch (Exception e){
+            log.error("{} : error with daily reports", e.getMessage());
+            throw e;
+        }
 //
 //        /// 일간 통계 구하기
 //        Map<Long, List<DailyReportDto>> dailyReports = dailyReport(hourlyReports, reportDataType);

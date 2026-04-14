@@ -1,8 +1,12 @@
 package com.suncontrol.core.dto.report;
 
 import com.suncontrol.core.constant.common.Weather;
+import com.suncontrol.core.constant.util.GenerationStatus;
 import com.suncontrol.core.constant.util.ReportDataType;
+import com.suncontrol.core.dto.component.GenerationValuesDto;
+import com.suncontrol.core.dto.component.StoppedDto;
 import com.suncontrol.core.entity.report.DailyReport;
+import com.suncontrol.core.util.SafeDivider;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +30,7 @@ public class DailyReportDto {
     private BigDecimal capacityFactor; /// 실측값 / 인버터용량
     private BigDecimal accumEnergy; /// 인버터 계량기 수치
     private Weather weather;
+    private Integer weatherCode;
     private int stoppedTime; /// 가동정지 시간(초)
     private int incidentCount; /// 가동정지 회수
     private LocalDateTime createdAt;
@@ -33,9 +38,6 @@ public class DailyReportDto {
 
     public Integer getDayOffset() {
         return this.reportDataType.getDayOffset();
-    }
-    public Integer getWeatherCode() {
-        return this.weather.getWeatherCode();
     }
 
     public DailyReportDto(DailyReport entity) {
@@ -50,9 +52,44 @@ public class DailyReportDto {
         this.capacityFactor = entity.getCapacityFactor();
         this.accumEnergy = entity.getAccumEnergy();
         this.weather = Weather.fromCode(entity.getWeatherCode());
+        this.weatherCode = entity.getWeatherCode();
         this.stoppedTime = entity.getStoppedTime();
         this.incidentCount = entity.getIncidentCount();
         this.createdAt = entity.getCreatedAt();
         this.updatedAt = entity.getUpdatedAt();
+    }
+
+    public GenerationValuesDto getValuesDto() {
+        return new GenerationValuesDto(
+                inverterId, baseDate.atStartOfDay(), valueExpected, valueActual, valuePrevious,
+                accumEnergy, performanceRatio, GenerationStatus.PENDING
+        );
+    }
+
+    public DailyReportDto(
+            GenerationValuesDto dto,
+            BigDecimal capacity,
+            Integer weatherCode,
+            ReportDataType reportDataType,
+            StoppedDto stoppedDto
+    ) {
+        this.inverterId = dto.getInverterId();
+        this.baseDate = dto.getBaseTime().toLocalDate();
+        this.reportDataType = reportDataType;
+        this.weatherCode = weatherCode;
+
+        this.valueActual = dto.getValueActual();
+        this.valueExpected = dto.getValueExpected();
+        this.valuePrevious = dto.getValuePrevious();
+        this.accumEnergy = dto.getAccumEnergy();
+
+        this.performanceRatio = dto.getPerformanceRatio();
+
+        BigDecimal capacityDailyTotal = capacity.multiply(BigDecimal.valueOf(24));
+        this.expectedRatio = SafeDivider.ratioDivide(valueExpected, capacityDailyTotal);
+        this.capacityFactor = SafeDivider.ratioDivide(valueExpected, capacityDailyTotal);
+
+        this.stoppedTime = stoppedDto.getStoppedTime();
+        this.incidentCount = stoppedDto.getIncidentCount();
     }
 }

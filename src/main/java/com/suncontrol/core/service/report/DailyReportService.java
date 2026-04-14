@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,6 +34,16 @@ public class DailyReportService {
 
     public List<DailyReportDto> findAllLatestByInverter(Integer dayOffset) {
         List<DailyReport> entities = repository.findAllLatestByInverter(dayOffset);
+
+        if(entities == null || entities.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return DataCollectorsUtil.toDataList(entities, DailyReportDto::new);
+    }
+
+    public List<DailyReportDto> findAllByDateBetween(LocalDate start, LocalDate end, Integer dayOffset) {
+        List<DailyReport> entities = repository.findAllByDateBetween(start, end, dayOffset);
 
         if(entities == null || entities.isEmpty()) {
             return Collections.emptyList();
