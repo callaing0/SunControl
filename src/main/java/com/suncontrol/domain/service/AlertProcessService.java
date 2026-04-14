@@ -6,7 +6,7 @@ import com.suncontrol.mapper.Repository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -15,32 +15,33 @@ public class AlertProcessService {
 
     private final Repository repository;
 
-    // 리스트 조회용
     public List<AlertResponseDTO> findAll() {
         return repository.findAll();
     }
 
-    /**
-     * ✅ [중요] 실시간 자동 알림 발송용 메서드
-     * 버튼 안 눌러도 알림을 보내고 싶을 때 '다른 파일'에서 이 메서드를 호출하면 됩니다.
-     */
+    // ✅ 실시간 알림 전송 핵심 메서드
     public void sendAutomaticAlert(String message) {
-        // 1. emitters가 비어있는지 로그 확인
         if (NotificationController.emitters.isEmpty()) {
-            System.out.println(">>> 접속 중인 클라이언트가 없음");
+            System.out.println(">>> [SSE] 연결된 브라우저가 없습니다.");
             return;
         }
 
         NotificationController.emitters.forEach((key, emitter) -> {
             try {
                 emitter.send(SseEmitter.event()
-                        .name("alertUpdate") // 2. 이 이름이 HTML의 addEventListener와 같은지 확인
+                        .name("alertUpdate")
                         .data(message));
-            } catch (Exception e) {
+                System.out.println(">>> [SSE] 알림 발송 성공: " + message);
+            } catch (IOException e) {
                 NotificationController.emitters.remove(key);
             }
         });
     }
+
+    // ✅ 테스트 버튼용 메서드
+//    public void sendSimpleNotification(Long id) {
+//        sendAutomaticAlert("🚨 [테스트] 장비 장애 감지! (ID: " + id + ")");
+//    }
 
     // 2. 테스트용 (기존 버튼 기능 유지)
     public void sendSimpleNotification(Long id) {

@@ -2,23 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.suncontrol.mapper.Repository">
 
-    <resultMap id="AlertMap" type="com.suncontrol.domain.dto.AlertResponseDTO">
-        <id property="id" column="id" />
-        <result property="inverterId" column="inverter_id" />
-        <result property="status" column="status" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
-        <result property="createdAt" column="created_at" />
-        <result property="checkedAt" column="checked_at" />
-        <result property="resolvedAt" column="resolved_at" />
-    </resultMap>
-
-    <select id="findAll" resultMap="AlertMap">
+    <select id="findAll" resultType="com.suncontrol.domain.dto.AlertResponseDTO">
         SELECT
             id,
-            inverter_id,
+            inverter_id AS inverterId,
+            inverter_id AS location,
             status,
-            created_at,
-            checked_at,
-            resolved_at
+            created_at AS createdAt
         FROM alert_log
         ORDER BY created_at DESC
     </select>
@@ -31,8 +21,8 @@
         UPDATE alert_log
         SET
             status = #{status},
-            checked_at = #{checkedAt, jdbcType=TIMESTAMP},
-            resolved_at = #{resolvedAt, jdbcType=TIMESTAMP}
+            checked_at = #{checkedAt},
+            resolved_at = #{resolvedAt}
         WHERE id = #{id}
     </update>
 </mapper>
