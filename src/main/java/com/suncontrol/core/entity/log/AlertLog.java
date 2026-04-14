@@ -2,7 +2,6 @@ package com.suncontrol.core.entity.log;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 @Getter

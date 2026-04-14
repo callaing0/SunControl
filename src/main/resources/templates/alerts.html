@@ -3,67 +3,189 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <div layout:fragment="content">
+    <style>
+        #statusModal { transition: opacity 0.3s ease; }
+        .modal-content { transform: scale(0.9); transition: transform 0.3s ease; }
+        #statusModal:not(.hidden) .modal-content { transform: scale(1); }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #eee; border-radius: 10px; }
+
+        /* 토스트 애니메이션 */
+        .toast-enter { transform: translateX(120%); opacity: 0; }
+        .toast-show { transform: translateX(0); opacity: 1; }
+    </style>
+
+    <div id="toastContainer" class="fixed top-10 right-10 z-[110] flex flex-col gap-4"></div>
+
+    <div id="statusModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div class="modal-content bg-white rounded-[40px] p-10 max-w-md w-full shadow-2xl text-center">
+            <div id="modalIcon" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span id="iconSymbol" class="text-3xl font-black"></span>
+            </div>
+            <h3 id="modalTitle" class="text-2xl font-[900] text-gray-800 mb-2 italic uppercase tracking-tighter">System Alert</h3>
+            <div class="bg-gray-50 rounded-2xl p-5 mb-8 border border-gray-100">
+                <p id="modalMessage" class="text-gray-600 text-sm font-bold leading-relaxed break-all"></p>
+            </div>
+            <button onclick="closeStatusModal()" class="w-full py-4 rounded-2xl bg-gray-900 text-white font-black uppercase text-xs hover:bg-blue-600 transition-all shadow-lg">확인</button>
+        </div>
+    </div>
+
     <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 flex-1 flex flex-col min-h-[82vh]">
         <div class="mb-10 px-2 flex justify-between items-end">
             <div>
                 <h2 class="text-3xl font-[900] text-gray-800 tracking-tighter italic uppercase">알람 이력</h2>
                 <p class="text-sm text-gray-400 font-bold mt-1 tracking-tight">실시간 장애 추적 시스템</p>
             </div>
-            <div th:if="${alerts != null and !#lists.isEmpty(alerts)}" class="text-right">
-                <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-5 py-2.5 rounded-full border border-blue-100 uppercase tracking-widest shadow-sm">
-                    Total Logs: <span th:text="${#lists.size(alerts)}">0</span>
-                </span>
-            </div>
         </div>
 
         <div class="rounded-[35px] border border-gray-100 overflow-hidden flex flex-col flex-1 bg-white">
-            <div class="bg-gray-900 text-white flex text-[13px] font-black py-6 px-12 items-center uppercase tracking-tighter">
-                <div class="w-32 text-center">Log ID</div>
-                <div class="flex-1 text-center border-l border-gray-700">장애 감지 시간</div>
-                <div class="flex-1 text-center border-l border-gray-700">조치 완료 시간</div>
-                <div class="w-40 text-center border-l border-gray-700">위치</div>
-                <div class="w-32 text-center border-l border-gray-700">상태</div>
+            <div class="bg-gray-900 text-white flex text-[13px] font-black py-6 px-12 items-center uppercase tracking-tighter text-center">
+                <div class="w-20">ID</div>
+                <div class="flex-1 border-l border-gray-700">장애 감지 시간</div>
+                <div class="flex-1 border-l border-gray-700">조치 완료 시간</div>
+                <div class="w-32 border-l border-gray-700">장치 ID</div>
+                <div class="w-32 border-l border-gray-700">상태</div>
             </div>
 
             <div class="flex-1 flex flex-col relative divide-y divide-gray-50 overflow-y-auto custom-scroll">
-                <th:block th:if="${alerts == null or #lists.isEmpty(alerts)}">
-                    <div class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/30 backdrop-blur-[2px]">
-                        <div class="bg-white px-8 py-5 rounded-[35px] shadow-2xl border border-gray-100 flex flex-col items-center space-y-3">
-                            <div class="flex items-center space-x-3">
-                                <span class="flex h-3 w-3 rounded-full bg-green-500 animate-pulse"></span>
-                                <span class="text-gray-800 font-black tracking-widest text-sm uppercase">System Status: Optimal</span>
-                            </div>
-                            <p class="text-gray-400 text-[11px] font-bold">현재 보고된 시스템 장애 이력이 없습니다.</p>
-                        </div>
-                    </div>
-                    <div th:each="i : ${#numbers.sequence(1, 8)}" class="flex py-8 px-12 text-center items-center text-xl font-black text-gray-100 grayscale opacity-10">
-                        <div class="w-32 text-base font-bold italic">L-0000</div>
-                        <div class="flex-1 text-base">0000-00-00 00:00:00</div>
-                        <div class="flex-1 text-base">--</div>
-                        <div class="w-40 text-sm font-bold tracking-widest uppercase">STATION</div>
-                        <div class="w-32 text-xs font-black uppercase text-gray-200">CLEAN</div>
-                    </div>
-                </th:block>
-
                 <th:block th:if="${alerts != null and !#lists.isEmpty(alerts)}">
-                    <div th:each="alert : ${alerts}" class="flex py-8 px-12 text-center items-center text-xl font-black text-gray-700 hover:bg-gray-50 transition-all cursor-default group">
-                        <div class="w-32 text-base font-bold text-gray-400 group-hover:text-gray-600" th:text="${alert.id}">L-0000</div>
-                        <div class="flex-1 text-base text-gray-800" th:text="${#temporals.format(alert.createdAt, 'yyyy-MM-dd HH:mm:ss')}">Time</div>
-                        <div class="flex-1 text-base text-gray-400 font-medium" th:text="${alert.resolvedAt != null ? #temporals.format(alert.resolvedAt, 'yyyy-MM-dd HH:mm:ss') : '진행 중...'}">--</div>
-                        <div class="w-40 text-sm font-bold text-gray-600 uppercase" th:text="${alert.location}">Location</div>
-                        <div class="w-32">
-                            <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border"
-                                  th:classappend="${alert.severity >= 3 ? 'bg-red-50 text-red-500 border-red-100' : 'bg-green-50 text-green-500 border-green-100'}"
-                                  th:text="${alert.message}">정상</span>
+                    <div th:each="alert : ${alerts}" th:if="${alert != null}" class="flex py-8 px-12 text-center items-center hover:bg-gray-50 transition-all">
+                        <div class="w-20 text-xs font-bold text-gray-400" th:text="${alert.id}">0</div>
+                        <div class="flex-1 text-base font-bold text-gray-700"
+                             th:text="${alert.createdAt != null ? #temporals.format(alert.createdAt, 'yyyy-MM-dd HH:mm:ss') : '--:--:--'}">
+                        </div>
+                        <div class="flex-1 text-base font-medium text-gray-400"
+                             th:text="${alert.resolvedAt != null ? #temporals.format(alert.resolvedAt, 'yyyy-MM-dd HH:mm:ss') : '진행 중'}">
+                        </div>
+                        <div class="w-32 text-base font-black text-gray-800" th:text="${alert.inverterId}">0</div>
+                        <div class="w-32 flex justify-center">
+                            <th:block th:if="${alert.status != null}">
+                                <button th:if="${alert.status.name() == 'PENDING'}"
+                                        th:onclick="|resolveAlert(${alert.id})|"
+                                        class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border bg-red-50 text-red-500 border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                                    대기
+                                </button>
+                                <button th:if="${alert.status.name() == 'PROCESSING'}"
+                                        th:onclick="|resolveAlert(${alert.id})|"
+                                        class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border bg-blue-50 text-blue-500 border-blue-100 hover:bg-blue-500 hover:text-white transition-all shadow-sm">
+                                    확인 중
+                                </button>
+                                <span th:if="${alert.status.name() == 'RESOLVED'}"
+                                      class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border bg-green-50 text-green-500 border-green-100">
+                                    조치 완료
+                                </span>
+                            </th:block>
                         </div>
                     </div>
                 </th:block>
             </div>
         </div>
-        <div class="mt-8 text-center">
-            <p class="text-[11px] font-black text-gray-300 uppercase tracking-widest">SolarGuard Smart Monitoring v2.0</p>
-        </div>
     </div>
 </div>
-<th:block layout:fragment="script"></th:block>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        let needsReload = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. 실시간 알림 구독 (SSE)
+            const eventSource = new EventSource('/api/notifications/subscribe');
+
+            eventSource.addEventListener('alertUpdate', (event) => {
+                console.log("실시간 알림 수신:", event.data);
+                showToast("실시간 알림", event.data);
+                // 실시간 알림을 받았을 때도 나중에 닫으면 갱신되게 하고 싶다면 활성화
+                // needsReload = true;
+            });
+
+            eventSource.onerror = () => {
+                console.error("실시간 알림 연결 끊김. 재연결 시도...");
+                eventSource.close(); // 에러 시 닫고 재연결 로직 필요 시 추가
+            };
+        });
+
+        // 2. 우측 상단 토스트 함수
+        function showToast(title, message) {
+            const container = document.getElementById('toastContainer');
+            if(!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = "bg-gray-900 text-white p-6 rounded-[25px] shadow-2xl border border-gray-700 min-w-[320px] toast-enter transition-all duration-500 ease-out cursor-pointer";
+
+            toast.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center animate-pulse">
+                        <span class="text-white text-xs">🔔</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-black uppercase tracking-tighter italic">System Notification</h4>
+                        <p class="text-[11px] text-gray-400 font-bold mt-1 tracking-tight">${message}</p>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('toast-show'), 100);
+
+            // 토스트 클릭 시 즉시 새로고침 (사용자 편의성)
+            toast.onclick = () => location.reload();
+
+            setTimeout(() => {
+                toast.classList.remove('toast-show');
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+
+        // 3. 중앙 모달 제어
+        function openStatusModal(title, message, isSuccess) {
+            const modal = document.getElementById('statusModal');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            const iconBox = document.getElementById('modalIcon');
+            const iconSymbol = document.getElementById('iconSymbol');
+
+            if (isSuccess) {
+                iconBox.className = "w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6";
+                iconSymbol.innerText = "✓";
+                needsReload = true; // 성공 시에만 새로고침 플래그 활성화
+            } else {
+                iconBox.className = "w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6";
+                iconSymbol.innerText = "✕";
+                needsReload = false;
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeStatusModal() {
+            document.getElementById('statusModal').classList.add('hidden');
+            // 상태가 변경(success)된 경우에만 페이지 새로고침
+            if (needsReload) {
+                console.log("데이터 변경 감지: 새로고침을 실행합니다.");
+                location.reload();
+            }
+        }
+
+        // 4. 상태 변경 API 호출
+        function resolveAlert(id) {
+            console.log("상태 변경 요청 ID:", id);
+            fetch(`/api/alerts/resolve/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+                    .then(async response => {
+                        const resultMsg = await response.text();
+                        if (response.ok) {
+                            // 성공 시 모달 띄우기 (isSuccess = true)
+                            openStatusModal("Updated", "상태 변경이 완료되었습니다.", true);
+                        } else {
+                            openStatusModal("Error", resultMsg || "변경 중 오류가 발생했습니다.", false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Fetch Error:", error);
+                        openStatusModal("Error", "서버 연결 실패", false);
+                    });
+        }
+    </script>
+</th:block>
 </html>

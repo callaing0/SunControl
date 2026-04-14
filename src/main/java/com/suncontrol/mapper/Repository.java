@@ -1,24 +1,32 @@
 package com.suncontrol.mapper;
 
+import com.suncontrol.core.entity.log.AlertLog;
 import com.suncontrol.domain.dto.AlertResponseDTO;
 import com.suncontrol.domain.dto.AlertSaveRequestDTO;
-import com.suncontrol.domain.dto.AlertUpdateStatusDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
 public interface Repository {
-
-    // 1. 전체 조회 (List용)
     List<AlertResponseDTO> findAll();
 
-    // 2. 지역별 조회 (이게 없어서 빨간 줄 뜬 겁니다! 🥊)
-    List<AlertResponseDTO> findByLocation(String location);
+    // @Param을 통해 XML의 #{id}와 매칭
+    AlertLog findById(@Param("id") Long id);
 
-    // 3. 데이터 삽입 (API 저장용)
+    // 여러 파라미터가 들어갈 때는 @Param이 필수입니다.
+    void updateAlertProcess(
+            @Param("id") Long id,
+            @Param("status") int status,
+            @Param("checkedAt") LocalDateTime checkedAt,
+            @Param("resolvedAt") LocalDateTime resolvedAt
+    );
+
+
     void insertAlert(AlertSaveRequestDTO dto);
 
-    int updateStatus(Long id, int status);
+    List<AlertResponseDTO> findByLocation(String location);
 
-    void updateAlertStatuses(List<AlertUpdateStatusDto> updateList);
+    int updateStatus(Long id, int status);
 }
