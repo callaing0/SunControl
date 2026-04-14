@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.servlet.http.HttpSession;
 
 import java.security.Principal;
 
@@ -23,7 +24,7 @@ public class MyPageController {
 
     // 마이페이지 조회
     @GetMapping
-    public String showMyPage(Model model, Principal principal) {
+    public String showMyPage(Model model, Principal principal, HttpSession session) {
 
         if (principal == null) {
             return "redirect:/login";
@@ -31,9 +32,11 @@ public class MyPageController {
 
         // 로그인 사용자 userId 가져오기
         String userId = principal.getName();
+        Long selectedPlantId = (Long) session.getAttribute("selectedPlantId");
+
 
         // MyPage 데이터 생성
-        MyPageVo myPageVo = myPageService.findMyPageView(userId);
+        MyPageVo myPageVo = myPageService.findMyPageView(userId, selectedPlantId);
 
         if (myPageVo == null) {
             return "redirect:/login";

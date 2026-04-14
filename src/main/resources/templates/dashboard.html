@@ -129,13 +129,27 @@
                         시간별 발전량 / 일사량 추이
                     </h3>
                     <div class="flex-1 chart-container flex items-center justify-center min-h-0">
-                        <canvas id="solarDashboardChart" th:if="${summary != null}"></canvas>
-                        <div th:if="${summary == null}" class="text-center">
-                            <div class="text-5xl mb-4 opacity-20">📊</div>
-                            <p class="text-gray-400 font-bold italic uppercase">표시할 차트 데이터가 없습니다.</p>
-                            <p class="text-[10px] text-gray-300 uppercase tracking-widest mt-2">
-                                Waiting for real-time solar data...
+                        <canvas id="solarDashboardChart"
+                                th:if="${summary != null and summary.chartLabels != null and !#lists.isEmpty(summary.chartLabels)}"></canvas>
+
+                        <div th:if="${summary == null or summary.chartLabels == null or #lists.isEmpty(summary.chartLabels)}"
+                             class="w-full h-full flex flex-col items-center justify-center text-center bg-gray-50 rounded-[30px] border border-dashed border-gray-200">
+
+                            <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-5 shadow-inner">
+                                <span class="text-3xl opacity-50">📡</span>
+                            </div>
+
+                            <p class="text-gray-500 font-black italic uppercase tracking-tight text-base">
+                                현재 수집된 차트 데이터가 없습니다.
                             </p>
+
+                            <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest mt-3">
+                                일사량 데이터가 수집되면 발전량 차트와 함께 표시됩니다.
+                            </p>
+
+                            <div class="mt-5 px-4 py-2 rounded-full bg-white border border-gray-200 text-[10px] font-black text-gray-400 uppercase tracking-widest shadow-sm">
+                                Waiting for irradiance data
+                            </div>
                         </div>
                     </div>
                 </div>
