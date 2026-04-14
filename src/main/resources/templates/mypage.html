@@ -14,10 +14,13 @@
         hasPanels=${panels != null and !#maps.isEmpty(panels)}
      ">
 
-    <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 space-y-12 min-h-[82vh] flex flex-col">
+    <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 space-y-8 min-h-[82vh] flex flex-col">
+        <!-- 헤더 -->
         <div class="px-2">
             <h2 class="text-3xl font-black text-gray-800 tracking-tighter italic uppercase">마이페이지</h2>
-            <p class="text-sm text-gray-400 font-bold mt-1 tracking-tight">회원 정보 및 등록된 발전 설비 자산을 관리합니다.</p>
+            <p class="text-sm text-gray-400 font-bold mt-1 tracking-tight">
+                회원 정보 및 등록된 발전 설비 자산을 관리합니다.
+            </p>
 
             <div th:if="${passwordError}"
                  class="mt-4 rounded-2xl bg-red-50 border border-red-200 px-5 py-4 text-red-600 font-bold">
@@ -28,13 +31,14 @@
                  class="mt-4 rounded-2xl bg-green-50 border border-green-200 px-5 py-4 text-green-600 font-bold">
                 <span th:text="${passwordSuccess}"></span>
             </div>
-
         </div>
 
-        <section class="mt-4">
+        <!-- 계정 정보 카드 -->
+        <section class="bg-white rounded-[40px] border border-gray-100 shadow-sm p-8 hover:shadow-md transition-all">
             <div class="flex justify-between items-end mb-8 px-1">
                 <h2 class="text-xl font-black text-gray-800 tracking-tighter italic uppercase flex items-center">
-                    <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>계정 정보
+                    <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
+                    계정 정보
                 </h2>
                 <button type="button"
                         onclick="openModal('passwordModal')"
@@ -43,7 +47,7 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                 <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 relative shadow-sm transition-all hover:bg-white">
                     <span class="text-[10px] text-gray-400 absolute top-4 left-6 font-black uppercase tracking-widest">사용자</span>
                     <input type="text"
@@ -78,9 +82,13 @@
             </div>
         </section>
 
-        <section class="border-t border-gray-50 pt-12">
+        <!-- 발전소 카드 -->
+        <section class="bg-white rounded-[40px] border border-gray-100 shadow-sm p-8 hover:shadow-md transition-all">
             <div class="flex justify-between items-center mb-6 px-1 italic uppercase">
-                <h2 class="text-xl font-black text-gray-800">01. 발전소</h2>
+                <h2 class="text-xl font-black text-gray-800 flex items-center">
+                    <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
+                    발전소
+                </h2>
                 <button type="button"
                         onclick="openModal('plantModal')"
                         class="bg-gray-900 text-white px-6 py-3 rounded-2xl text-[11px] font-black shadow-lg hover:bg-black transition-all">
@@ -89,7 +97,7 @@
             </div>
 
             <div th:if="${hasPlant}" class="grid grid-cols-1 gap-4">
-                <div class="bg-white border border-gray-100 p-8 rounded-[35px] shadow-sm flex justify-between items-center hover:bg-gray-50/50 transition-all">
+                <div class="bg-gray-50 border border-gray-100 p-8 rounded-[28px] shadow-sm flex flex-col md:flex-row md:justify-between md:items-center gap-3 hover:bg-white transition-all">
                     <span class="font-black text-gray-800 text-lg italic uppercase"
                           th:text="${plant.name != null ? plant.name : '발전소 이름'}">발전소 이름</span>
                     <span class="text-sm text-gray-400 font-bold italic"
@@ -98,16 +106,23 @@
             </div>
 
             <div th:if="${!hasPlant}"
-                 class="bg-gray-50 rounded-[40px] border border-dashed border-gray-200 min-h-[150px] flex items-center justify-center">
-                <p class="text-gray-400 font-black italic uppercase tracking-tighter">등록된 발전소 정보가 없습니다.</p>
+                 class="bg-gray-50 rounded-[28px] border border-dashed border-gray-200 min-h-[160px] flex items-center justify-center">
+                <p class="text-gray-400 font-black italic uppercase tracking-tighter">
+                    등록된 발전소 정보가 없습니다.
+                </p>
             </div>
         </section>
 
-        <div class="grid grid-cols-2 gap-10">
+        <!-- 인버터 / 패널 카드 -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <!-- 인버터 카드 -->
             <section th:classappend="${!hasPlant} ? 'opacity-40 pointer-events-none' : ''"
-                     class="border-t border-gray-50 pt-12 transition-all duration-300">
+                     class="bg-white rounded-[40px] border border-gray-100 shadow-sm p-8 transition-all duration-300 hover:shadow-md">
                 <div class="flex justify-between items-center mb-6 px-1 italic uppercase font-black text-gray-800">
-                    <h2 class="text-xl">02. 인버터</h2>
+                    <h2 class="text-xl flex items-center">
+                        <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
+                        인버터
+                    </h2>
                     <button type="button"
                             th:disabled="${!hasPlant}"
                             onclick="openModal('inverterModal')"
@@ -117,28 +132,35 @@
                 </div>
 
                 <div th:if="${hasInverters}" class="space-y-3">
-                    <!-- 인버터별 버튼 -->
                     <button type="button"
                             th:each="inv : ${inverters}"
                             th:attr="data-inverter-id=${inv.id}"
                             th:onclick="|showPanels(${inv.id}, this)|"
-                            class="panel-filter-btn w-full p-5 bg-white border border-gray-100 rounded-2xl flex justify-between items-center hover:border-blue-300 transition-all">
+                            class="panel-filter-btn w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl flex justify-between items-center hover:border-blue-300 hover:bg-white transition-all">
                         <span class="font-[900] text-gray-700 uppercase italic"
                               th:text="${inv.name != null ? inv.name : '인버터'}">인버터 명칭</span>
                     </button>
                 </div>
 
                 <div th:if="${!hasPlant or !hasInverters}"
-                     class="bg-gray-50 rounded-[35px] border border-dashed border-gray-200 min-h-[200px] flex flex-col items-center justify-center">
-                    <p th:if="${!hasPlant}" class="text-red-400 font-black italic uppercase tracking-tighter mb-2">발전소를 먼저 등록해주세요</p>
-                    <p th:unless="${!hasPlant}" class="text-gray-300 font-black italic uppercase tracking-tighter">인버터 내역 없음</p>
+                     class="bg-gray-50 rounded-[28px] border border-dashed border-gray-200 min-h-[220px] flex flex-col items-center justify-center">
+                    <p th:if="${!hasPlant}" class="text-red-400 font-black italic uppercase tracking-tighter mb-2">
+                        발전소를 먼저 등록해주세요
+                    </p>
+                    <p th:unless="${!hasPlant}" class="text-gray-300 font-black italic uppercase tracking-tighter">
+                        인버터 내역 없음
+                    </p>
                 </div>
             </section>
 
+            <!-- 패널 카드 -->
             <section th:classappend="${!hasPlant} ? 'opacity-40 pointer-events-none' : ''"
-                     class="border-t border-gray-50 pt-12 transition-all duration-300">
+                     class="bg-white rounded-[40px] border border-gray-100 shadow-sm p-8 transition-all duration-300 hover:shadow-md">
                 <div class="flex justify-between items-center mb-6 px-1 italic uppercase font-black text-gray-800">
-                    <h2 class="text-xl">03. 패널</h2>
+                    <h2 class="text-xl flex items-center">
+                        <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
+                        패널
+                    </h2>
                     <button type="button"
                             th:disabled="${!hasPlant}"
                             onclick="openModal('panelModal')"
@@ -152,17 +174,21 @@
                          th:id="|panel-group-${panelEntry.key}|"
                          class="panel-group hidden">
                         <div th:if="${panelEntry.value != null and !#lists.isEmpty(panelEntry.value)}"
-                             class="p-5 bg-white border border-gray-100 rounded-2xl flex justify-between items-center hover:border-yellow-300 transition-all mb-3">
-            <span class="font-[900] text-gray-700 uppercase italic"
-                  th:text="${panelEntry.value[0].name != null ? panelEntry.value[0].name : '패널'}">패널 명칭</span>
+                             class="p-5 bg-gray-50 border border-gray-100 rounded-2xl flex justify-between items-center hover:border-yellow-300 hover:bg-white transition-all mb-3">
+                            <span class="font-[900] text-gray-700 uppercase italic"
+                                  th:text="${panelEntry.value[0].name != null ? panelEntry.value[0].name : '패널'}">패널 명칭</span>
                         </div>
                     </div>
                 </div>
 
                 <div th:if="${!hasPlant or !hasPanels}"
-                     class="bg-gray-50 rounded-[35px] border border-dashed border-gray-200 min-h-[200px] flex flex-col items-center justify-center">
-                    <p th:if="${!hasPlant}" class="text-red-400 font-black italic uppercase tracking-tighter mb-2">발전소를 먼저 등록해주세요</p>
-                    <p th:unless="${!hasPlant}" class="text-gray-300 font-black italic uppercase tracking-tighter">패널 내역 없음</p>
+                     class="bg-gray-50 rounded-[28px] border border-dashed border-gray-200 min-h-[220px] flex flex-col items-center justify-center">
+                    <p th:if="${!hasPlant}" class="text-red-400 font-black italic uppercase tracking-tighter mb-2">
+                        발전소를 먼저 등록해주세요
+                    </p>
+                    <p th:unless="${!hasPlant}" class="text-gray-300 font-black italic uppercase tracking-tighter">
+                        패널 내역 없음
+                    </p>
                 </div>
             </section>
         </div>
@@ -183,18 +209,21 @@
 
             document.querySelectorAll('.panel-filter-btn').forEach(btn => {
                 btn.classList.remove('border-yellow-300', 'bg-yellow-50');
-                btn.classList.add('border-gray-100', 'bg-white');
+                btn.classList.add('border-gray-100', 'bg-gray-50');
             });
 
             if (clickedButton) {
-                clickedButton.classList.remove('border-gray-100', 'bg-white');
+                clickedButton.classList.remove('border-gray-100', 'bg-gray-50');
                 clickedButton.classList.add('border-yellow-300', 'bg-yellow-50');
             }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             const defaultButton = document.querySelector('.panel-filter-btn');
-            showPanels(0, defaultButton);
+            if (defaultButton) {
+                const firstId = defaultButton.getAttribute('data-inverter-id');
+                showPanels(firstId, defaultButton);
+            }
         });
     </script>
 </th:block>
