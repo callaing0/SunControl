@@ -34,7 +34,7 @@ public class AlertProcessService {
             }
         });
     }
-
+    
     public int getStatusCode(Long id) {
         return 0;
     }
