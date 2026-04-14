@@ -25,17 +25,17 @@ public class AlertProcessService {
      * 버튼 안 눌러도 알림을 보내고 싶을 때 '다른 파일'에서 이 메서드를 호출하면 됩니다.
      */
     public void sendAutomaticAlert(String message) {
+        // 1. emitters가 비어있는지 로그 확인
         if (NotificationController.emitters.isEmpty()) {
-            System.out.println(">>> [SSE] 접속 중인 브라우저가 없습니다.");
+            System.out.println(">>> 접속 중인 클라이언트가 없음");
             return;
         }
 
         NotificationController.emitters.forEach((key, emitter) -> {
             try {
                 emitter.send(SseEmitter.event()
-                        .name("alertUpdate") // HTML의 addEventListener 이름
+                        .name("alertUpdate") // 2. 이 이름이 HTML의 addEventListener와 같은지 확인
                         .data(message));
-                System.out.println(">>> [SSE] 실시간 알림 자동 발송 성공!");
             } catch (Exception e) {
                 NotificationController.emitters.remove(key);
             }
