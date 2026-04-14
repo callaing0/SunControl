@@ -36,10 +36,17 @@ public class InverterInfoVo {
     }
 
     public BigDecimal getPerformanceRate() {
+        if (currentPower == null || capacity == null || capacity.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
         return currentPower.divide(capacity, 3, RoundingMode.HALF_EVEN);
     }
 
     public String getName() {
         return serial;
+    }
+
+    public BigDecimal getPerformancePercent() {
+        return getPerformanceRate().movePointRight(2);
     }
 }
