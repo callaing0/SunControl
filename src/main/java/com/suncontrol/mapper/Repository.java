@@ -12,17 +12,14 @@ import java.util.List;
 public interface Repository {
     List<AlertResponseDTO> findAll();
 
-    // @Param을 통해 XML의 #{id}와 매칭
     AlertLog findById(@Param("id") Long id);
 
-    // 여러 파라미터가 들어갈 때는 @Param이 필수입니다.
     void updateAlertProcess(
             @Param("id") Long id,
             @Param("status") int status,
             @Param("checkedAt") LocalDateTime checkedAt,
             @Param("resolvedAt") LocalDateTime resolvedAt
     );
-
 
     void insertAlert(AlertSaveRequestDTO dto);
 

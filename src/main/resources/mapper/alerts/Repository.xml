@@ -12,7 +12,15 @@
     </resultMap>
 
     <select id="findAll" resultMap="AlertMap">
-        SELECT * FROM alert_log ORDER BY created_at DESC
+        SELECT
+            id,
+            inverter_id,
+            status,
+            created_at,
+            checked_at,
+            resolved_at
+        FROM alert_log
+        ORDER BY created_at DESC
     </select>
 
     <select id="findById" resultType="com.suncontrol.core.entity.log.AlertLog">
@@ -23,8 +31,8 @@
         UPDATE alert_log
         SET
             status = #{status},
-            checked_at = #{checkedAt},
-            resolved_at = #{resolvedAt}
+            checked_at = #{checkedAt, jdbcType=TIMESTAMP},
+            resolved_at = #{resolvedAt, jdbcType=TIMESTAMP}
         WHERE id = #{id}
     </update>
 </mapper>
