@@ -2,6 +2,7 @@ package com.suncontrol.core.entity.report;
 
 import com.suncontrol.core.dto.report.DailyReportDto;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class DailyReport {
     private Long id;
     private Long inverterId;

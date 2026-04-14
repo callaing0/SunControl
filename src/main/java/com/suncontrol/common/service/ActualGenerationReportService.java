@@ -184,7 +184,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
         List<DailyReportDto> resultList = new ArrayList<>();
         LocalDate current = startDate;
 
-        while(!current.isAfter(endDate)) {
+        while(current.isBefore(endDate)) {
             Map<Long, List<HourlyReportDto>> sourceInnerMap = hourlyReportMap.getOrDefault(current, Collections.emptyMap());
             Map<Long, DailyReportDto> previousInnerMap = previousMap.getOrDefault(current, Collections.emptyMap());
             Map<District, DailyWeatherDto> dailyWeatherInnerMap = weatherMap.getOrDefault(current, Collections.emptyMap());
@@ -247,7 +247,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                 .isBefore(LocalTime.of(8,0));
         LocalDateTime nowPlusDayOffset =
                 defaultStartTime.plusDays(
-                        reportDataType.getDayOffset() + (isAfterSunset ? 0 : -1)
+                        reportDataType.getDayOffset() + (isAfterSunset ? 1 : 0)
                 ).toLocalDate().atStartOfDay();
         return TimeTruncater.getOldestTimeOrDefault(
                 List.of(startTime.plusMonths(1), nowPlusDayOffset),
@@ -264,7 +264,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
         return TimeTruncater.getOldestTimeOrDefault(
                 dtoList,
                 defaultStartTime,
-                dto -> dto.getBaseDate().atStartOfDay()
+                dto -> dto.getBaseDate().plusDays(1).atStartOfDay()
         );
     }
 
