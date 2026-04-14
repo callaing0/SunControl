@@ -4,5 +4,37 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.suncontrol.core.repository.report.MonthlyReportRepository">
+    <insert id="saveAll" parameterType="com.suncontrol.core.entity.report.MonthlyReport">
+        INSERT INTO monthly_report (
+        inverter_id, base_month,
+        value_expected, value_actual, value_previous,
+        performance_ratio, expected_ratio, capacity_factor, accum_energy,
+        stopped_time, incident_count
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.inverterId}, #{item.baseMonth},
+            #{item.valueExpected}, #{item.valueActual}, #{item.valuePrevious},
+            #{item.performanceRatio}, #{item.expectedRatio}, #{item.capacityFactor}, #{item.accumEnergy},
+            #{item.stoppedTime}, #{item.incidentCount}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        value_expected = VALUES(value_expected),
+        value_actual = VALUES(value_actual),
+        value_previous = VALUES(value_previous),
+        performance_ratio = VALUES(performance_ratio),
+        expected_ratio = VALUES(expected_ratio),
+        capacity_factor = VALUES(capacity_factor),
+        accum_energy = VALUES(accum_energy),
+        stopped_time = VALUES(stopped_time),
+        incident_count = VALUES(incident_count),
+        updated_at = NOW()
+    </insert>
 
+    <select id="findAllByMonthBetween" resultType="com.suncontrol.core.entity.report.MonthlyReport">
+        SELECT * FROM monthly_report
+        WHERE base_month >= #{start}
+        AND base_month < #{end}
+    </select>
 </mapper>
