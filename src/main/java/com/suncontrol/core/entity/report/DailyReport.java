@@ -1,5 +1,6 @@
 package com.suncontrol.core.entity.report;
 
+import com.suncontrol.core.dto.report.DailyReportDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,4 +27,20 @@ public class DailyReport {
     private Integer dayOffset; /// 0: 당일 1~7:N일전 예측 표시
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public DailyReport(DailyReportDto dto) {
+        this.inverterId = dto.getInverterId();
+        this.baseDate = dto.getBaseDate();
+        this.dayOffset = dto.getDayOffset();
+        this.valueExpected = dto.getValueExpected();
+        this.valueActual = dto.getValueActual();
+        this.valuePrevious = dto.getValuePrevious();
+        this.performanceRatio = dto.getPerformanceRatio();
+        this.expectedRatio = dto.getExpectedRatio();
+        this.capacityFactor = dto.getCapacityFactor();
+        this.accumEnergy = dto.getAccumEnergy();
+        this.weatherCode = dto.getWeatherCode();
+        this.stoppedTime = dto.getStoppedTime();
+        this.incidentCount = dto.getIncidentCount();
+    }
 }
