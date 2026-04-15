@@ -4,6 +4,7 @@ import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.dto.log.DailyWeatherDto;
 import com.suncontrol.core.entity.log.DailyWeather;
 import com.suncontrol.core.repository.log.DailyWeatherRepository;
+import com.suncontrol.core.util.DataCollectorsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,8 @@ public class DailyWeatherService {
     public void saveAll(List<DailyWeatherDto> dtos) {
         /// 들어온 컬렉션 객체를 Entity List로 변환하여 저장
         /// dto 리스트를 entity 리스트로 변환
-        List<DailyWeather> entities = dtos.stream().map(DailyWeather::new).toList();
+        List<DailyWeather> entities =
+                DataCollectorsUtil.toDataList(dtos, DailyWeather::new);
 
         /// entity리스트를 DB에 저장
         int result = repository.saveAll(entities);
@@ -43,7 +45,7 @@ public class DailyWeatherService {
             return Collections.emptyList();
         }
 
-        return entities.stream().map(DailyWeatherDto::new).toList();
+        return DataCollectorsUtil.toDataList(entities, DailyWeatherDto::new);
     }
 
     private List<DailyWeather> findLatestLogs(LocalDate start, LocalDate end) {

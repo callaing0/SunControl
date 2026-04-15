@@ -145,7 +145,8 @@ public class GenerationEnergyService {
                 for(InverterGenerationDto inverter : inverters) {
                     /// 인버터 별 생성 시작시간 정하기
                     LocalDateTime inverterStart =
-                            recentGenerated.getOrDefault(inverter.getId(), start);
+                            recentGenerated.getOrDefault(inverter.getId(), inverter.getCreatedAt());
+                    inverterStart = inverterStart.isBefore(start) ? start : inverterStart;
 
                     // region 6. 세부 로직 호출
                 /// TODO : getResult 파라미터 추가 (날씨정보 묶음 & 인버터 스펙)
@@ -193,7 +194,7 @@ public class GenerationEnergyService {
     private GenerationResultSet getResult
             (LocalDateTime start, LocalDateTime end, InverterGenerationDto inv,
              WeatherContext context, int termSecond) {
-        log.debug("{} 인버터 {}부터 {}까지의 기록생성", inv.getId(), start, end);
+        log.info("{} 인버터 {}부터 {}까지의 기록생성", inv.getId(), start, end);
         List<GenerationResultDto> resultList = new ArrayList<>();
         LocalDateTime current = start;
 
@@ -241,7 +242,7 @@ public class GenerationEnergyService {
             resultList.add(result);
 
             current = TimeTruncater.truncateToNextTerm
-                    (current.plusHours(1), termSecond);
+                    (current, termSecond);
         }
         /// 최종 누적발전량 업데이트
         inv.setLastAccumEnergy(lastAccumEnergy);

@@ -22,7 +22,7 @@ public class HourlyReportService {
     @Transactional
     public void saveAll(List<HourlyReportDto> dtoList) {
         if(dtoList == null || dtoList.isEmpty()) {
-            log.warn("no reports found");
+            log.warn("no hourly reports found");
             return;
         }
 

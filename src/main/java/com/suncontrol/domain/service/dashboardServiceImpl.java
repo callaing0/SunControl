@@ -38,12 +38,11 @@ public class dashboardServiceImpl implements dashboardService {
 
         Long targetPlantId = plant.getPlantId();
 
-        DashboardRealtimeDto realtime = dashboardRepository.selectPlantRealtime(targetPlantId);
-        DashboardSunTimeDto sunTime = dashboardRepository.selectTodaySunTime(plant.getDistrictCode());
-        BigDecimal temperature = dashboardRepository.selectLatestTemperature(plant.getDistrictCode());
-        BigDecimal insolation = dashboardRepository.selectTodayInsolation(targetPlantId);
-        DashboardGenerationDto generation = dashboardRepository.selectTodayGeneration(targetPlantId);
-        BigDecimal totalGeneration = dashboardRepository.selectTotalGeneration(targetPlantId);
+        // 🔥 인버터 존재 여부 체크
+        List<DashboardInverterDto> inverterList =
+                dashboardRepository.selectInvertersByPlant(memberId, targetPlantId);
+
+        boolean hasInverters = inverterList != null && !inverterList.isEmpty();
 
         dashboardSummaryDto summary = new dashboardSummaryDto();
 
@@ -51,8 +50,38 @@ public class dashboardServiceImpl implements dashboardService {
         summary.setPlantName(plant.getPlantName());
         summary.setLocation(plant.getLocation());
 
-        summary.setCurrentPower(nvl(realtime != null ? realtime.getCurrentPower() : null));
-        summary.setEfficiency(nvl(realtime != null ? realtime.getEfficiency() : null));
+        // 🔥 인버터 없으면 여기서 끝
+        if (!hasInverters) {
+            summary.setCurrentPower(BigDecimal.ZERO);
+            summary.setEfficiency(BigDecimal.ZERO);
+            summary.setDailyAccumulation(BigDecimal.ZERO);
+            summary.setPredGen(BigDecimal.ZERO);
+            summary.setInsolation(BigDecimal.ZERO);
+            summary.setSunTime("--");
+            summary.setWeatherStatus("--");
+
+            summary.setUnitPrice(UNIT_PRICE);
+            summary.setTotalProfit(BigDecimal.ZERO);
+            summary.setCo2Reduction(BigDecimal.ZERO);
+            summary.setTreeCount(0);
+
+            summary.setChartLabels(List.of());
+            summary.setPowerList(List.of());
+            summary.setInsolationList(List.of());
+
+            return summary;
+        }
+
+        DashboardRealtimeDto realtime = dashboardRepository.selectPlantRealtime(targetPlantId);
+        DashboardSunTimeDto sunTime = dashboardRepository.selectTodaySunTime(plant.getDistrictCode());
+        BigDecimal temperature = dashboardRepository.selectLatestTemperature(plant.getDistrictCode());
+        BigDecimal insolation = dashboardRepository.selectTodayInsolation(targetPlantId);
+        DashboardGenerationDto generation = dashboardRepository.selectTodayGeneration(targetPlantId);
+        BigDecimal totalGeneration = dashboardRepository.selectTotalGeneration(targetPlantId);
+
+        summary.setPlantId(targetPlantId);
+        summary.setPlantName(plant.getPlantName());
+        summary.setLocation(plant.getLocation());
 
         summary.setDailyAccumulation(nvl(generation != null ? generation.getDailyAccumulation() : null));
         summary.setPredGen(nvl(generation != null ? generation.getPredGen() : null));
@@ -81,9 +110,30 @@ public class dashboardServiceImpl implements dashboardService {
         List<DashboardHourlyValueDto> powerRows = dashboardRepository.selectHourlyPower(targetPlantId);
         List<DashboardHourlyValueDto> insolationRows = dashboardRepository.selectHourlyInsolation(targetPlantId);
 
-        summary.setChartLabels(buildChartLabels());
-        summary.setPowerList(buildHourlySeries(powerRows, 6, 18));
-        summary.setInsolationList(buildHourlySeries(insolationRows, 6, 18));
+        boolean hasInsolationData = insolationRows != null && !insolationRows.isEmpty();
+
+        int startHour = 6;
+        int endHour = 18;
+
+        // 🔥 출력량 / 효율 제어
+        if (!hasInsolationData) {
+            summary.setCurrentPower(BigDecimal.ZERO);
+            summary.setEfficiency(BigDecimal.ZERO);
+        } else {
+            summary.setCurrentPower(nvl(realtime != null ? realtime.getCurrentPower() : null));
+            summary.setEfficiency(nvl(realtime != null ? realtime.getEfficiency() : null));
+        }
+
+        // 🔥 차트 제어
+        if (!hasInsolationData) {
+            summary.setChartLabels(List.of());
+            summary.setPowerList(List.of());
+            summary.setInsolationList(List.of());
+        } else {
+            summary.setChartLabels(buildChartLabels());
+            summary.setPowerList(buildHourlySeries(powerRows, startHour, endHour));
+            summary.setInsolationList(buildHourlySeries(insolationRows, startHour, endHour));
+        }
 
         return summary;
     }
@@ -103,6 +153,7 @@ public class dashboardServiceImpl implements dashboardService {
 
     private List<BigDecimal> buildHourlySeries(List<DashboardHourlyValueDto> source, int startHour, int endHour) {
         List<BigDecimal> result = new ArrayList<>();
+        int currentHour = java.time.LocalTime.now().getHour();
 
         for (int hour = startHour; hour <= endHour; hour++) {
             result.add(null);
@@ -118,7 +169,13 @@ public class dashboardServiceImpl implements dashboardService {
             }
 
             int hour = row.getHour();
+
             if (hour < startHour || hour > endHour) {
+                continue;
+            }
+
+            // 현재 시각 이후 데이터는 표시하지 않음
+            if (hour > currentHour) {
                 continue;
             }
 
