@@ -2,6 +2,7 @@ package com.suncontrol.common.service;
 
 import com.suncontrol.core.constant.util.ReportDataType;
 import com.suncontrol.core.constant.util.StaticValues;
+import com.suncontrol.core.dto.component.InverterMeta;
 import com.suncontrol.core.dto.log.GenerationLogDto;
 import com.suncontrol.core.dto.report.*;
 import com.suncontrol.core.service.asset.PlantService;
@@ -9,6 +10,7 @@ import com.suncontrol.core.service.asset.InverterService;
 import com.suncontrol.core.service.log.DailyWeatherService;
 import com.suncontrol.core.service.log.GenerationLogService;
 import com.suncontrol.core.service.report.*;
+import com.suncontrol.core.util.DataCollectorsUtil;
 import com.suncontrol.core.util.TimeTruncater;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -57,37 +59,26 @@ public abstract class AbstractGenerationReportService {
             log.error("{} : error with daily reports", e.getMessage());
             throw e;
         }
-//
-//        /// 일간 통계 구하기
-//        Map<Long, List<DailyReportDto>> dailyReports = dailyReport(hourlyReports, reportDataType);
-//        try {
-//            //TODO : 맵을 평탄화 해서 보내줄 것임
-////            dailyReportService.saveAll(dailyReports);
-//        } catch (Exception e){
-//            log.error("{} : error with daily reports", e.getMessage());
-//        }
-//
-//        /// 월간 통계 구하기
-//        Map<Long, List<MonthlyReportDto>> monthlyReports = monthlyReport(dailyReports);
-//        try {
-//            //TODO : 맵을 평탄화 해서 보내줄 것임
-////            monthlyReportService.saveAll(monthlyReports);
-//        } catch (Exception e){
-//            log.error("{} : error with monthly reports", e.getMessage());
-//        }
+
+        try {
+            monthlyProcess();
+        } catch (Exception e){
+            log.error("{} : error with monthly reports", e.getMessage());
+            throw e;
+        }
     }
 
     protected abstract Map<LocalDateTime, Map<Long, List<GenerationLogDto>>> getRawSource(LocalDateTime start, LocalDateTime end);
 
     protected abstract Map<LocalDate, Map<Long, List<HourlyReportDto>>> getHourlySource(LocalDateTime start, LocalDateTime end, int dayOffset);
 
-    protected abstract Map<Long, List<DailyReportDto>> getDailySource(LocalDate start, LocalDate end);
+    protected abstract Map<String, Map<Long, List<DailyReportDto>>> getDailySource(LocalDate start, LocalDate end);
 
     protected abstract List<HourlyReportDto> hourlyReport(LocalDateTime start, LocalDateTime end, ReportDataType reportDataType);
 
     protected abstract List<DailyReportDto> dailyReport(LocalDateTime start, LocalDateTime end, ReportDataType reportDataType);
 
-    protected abstract List<MonthlyReportDto> monthlyReport(LocalDateTime start, LocalDateTime end, ReportDataType reportDataType);
+    protected abstract List<MonthlyReportDto> monthlyReport(LocalDate start, LocalDate end);
 
     private void hourlyProcess(ReportDataType reportDataType) {
         /// 시작시간, 끝 시간을 구하기 위해 "마지막 생성 시간 중 가장 오래된 기록 가져오기"
@@ -120,11 +111,31 @@ public abstract class AbstractGenerationReportService {
         dailyReportService.saveAll(dailyReportDtoList);
     }
 
+    protected abstract LocalDate getStartDateForMonthly(LocalDate defaultStartDate);
+
+    protected abstract LocalDate getEndDateForMonthly(LocalDate defaultStartDate, LocalDate startDate);
+
     protected abstract LocalDateTime getEndTimeForDaily(LocalDateTime startTime, LocalDateTime defaultStartTime, ReportDataType reportDataType);
 
     protected abstract LocalDateTime getStartTimeForDaily(LocalDateTime defaultStartTime, ReportDataType reportDataType);
 
-    private void monthlyProcess(List<MonthlyReportDto> monthlyReportDtoList) {
+    private void monthlyProcess() {
+        LocalDate baseStartDate = LocalDate.now().withDayOfMonth(1);
+        LocalDate baseEndDate = LocalDate.now();
+
+        LocalDate startDate = getStartDateForMonthly(baseStartDate);
+        LocalDate endDate = getEndDateForMonthly(baseEndDate, startDate);
+
+        String startMonth = TimeTruncater.getBaseMonth(startDate);
+        String endMonth = TimeTruncater.getBaseMonth(endDate);
+        log.info("{} 부터 {} 까지 월간통계생성", startDate, endDate);
+        if(startMonth.equals(endMonth)) {
+            log.warn("월말 결산은 매 월 1일에만 진행함");
+            return;
+        }
+
+        List<MonthlyReportDto> monthlyReportDtoList = monthlyReport(startDate, endDate);
+
         monthlyReportService.saveAll(monthlyReportDtoList);
     }
 
@@ -132,4 +143,11 @@ public abstract class AbstractGenerationReportService {
             (LocalDateTime defaultTime, ReportDataType reportDataType);
     protected abstract LocalDateTime getEndTimeForHourly
             (LocalDateTime start, ReportDataType reportDataType);
+
+    protected List<InverterMeta> getInverterList() {
+        return DataCollectorsUtil.toDataList(
+                inverterService.findAllActive(),
+                InverterMeta::new
+        );
+    }
 }
