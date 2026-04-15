@@ -12,7 +12,15 @@
                 <p class="text-sm text-gray-400 font-bold mt-1 tracking-tight">실시간 장애 추적 시스템</p>
             </div>
 
-            <button onclick="testPush()" class="bg-red-500 text-white px-6 py-2 rounded-full font-black text-xs hover:bg-black transition-all shadow-lg">
+            <button th:if="${not #lists.isEmpty(alerts)}"
+                    th:onclick="|testPush(${alerts[0].status})|"
+                    class="bg-red-500 text-white px-6 py-2 rounded-full font-black text-xs hover:bg-black transition-all shadow-lg">
+                🚨 즉시 알림 테스트
+            </button>
+
+            <button th:if="${#lists.isEmpty(alerts)}"
+                    onclick="testPush(0)"
+                    class="bg-red-500 text-white px-6 py-2 rounded-full font-black text-xs hover:bg-black transition-all shadow-lg">
                 🚨 즉시 알림 테스트
             </button>
 
@@ -25,28 +33,34 @@
 
         <div class="rounded-[35px] border border-gray-100 overflow-hidden flex flex-col flex-1 bg-white">
             <div class="bg-gray-900 text-white flex text-[13px] font-black py-6 px-12 items-center uppercase tracking-tighter">
-                <div class="w-32 text-center">Log ID</div>
+                <div class="w-24 text-center">LOG ID</div>
+                <div class="w-32 text-center border-l border-gray-700">INVERTER ID</div>
                 <div class="flex-1 text-center border-l border-gray-700">장애 감지 시간</div>
                 <div class="flex-1 text-center border-l border-gray-700">조치 완료 시간</div>
                 <div class="w-40 text-center border-l border-gray-700">위치</div>
-                <div class="w-32 text-center border-l border-gray-700">상태</div>
+                <div class="w-24 text-center border-l border-gray-700">상태</div>
             </div>
 
             <div class="flex-1 flex flex-col relative divide-y divide-gray-50 overflow-y-auto custom-scroll">
                 <th:block th:if="${alerts != null and !#lists.isEmpty(alerts)}">
                     <div th:each="alert : ${alerts}" class="flex py-8 px-12 text-center items-center text-xl font-black text-gray-700 hover:bg-gray-50">
-                        <div class="w-32 text-base font-bold text-gray-400" th:text="${alert.id}">L-0000</div>
-                        <div class="flex-1 text-base text-gray-800" th:text="${alert.createdAt != null ? #temporals.format(alert.createdAt, 'yyyy-MM-dd HH:mm:ss') : '--'}"></div>
-                        <div class="flex-1 text-base text-gray-400" th:text="${alert.resolvedAt != null ? #temporals.format(alert.resolvedAt, 'yyyy-MM-dd HH:mm:ss') : '진행 중...'}"></div>
-                        <div class="w-40 text-sm font-bold text-gray-600 uppercase" th:text="${alert.location}"></div>
-                        <div class="w-32">
+                        <div class="w-24 text-base font-bold text-gray-400" th:text="${alert.id}">1</div>
+                        <div class="w-32 text-base font-bold text-blue-600" th:text="${alert.getInverterNumber()}">260401</div>
+                        <div class="flex-1 text-base text-gray-800"
+                             th:text="${alert.createdAt != null ? #temporals.format(alert.createdAt, 'yyyy-MM-dd HH:mm:ss') : '--'}"></div>
+                        <div class="flex-1 text-base text-gray-400"
+                             th:text="${alert.resolvedAt != null ? #temporals.format(alert.resolvedAt, 'yyyy-MM-dd HH:mm:ss') : '진행 중...'}"></div>
+                        <div class="w-40 text-sm font-bold text-gray-600 uppercase"
+                             th:text="${alert.location != null ? alert.location : '-'}"></div>
+                        <div class="w-24">
                             <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border"
-                                  th:classappend="${alert.status == 0 or alert.statusDescription == '장애' ? 'bg-red-50 text-red-500 border-red-100' : 'bg-green-50 text-green-500 border-green-100'}"
-                                  th:text="${alert.statusDescription}"></span>
+                                  th:classappend="${alert.status == 0 ? 'bg-red-50 text-red-500 border-red-100' : 'bg-green-50 text-green-500 border-green-100'}"
+                                  th:text="${alert.status == 0 ? '대기' : '조치 완료'}">대기</span>
                         </div>
                     </div>
                 </th:block>
-                <div th:if="${alerts == null or #lists.isEmpty(alerts)}" class="flex-1 flex items-center justify-center text-gray-300 font-bold italic">
+
+                <div th:if="${alerts == null or #lists.isEmpty(alerts)}" class="flex-1 flex items-center justify-center text-gray-300 font-bold italic text-3xl">
                     NO ALARM LOGS DETECTED
                 </div>
             </div>
@@ -56,46 +70,66 @@
 
 <th:block layout:fragment="script">
     <script th:inline="javascript">
-        // SSE 구독 시작
-        const eventSource = new EventSource('/api/notifications/subscribe');
+        /**
+         * ✅ 테스트 푸시 완벽 차단 로직
+         */
+        window.testPush = function(currentStatus) {
+            console.log("현재 감지된 상태값:", currentStatus);
 
-        eventSource.addEventListener('alertUpdate', function(event) {
-            showEmergencyToast(event.data);
-        });
+            // 상태가 1(조치 완료)이면 절대 알림을 띄우지 않고 함수 종료
+            if (Number(currentStatus) === 1) {
+                console.warn("차단: 이미 조치 완료된 상태입니다.");
+                return;
+            }
 
-        // ✅ 알림 테스트 함수
-        function testPush() {
-            console.log("알림 테스트를 시작합니다.");
-            // 실제 동작 확인을 위해 토스트를 직접 띄워봄
-            showEmergencyToast("시스템 테스트 알림이 정상적으로 작동 중입니다!");
+            // 0(대기)일 때만 실행
+            showEmergencyToast("🚨 [장애발생] 인버터:260401 | 통신이상 감지됨");
+        };
+
+        function connectSSE() {
+            const eventSource = new EventSource('/api/notifications/subscribe');
+
+            eventSource.addEventListener('alertUpdate', function(event) {
+                const msg = event.data;
+                // 메시지에 '조치'나 '완료'가 포함되면 푸시 안 띄움
+                if (!/조치|완료|정상/.test(msg)) {
+                    showEmergencyToast(msg);
+                }
+            });
+
+            eventSource.onerror = function() {
+                eventSource.close();
+                setTimeout(connectSSE, 3000);
+            };
         }
 
-        // ✅ 토스트 알림 표시 함수
+        connectSSE();
+
         function showEmergencyToast(message) {
             const container = document.getElementById('toastContainer');
             if(!container) return;
 
             const toast = document.createElement('div');
-            toast.className = "bg-red-600 text-white p-6 rounded-[30px] shadow-2xl border-4 border-red-800 min-w-[380px] animate-bounce mb-4 cursor-pointer hover:scale-105 transition-transform";
+            toast.className = "bg-red-500 text-white p-6 rounded-[30px] shadow-2xl border-4 border-red-700 min-w-[400px] animate-bounce mb-4 cursor-pointer hover:scale-105 transition-transform";
+
             toast.innerHTML = `
                 <div class="flex items-center gap-5">
-                    <div class="text-5xl">🚨</div>
-                    <div>
-                        <h4 class="text-[15px] font-[900] uppercase italic tracking-tighter">Emergency Alert</h4>
-                        <p class="text-[12px] font-bold mt-2">${message}</p>
+                    <div class="text-4xl">🚨</div>
+                    <div class="flex-1">
+                        <h4 class="text-[14px] font-[900] uppercase italic tracking-tighter text-white opacity-80">Critical Alert</h4>
+                        <p class="text-[13px] font-bold mt-1 text-white break-all leading-relaxed">${message}</p>
+                        <p class="text-[10px] text-white mt-2 font-black uppercase tracking-widest opacity-60 italic text-right">Click to View</p>
                     </div>
-                </div>`;
+                </div>
+            `;
 
-            // 클릭 시 페이지 새로고침하여 최신 로그 확인
             toast.onclick = () => location.reload();
-
             container.appendChild(toast);
 
-            // 6초 후 제거
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-x-full');
                 setTimeout(() => toast.remove(), 500);
-            }, 6000);
+            }, 8000);
         }
     </script>
 </th:block>

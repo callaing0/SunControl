@@ -6,9 +6,12 @@
         SELECT
             id,
             inverter_id AS inverterId,
-            inverter_id AS location,
             status,
-            created_at AS createdAt
+            alert_type AS alertType,
+            severity,
+            message,
+            created_at AS createdAt,
+            resolved_at AS resolvedAt
         FROM alert_log
         ORDER BY created_at DESC
     </select>
