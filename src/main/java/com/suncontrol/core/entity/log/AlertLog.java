@@ -16,4 +16,5 @@ public class AlertLog {
     private LocalDateTime createdAt;
     private LocalDateTime checkedAt;
     private LocalDateTime resolvedAt;
+    private Integer durationSeconds;
 }

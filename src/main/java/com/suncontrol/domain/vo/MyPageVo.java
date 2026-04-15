@@ -1,5 +1,7 @@
 package com.suncontrol.domain.vo;
 
+import com.suncontrol.core.constant.asset.InverterType;
+import com.suncontrol.core.constant.asset.PanelModel;
 import com.suncontrol.core.vo.MemberDetailVo;
 import com.suncontrol.domain.vo.asset.InverterDetailVo;
 import com.suncontrol.domain.vo.asset.PanelVo;
@@ -25,4 +27,8 @@ public class MyPageVo {
 
     // TODO:패널 정보 (추후 사용)
     private Map<Long, List<PanelVo>> panels;
+
+    private List<InverterType> inverterTypes = InverterType.LIST;
+
+    private List<PanelModel> panelModels = PanelModel.LIST;
 }

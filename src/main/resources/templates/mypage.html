@@ -14,6 +14,9 @@
         hasPanels=${panels != null and !#maps.isEmpty(panels)}
      ">
 
+    <div th:replace="~{fragments/modals :: inverterModal}"></div>
+    <div th:replace="~{fragments/modals :: panelModal}"></div>
+
     <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 space-y-8 min-h-[82vh] flex flex-col">
         <!-- 헤더 -->
         <div class="px-2">
@@ -96,12 +99,61 @@
                 </button>
             </div>
 
-            <div th:if="${hasPlant}" class="grid grid-cols-1 gap-4">
-                <div class="bg-gray-50 border border-gray-100 p-8 rounded-[28px] shadow-sm flex flex-col md:flex-row md:justify-between md:items-center gap-3 hover:bg-white transition-all">
-                    <span class="font-black text-gray-800 text-lg italic uppercase"
-                          th:text="${plant.name != null ? plant.name : '발전소 이름'}">발전소 이름</span>
-                    <span class="text-sm text-gray-400 font-bold italic"
-                          th:text="${plant.address != null ? plant.address : '주소 정보 없음'}">주소 정보</span>
+            <div th:if="${hasPlant}" class="space-y-5">
+                <div class="bg-gray-50 border border-gray-100 p-8 rounded-[28px] shadow-sm hover:bg-white transition-all">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+                        <div>
+                            <p class="text-[11px] text-gray-400 font-black uppercase tracking-widest">발전소명</p>
+                            <p class="mt-2 font-black text-gray-800 text-2xl italic uppercase"
+                               th:text="${plant.name != null ? plant.name : '-'}">강남 발전소</p>
+                        </div>
+
+                        <div class="text-right">
+                            <p class="text-[11px] text-gray-400 font-black uppercase tracking-widest">주소</p>
+                            <p class="mt-2 text-sm text-gray-500 font-bold italic"
+                               th:text="${plant.address != null ? plant.address : '-'}">서울 강남</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 shadow-sm hover:bg-white transition-all">
+                        <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">시/도</p>
+                        <p class="mt-3 text-gray-800 font-[900]"
+                           th:text="${plant.province != null ? plant.province.shortDesc : '-'}">서울특별시</p>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 shadow-sm hover:bg-white transition-all">
+                        <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">위도</p>
+                        <p class="mt-3 text-gray-800 font-[900]"
+                           th:text="${plant.latitude != null ? plant.latitude : '-'}">37.500000</p>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 shadow-sm hover:bg-white transition-all">
+                        <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">경도</p>
+                        <p class="mt-3 text-gray-800 font-[900]"
+                           th:text="${plant.longitude != null ? plant.longitude : '-'}">127.00000</p>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 shadow-sm hover:bg-white transition-all">
+                        <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">방위각</p>
+                        <p class="mt-3 text-gray-800 font-[900]"
+                           th:text="${plant.azimuth} + '°'">180°</p>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 shadow-sm hover:bg-white transition-all">
+                        <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">경사각</p>
+                        <p class="mt-3 text-gray-800 font-[900]"
+                           th:text="${plant.tilt} + '°'">30°</p>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 shadow-sm hover:bg-white transition-all">
+                        <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">좌표</p>
+                        <p class="mt-3 text-gray-800 font-[900]"
+                           th:text="${(plant.latitude != null ? plant.latitude : '-') + ', ' + (plant.longitude != null ? plant.longitude : '-')}">
+                            37.500000, 127.00000
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -131,15 +183,57 @@
                     </button>
                 </div>
 
-                <div th:if="${hasInverters}" class="space-y-3">
-                    <button type="button"
-                            th:each="inv : ${inverters}"
+                <div th:if="${hasInverters}" class="overflow-hidden rounded-[28px] border border-gray-100 bg-gray-50">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-100 text-gray-500 uppercase text-[11px]">
+                        <tr>
+                            <th class="px-4 py-3 text-center">S/N</th>
+                            <th class="px-4 py-3 text-center">상태</th>
+                            <th class="px-4 py-3 text-center">출력(kW)</th>
+                            <th class="px-4 py-3 text-center">정격용량(kW)</th>
+                            <th class="px-4 py-3 text-center">설계용량(kW)</th>
+                            <th class="px-4 py-3 text-center">변화효율(%)</th>
+                            <th class="px-4 py-3 text-center">누적발전량(kWh)</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr th:each="inv : ${inverters}"
                             th:attr="data-inverter-id=${inv.id}"
                             th:onclick="|showPanels(${inv.id}, this)|"
-                            class="panel-filter-btn w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl flex justify-between items-center hover:border-blue-300 hover:bg-white transition-all">
-                        <span class="font-[900] text-gray-700 uppercase italic"
-                              th:text="${inv.name != null ? inv.name : '인버터'}">인버터 명칭</span>
-                    </button>
+                            class="panel-filter-row cursor-pointer border-t border-gray-100 hover:bg-white transition-all">
+                            <td class="px-4 py-4 text-center font-black text-gray-700 italic"
+                                th:text="${inv.serial != null ? inv.serial : '-'}">INV-1001</td>
+
+                            <td class="px-4 py-4 text-center font-bold"
+                                th:switch="${inv.status != null ? inv.status.name() : ''}">
+
+                                <span th:case="'INVERTER_NORMAL'">정상</span>
+                                <span th:case="'INVERTER_ERROR'">에러</span>
+                                <span th:case="'INVERTER_INTERNAL_ERROR'">내부 오류</span>
+                                <span th:case="'INVERTER_DELETED'">삭제됨</span>
+                                <span th:case="'INVERTER_END'">종료</span>
+                                <span th:case="*">-</span>
+
+                            </td>
+
+                            <td class="px-4 py-4 text-center font-bold"
+                                th:text="${inv.currentPower != null ? inv.currentPower : 0}">80.00</td>
+
+                            <td class="px-4 py-4 text-center font-bold"
+                                th:text="${inv.ratedCapacity != null ? inv.ratedCapacity : 0}">100.000</td>
+
+                            <td class="px-4 py-4 text-center font-bold"
+                                th:text="${inv.measuredCapacity != null ? inv.measuredCapacity : 0}">95.000</td>
+
+                            <td class="px-4 py-4 text-center font-bold"
+                                th:text="${inv.performancePercent != null ? inv.performancePercent : 0}">84.2</td>
+
+                            <td class="px-4 py-4 text-center font-bold"
+                                th:text="${#numbers.formatDecimal(inv.lastAccumEnergy, 1, 2)}">5000.00</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <div th:if="${!hasPlant or !hasInverters}"
@@ -172,12 +266,42 @@
                 <div th:if="${hasPanels}" class="space-y-3">
                     <div th:each="panelEntry : ${panels}"
                          th:id="|panel-group-${panelEntry.key}|"
-                         class="panel-group hidden">
-                        <div th:if="${panelEntry.value != null and !#lists.isEmpty(panelEntry.value)}"
-                             class="p-5 bg-gray-50 border border-gray-100 rounded-2xl flex justify-between items-center hover:border-yellow-300 hover:bg-white transition-all mb-3">
-                            <span class="font-[900] text-gray-700 uppercase italic"
-                                  th:text="${panelEntry.value[0].name != null ? panelEntry.value[0].name : '패널'}">패널 명칭</span>
-                        </div>
+                         class="panel-group hidden overflow-hidden rounded-[28px] border border-gray-100 bg-gray-50">
+
+                        <table class="w-full text-sm" th:if="${panelEntry.value != null and !#lists.isEmpty(panelEntry.value)}">
+                            <thead class="bg-gray-100 text-gray-500 uppercase text-[11px]">
+                            <tr>
+                                <th class="px-4 py-3 text-center">구분</th>
+                                <th class="px-4 py-3 text-center">모델명</th>
+                                <th class="px-4 py-3 text-center">제조사</th>
+                                <th class="px-4 py-3 text-center">단위출력(W)</th>
+                                <th class="px-4 py-3 text-center">수량</th>
+                                <th class="px-4 py-3 text-center">기댓값(kW)</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr th:each="panel : ${panelEntry.value}"
+                                class="border-t border-gray-100 hover:bg-white transition-all">
+                                <td class="px-4 py-4 text-center font-bold">태양광 패널</td>
+
+                                <td class="px-4 py-4 text-center font-bold"
+                                    th:text="${panel.name != null ? panel.name : '-'}">DUMMY-A</td>
+
+                                <td class="px-4 py-4 text-center font-bold"
+                                    th:text="${panel.manufacturer != null ? panel.manufacturer : '-'}">제조사</td>
+
+                                <td class="px-4 py-4 text-center font-bold"
+                                    th:text="${panel.unitCapacity}">500</td>
+
+                                <td class="px-4 py-4 text-center font-bold"
+                                    th:text="${panel.count}">18</td>
+
+                                <td class="px-4 py-4 text-center font-bold"
+                                    th:text="${#numbers.formatDecimal(panel.expectedCapacityKw, 1, 2)}">9.00</td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -197,7 +321,7 @@
 
 <th:block layout:fragment="script">
     <script>
-        function showPanels(key, clickedButton) {
+        function showPanels(key, clickedRow) {
             document.querySelectorAll('.panel-group').forEach(group => {
                 group.classList.add('hidden');
             });
@@ -207,22 +331,20 @@
                 target.classList.remove('hidden');
             }
 
-            document.querySelectorAll('.panel-filter-btn').forEach(btn => {
-                btn.classList.remove('border-yellow-300', 'bg-yellow-50');
-                btn.classList.add('border-gray-100', 'bg-gray-50');
+            document.querySelectorAll('.panel-filter-row').forEach(row => {
+                row.classList.remove('bg-yellow-50');
             });
 
-            if (clickedButton) {
-                clickedButton.classList.remove('border-gray-100', 'bg-gray-50');
-                clickedButton.classList.add('border-yellow-300', 'bg-yellow-50');
+            if (clickedRow) {
+                clickedRow.classList.add('bg-yellow-50');
             }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const defaultButton = document.querySelector('.panel-filter-btn');
-            if (defaultButton) {
-                const firstId = defaultButton.getAttribute('data-inverter-id');
-                showPanels(firstId, defaultButton);
+            const defaultRow = document.querySelector('.panel-filter-row');
+            if (defaultRow) {
+                const firstId = defaultRow.getAttribute('data-inverter-id');
+                showPanels(firstId, defaultRow);
             }
         });
     </script>

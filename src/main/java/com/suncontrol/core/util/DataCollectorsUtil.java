@@ -7,6 +7,17 @@ import java.util.stream.Stream;
 
 public class DataCollectorsUtil {
 
+    public static <K1, K2, V> Map<K2, Map<K1, V>> transpose(Map<K1, Map<K2, V>> originalMap) {
+        Map<K2, Map<K1, V>> resultMap = new HashMap<>();
+
+        originalMap.forEach((k1, innerMap) ->
+                innerMap.forEach((k2, value) ->
+                        resultMap.computeIfAbsent(k2, k -> new HashMap<>()).put(k1, value)
+                )
+        );
+        return resultMap;
+    }
+
     public static <T> List<T> nullFilteredList(List<T> list) {
         return nullFilteredStream(list.stream()).collect(Collectors.toList());
     }

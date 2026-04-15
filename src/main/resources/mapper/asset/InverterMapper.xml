@@ -26,14 +26,27 @@
         WHERE id = #{id} AND plant_id = #{plantId}
     </update>
     <update id="updateLastAccumAndStatus">
-        <foreach collection="list" item="item" separator=";">
-            UPDATE inverter
-            SET
-            last_accum_energy = #{item.lastAccumEnergy},
-            current_power = #{item.currentPower},
-            status_code = #{item.statusCode},
-            updated_at = NOW()
-            WHERE id = #{item.id}
+        UPDATE inverter
+        SET
+        last_accum_energy = CASE id
+        <foreach collection="list" item="item">
+            WHEN #{item.id} THEN #{item.lastAccumEnergy}
+        </foreach>
+        END,
+        current_power = CASE id
+        <foreach collection="list" item="item">
+            WHEN #{item.id} THEN #{item.currentPower}
+        </foreach>
+        END,
+        status_code = CASE id
+        <foreach collection="list" item="item">
+            WHEN #{item.id} THEN #{item.statusCode}
+        </foreach>
+        END,
+        updated_at = NOW()
+        WHERE id IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item.id}
         </foreach>
     </update>
     <select id = "findAllByPlantId"
