@@ -13,12 +13,12 @@ import java.math.BigDecimal;
 @ToString(callSuper = true)
 public class PlantDetailVo extends PlantInfoVo {
     /// 마이페이지용
-    private String address;
-    private BigDecimal latitude;
-    private BigDecimal longitude;
-    private Province province;
-    private int azimuth;
-    private int tilt;
+    private String address; // 주소
+    private BigDecimal latitude; // 위도
+    private BigDecimal longitude; // 경도
+    private Province province; // 지역
+    private int azimuth; // 방위각
+    private int tilt; // 경사각
 
     public PlantDetailVo(PlantInfoView view) {
         super(view);

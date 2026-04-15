@@ -14,7 +14,17 @@ import java.util.stream.Stream;
 @Getter
 @AllArgsConstructor
 public enum Province {
-    DAEJEON("30", "대전광역시", "대전");
+    DAEJEON("30", "대전광역시", "대전"),
+    SEOUL("11", "서울특별시", "서울"),
+    INCHEON("28", "인천광역시", "인천"),
+    GWANGJU("29", "광주광역시", "광주"),
+    DAEGU("27", "대구광역시", "대구"),
+    ULSAN("31", "울산광역시", "울산"),
+    BUSAN("26", "부산광역시", "부산"),
+    CHUNGBUK("43", "충청북도", "충북"),
+    CHUNGNAM("44", "충청남도", "충남"),
+    GANGWON("42", "강원도", "강원"),
+    JEJU("50", "제주특별자치도", "제주");
 
     private final String code; // 광역 코드
     private final String description; // 광역단체명
