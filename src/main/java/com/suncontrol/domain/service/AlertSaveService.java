@@ -25,7 +25,7 @@ public class AlertSaveService {
     @Transactional
     public void saveAlertData(AlertSaveRequestDTO dto) {
         if (dto.getEfficiency() != null && dto.getEfficiency() < 10.0) {
-            dto.setStatus(AlertStatus.ABNORMAL.getCode());
+            dto.setStatus(AlertStatus.PENDING.getCode());
             dto.setMessage("발전 효율 저하 감지: " + dto.getEfficiency() + "%");
         } else {
             return; // 정상은 저장 안 하거나 따로 처리
@@ -37,7 +37,7 @@ public class AlertSaveService {
 
     @Transactional
     public void changeAlertStatus(Long alertId) {
-        AlertLog alert = repository.findAlertById(alertId);
+        AlertLog alert = repository.findById(alertId);
 
         if (alert == null) {
             throw new IllegalArgumentException("해당 알람이 없습니다. id=" + alertId);
@@ -54,7 +54,7 @@ public class AlertSaveService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        if (next == AlertStatus.CHECKING && alert.getCheckedAt() == null) {
+        if (next == AlertStatus.PROCESSING && alert.getCheckedAt() == null) {
             alert.setCheckedAt(now);
         }
 
@@ -67,6 +67,11 @@ public class AlertSaveService {
             }
         }
 
-        repository.updateAlertStatus(alert);
+        repository.updateAlertProcess(
+                alert.getId(),
+                next.getCode(),
+                alert.getCheckedAt(),
+                alert.getResolvedAt()
+        );
     }
 }
