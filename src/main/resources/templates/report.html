@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorate="~{layout/layout}">
+<div layout:fragment="content">
+<body>
+
+<div class="w-[1560px] px-2 py-2  border border-gray-200 rounded-lg ">
+  <div>
+    <div>
+      <input type="month" value="2026-03">
+      <button class="bg-yellow-400 border border rounded px-6 text-white">조회</button>
+    </div>
+  </div>
+  <div class="w-full text-center  mt-3 flex py-4  justify-between text-[25px]">
+    <div class="border border-gray-200 rounded-xl  h-19  px-8">
+      <div class="p-2">
+        <p>월 누적 발전량</p>
+      </div>
+      <div class="font-bold">
+        <p th:text="${reportDto.valueActual}">5.521Kwh</p>
+      </div>
+    </div>
+
+    <div class="border border-gray-200 rounded-xl h-19  min-w-[200px]">
+      <div class="p-2">
+        <p>전월 대비 증감률</p>
+      </div>
+      <div class="font-bold text-green-700">
+        <p th:text="${reportDto.increaseRate}">+6.3%</p>
+      </div>
+    </div>
+
+
+    <div class="border border-gray-200 rounded-xl h-19 px-8">
+      <div class="p-2">
+        <p>기대 달성도</p>
+      </div>
+      <div class="font-bold">
+        <p th:text="${reportDto.performanceRatio}">88.5%</p>
+      </div>
+    </div>
+
+
+    <div class="border border-gray-200 rounded-xl h-19 px-8">
+      <div class="p-2">
+        <p>장애발생건수</p>
+      </div>
+      <div class="font-bold text-red-600">
+        <p th:text="${reportDto.incidentCount}">3%</p>
+      </div>
+    </div>
+
+
+    <div class="border border-gray-200 rounded-xl  h-19 min-w-[200px]">
+      <div class="p-2">
+        <p>월가동 중지 시간</p>
+      </div>
+      <div class="font-bold text-blue-500">
+        <p th:text="${reportDto.stoppedTime}">2.5h</p>
+      </div>
+    </div>
+  </div>
+  <div class="border min-h-[70vh]">
+    <table class="w-full   border-top[50px] border-gray-300 ">
+      <tr class="bg-gray-100 right-10 text-gray-600 text-[25px]" >
+        <td class="text-center py-2 border-b"><span>날짜</span></td>
+        <td class="text-center border-b"><span>발전량 (kwh)</span></td>
+        <td class="text-center border-b"><span>전월 대비</span></td>
+        <td class="text-center border-b"><span>기대 달성도</span></td>
+        <td class="text-center border-b"><span>장애 발생</span></td>
+      </tr>
+      <tr class="text-[25px]">
+        <td class="text-center py-5"><span>03-19</span></td>
+        <td class="text-center"><span>187.3</span></td>
+        <td class="text-center"><span>+8.2%</span></td>
+        <td class="text-center"><span>89.2%</span></td>
+        <td class="text-center"><span>장애 1건</span></td>
+      </tr>
+      <tr class="py-5 text-[25px]">
+        <td class="text-center py-4"><span>03-18</span></td>
+        <td class="text-center"><span>173.1</span></td>
+        <td class="text-center"><span>-3.1%</span></td>
+        <td class="text-center"><span>82.4%</span></td>
+        <td class="text-center"><span>장애1건</span></td>
+      </tr>
+    </table>
+  </div>
+</div>
+<div class="text-center flex justify-end py-5 ml-[450px]">
+  <button type="button" id="preview" class="border-black-200 bg-gray-100 px-7 rounded bg-yellow-400 text-white text-[25px]">리포트(PDF)다운로드</button>
+</div>
+
+<script>
+let view=document.getElementById("preview")
+view.addEventListener("click",function(){
+  location.href="report/pdfview";
+})
+
+
+
+
+</script>
+</body>
+</div>
+</html>
+
