@@ -17,4 +17,10 @@ public class AlertApiController {
         alertSaveService.saveAlertData(dto);
         return "success";
     }
+
+    @PostMapping("/alert/{id}/status")
+    public String changeAlertStatus(@PathVariable Long id) {
+        alertSaveService.changeAlertStatus(id);
+        return "success";
+    }
 }

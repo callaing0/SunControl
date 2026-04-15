@@ -19,7 +19,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ReportCalcDto {
     private final LocalDateTime baseTime;
-    private final GenerationValuesDto previous;
+    private final BigDecimal previous;
     private final List<GenerationValuesDto> list;
     private final int baseTerm;
     private final LocalDateTime createdAt;
@@ -30,8 +30,7 @@ public class ReportCalcDto {
         // previous는 null 일 수 있으므로 list의 0번 인덱스에서 inverterId를 꺼낸다.
         dto.setInverterId(list.get(0).getInverterId());
         dto.setBaseTime(baseTime);
-        dto.setValuePrevious(previous != null ?
-                previous.getValueActual() : BigDecimal.ZERO);
+        dto.setValuePrevious(previous != null ? previous : BigDecimal.ZERO);
         dto.setAccumEnergy(list.get(list.size() - 1).getAccumEnergy());
 
         return dto;

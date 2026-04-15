@@ -7,6 +7,7 @@ import com.suncontrol.core.dto.component.GenerationValuesDto;
 import com.suncontrol.core.dto.component.StoppedDto;
 import com.suncontrol.core.entity.report.DailyReport;
 import com.suncontrol.core.util.SafeDivider;
+import com.suncontrol.core.util.TimeTruncater;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -91,5 +93,13 @@ public class DailyReportDto {
 
         this.stoppedTime = stoppedDto.getStoppedTime();
         this.incidentCount = stoppedDto.getIncidentCount();
+    }
+
+    public StoppedDto getStoppedDto() {
+        return new StoppedDto(stoppedTime, incidentCount);
+    }
+
+    public String getBaseMonth() {
+        return TimeTruncater.getBaseMonth(baseDate);
     }
 }

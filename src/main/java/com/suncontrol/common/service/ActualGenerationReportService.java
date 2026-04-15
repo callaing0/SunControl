@@ -62,49 +62,51 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
     }
 
     @Override
-    protected Map<Long, List<DailyReportDto>> getDailySource(LocalDate start, LocalDate end) {
-        return Map.of();
+    protected Map<String, Map<Long, List<DailyReportDto>>> getDailySource(LocalDate start, LocalDate end) {
+        return DataCollectorsUtil.groupToNestedListMap(
+                getDailyReportService().findAllByDateBetween(start, end, ReportDataType.ACTUAL_SNAPSHOT.getDayOffset()),
+                DailyReportDto::getBaseMonth,
+                DailyReportDto::getInverterId
+        );
     }
 
     @Override
     protected List<HourlyReportDto> hourlyReport(
             LocalDateTime start, LocalDateTime end, ReportDataType reportDataType) {
         log.info("{}에서 {}까지의 {} 통계생성", start, end, reportDataType.getReportDescription());
-        Map<LocalDateTime, Map<Long, List<GenerationLogDto>>> generationInvMap =
-                getRawSource(start, end);
-        Map<LocalDateTime, Map<Long, HourlyReportDto>> previousMap
+        Map<Long, Map<LocalDateTime, List<GenerationLogDto>>> generationInvMap =
+                DataCollectorsUtil.transpose(getRawSource(start, end));
+        Map<Long, Map<LocalDateTime, HourlyReportDto>> previousMap
                 = DataCollectorsUtil.groupToMap(
                         getHourlyReportService().findAllByBaseTimeBetweenStartAndEnd(
                                 start.minusDays(1), end.minusDays(1), reportDataType.getDayOffset()
                         ),
-                        HourlyReportDto::getBaseTime,
-                        HourlyReportDto::getInverterId
+                        HourlyReportDto::getInverterId,
+                        HourlyReportDto::getBaseTime
         );
         /// 루프를 위한 인버터 리스트
-        List<InverterMeta> inverterList =
-                DataCollectorsUtil.toDataList(
-                        getInverterService().findAllActive(),
-                        InverterMeta::new
-                );
+        List<InverterMeta> inverterList = getInverterList();
 
         List<HourlyReportDto> resultList = new ArrayList<>();
 
-        LocalDateTime currentTime =
-                TimeTruncater.truncateToNextTerm(start, StaticValues.HOUR_SECONDS);
-        // 통계 생성은 인버터별로 '별도처리'를 할 필요가 없다.
-        while(!currentTime.isAfter(end)) {
-            Map<Long, HourlyReportDto> prevInnerMap =
+        for(InverterMeta inverter : inverterList) {
+            Long inverterId = inverter.getInverterId();
+            LocalDateTime currentTime =
+                    TimeTruncater.truncateToNextTerm(start, StaticValues.HOUR_SECONDS);
+            Map<LocalDateTime, HourlyReportDto> prevInnerMap =
                     previousMap.getOrDefault
-                            (currentTime.minusDays(1), Collections.emptyMap());
-            Map<Long, List<GenerationLogDto>> genLogInnverMap =
+                            (inverterId, new HashMap<>());
+            Map<LocalDateTime, List<GenerationLogDto>> genLogInnverMap =
                     generationInvMap.getOrDefault
-                            (currentTime, Collections.emptyMap());
+                            (inverterId, Collections.emptyMap());
             // 상세로직
-            for(InverterMeta inverter : inverterList) {
-                HourlyReportDto previous = prevInnerMap.get(inverter.getInverterId());
-                List<GenerationLogDto> genList = genLogInnverMap.get(inverter.getInverterId());
+            while(!currentTime.isAfter(end)) {
+                HourlyReportDto previous = prevInnerMap.get(currentTime.minusDays(1));
+                List<GenerationLogDto> genList = genLogInnverMap.get(currentTime);
                 if(genList == null || genList.isEmpty()) {
-                    log.warn("{} inverter 의 {} 기록없음", inverter.getInverterId(), currentTime);
+                    log.debug("{} inverter 의 {} 기록없음", inverterId, currentTime);
+                    currentTime = TimeTruncater.truncateToNextTerm
+                            (currentTime, StaticValues.HOUR_SECONDS);
                     continue;
                 }
                 /// 지금의 기록이 "이 인버터의 최초 기록" 인지 판별하는 변수
@@ -114,10 +116,10 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                                 StaticValues.HOUR_SECONDS)
                         .isEqual(currentTime);
 
-                GenerationValuesDto result =
+                GenerationValuesDto resultSet =
                         new ReportCalcDto(
                                 currentTime,
-                                (previous != null) ? previous.getValuesDto() : null,
+                                (previous != null) ? previous.getValueActual() : null,
                                 DataCollectorsUtil.toDataList(
                                         genList,
                                         GenerationLogDto::getValuesDto
@@ -126,18 +128,19 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                                 (isFirst) ? null : inverter.getCreatedAt()
                                 )
                                 .getValues();
-                resultList.add(
-                        new HourlyReportDto(
-                                result,
-                                inverter.getCapacity(),
-                                genList.get(genList.size() - 1).getWeatherCode(),
-                                reportDataType
-                        )
+                HourlyReportDto result = new HourlyReportDto(
+                        resultSet,
+                        inverter.getCapacity(),
+                        genList.get(genList.size() - 1).getWeatherCode(),
+                        reportDataType
                 );
+                resultList.add(result);
+                prevInnerMap.put(currentTime, result);
+                prevInnerMap.remove(currentTime.minusDays(3));
+                currentTime = TimeTruncater.truncateToNextTerm
+                        (currentTime, StaticValues.HOUR_SECONDS);
             }
 
-            currentTime = TimeTruncater.truncateToNextTerm
-                    (currentTime, StaticValues.HOUR_SECONDS);
         }
         return resultList;
     }
@@ -150,22 +153,15 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
         LocalDate endDate = end.toLocalDate();
 
         /// 통계작성용 원천데이터
-        Map<LocalDate, Map<Long, List<HourlyReportDto>>> hourlyReportMap = getHourlySource(start, end, reportDataType.getDayOffset());
+        Map<Long, Map<LocalDate, List<HourlyReportDto>>> hourlyReportMap =
+                DataCollectorsUtil.transpose(getHourlySource(start, end, reportDataType.getDayOffset()));
         /// 비교용 전일 데이터
-        Map<LocalDate, Map<Long, DailyReportDto>> previousMap = DataCollectorsUtil.groupToMap(
-                getDailyReportService().findAllByDateBetween(
-                        startDate.minusDays(1),
-                        endDate.minusDays(1),
-                        reportDataType.getDayOffset()),
-                DailyReportDto::getBaseDate,
+        Map<Long, DailyReportDto> previousMap = DataCollectorsUtil.mapBy(
+                getDailyReportService().findAllLatestByInverter(reportDataType.getDayOffset()),
                 DailyReportDto::getInverterId
         );
         /// 루프를 위한 인버터 리스트
-        List<InverterMeta> inverterList =
-                DataCollectorsUtil.toDataList(
-                        getInverterService().findAllActive(),
-                        InverterMeta::new
-                );
+        List<InverterMeta> inverterList = getInverterList();
         /// 날씨조회를 위한 발전소ID 지역맵
         Map<Long, District> plantDistrictMap =
                 DataCollectorsUtil.mapBy(
@@ -182,19 +178,21 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                 );
 
         List<DailyReportDto> resultList = new ArrayList<>();
-        LocalDate current = startDate;
 
-        while(current.isBefore(endDate)) {
-            Map<Long, List<HourlyReportDto>> sourceInnerMap = hourlyReportMap.getOrDefault(current, Collections.emptyMap());
-            Map<Long, DailyReportDto> previousInnerMap = previousMap.getOrDefault(current, Collections.emptyMap());
-            Map<District, DailyWeatherDto> dailyWeatherInnerMap = weatherMap.getOrDefault(current, Collections.emptyMap());
+        for(InverterMeta inverter : inverterList) {
+            Long inverterId = inverter.getInverterId();
+            Map<LocalDate, List<HourlyReportDto>> sourceInnerMap = hourlyReportMap.getOrDefault(inverterId, Collections.emptyMap());
+            DailyReportDto previous = previousMap.getOrDefault(inverterId, null);
 
-            for(InverterMeta inverter : inverterList) {
-                DailyReportDto previous = previousInnerMap.getOrDefault(inverter.getInverterId(), null);
-                List<HourlyReportDto> sources = sourceInnerMap.getOrDefault(inverter.getInverterId(), Collections.emptyList());
+            LocalDate current = startDate;
+
+            while(current.isBefore(endDate)) {
+                Map<District, DailyWeatherDto> dailyWeatherInnerMap = weatherMap.getOrDefault(current, Collections.emptyMap());
+                List<HourlyReportDto> sources = sourceInnerMap.getOrDefault(current, Collections.emptyList());
 
                 if(sources == null || sources.isEmpty()) {
                     log.warn("{} inverter 의 {} 기록없음", inverter.getInverterId(), current);
+                    current.plusDays(1);
                     continue;
                 }
 
@@ -202,7 +200,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                         new ReportStoppedCalcDto(
                                 current.atStartOfDay(),
                                 (previous != null) ?
-                                        previous.getValuesDto() : null,
+                                        previous.getValueActual() : null,
                                 DataCollectorsUtil.toDataList(
                                         sources,
                                         HourlyReportDto::getValuesDto
@@ -219,26 +217,101 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                         .map(DailyWeatherDto::getWeatherCode)
                         .orElse(Weather.CLEAR_SKY.getWmo());
 
-                resultList.add(
-                        new DailyReportDto(
-                                resultSet.getValues(),
-                                inverter.getCapacity(),
-                                weatherCode,
-                                reportDataType,
-                                resultSet.getStoppedDto()
-                        )
+                DailyReportDto result = new DailyReportDto(
+                        resultSet.getValues(),
+                        inverter.getCapacity(),
+                        weatherCode,
+                        reportDataType,
+                        resultSet.getStoppedDto()
                 );
-            }
+                resultList.add(result);
+                previous = result;
 
-            current = current.plusDays(1);
+                current = current.plusDays(1);
+            }
         }
 
         return resultList;
     }
 
     @Override
-    protected List<MonthlyReportDto> monthlyReport(LocalDateTime start, LocalDateTime end, ReportDataType reportDataType) {
-        return List.of();
+    protected List<MonthlyReportDto> monthlyReport(LocalDate start, LocalDate end) {
+
+        /// 통계 생성용 원천 데이터 불러오기
+        Map<Long, Map<String, List<DailyReportDto>>> dailyReportMap = DataCollectorsUtil.groupToNestedListMap(
+                getDailyReportService().findAllByDateBetween(start, end, ReportDataType.ACTUAL_SNAPSHOT.getDayOffset()),
+                DailyReportDto::getInverterId,
+                DailyReportDto::getBaseMonth
+        );
+        /// 비교용 전월 데이터
+        Map<Long, Map<String, MonthlyReportDto>> previousMap = DataCollectorsUtil.groupToMap(
+                getMonthlyReportService().findAllByMonthBetween(start.minusMonths(1), end.minusMonths(1)),
+                MonthlyReportDto::getInverterId,
+                MonthlyReportDto::getBaseMonth
+        );
+        /// 루프를 위한 인버터 리스트
+        List<InverterMeta> inverterList = getInverterList();
+        /// 결과값 저장하는 리스트
+        List<MonthlyReportDto> resultList = new ArrayList<>();
+
+        for(InverterMeta inverter : inverterList) {
+            Long inverterId = inverter.getInverterId();
+            Map<String, List<DailyReportDto>> dailyInnerMap = dailyReportMap.getOrDefault(inverterId, Collections.emptyMap());
+            Map<String, MonthlyReportDto> prevInnerMap = previousMap.getOrDefault(inverterId, Collections.emptyMap());
+
+            LocalDate current = start;
+            while(current.isBefore(end)) {
+                String currentMonth = TimeTruncater.getBaseMonth(current);
+                String prevMonth = TimeTruncater.getBaseMonth(current.minusMonths(1));
+
+                List<DailyReportDto> dailyList = dailyInnerMap.get(currentMonth);
+                MonthlyReportDto currentReport = prevInnerMap.get(currentMonth);
+
+                if(dailyList == null || dailyList.isEmpty() || currentReport != null) {
+                    continue;
+                }
+                MonthlyReportDto previous = prevInnerMap.get(prevMonth);
+                currentReport = new MonthlyReportDto();
+
+                ReportStoppedCalcDto resultSet = new ReportStoppedCalcDto(
+                        current.atStartOfDay(),
+                        previous != null ? previous.getValueActual() : null,
+                        DataCollectorsUtil.toDataList(
+                                dailyList,
+                                DailyReportDto::getValuesDto
+                        ),
+                        StaticValues.DAY_SECONDS * current.lengthOfMonth(),
+                        previous != null ? null : inverter.getCreatedAt()
+                );
+
+                resultList.add(new MonthlyReportDto(resultSet.getValues(), DataCollectorsUtil.toDataList(dailyList, DailyReportDto::getStoppedDto), inverter.getCapacity()));
+
+                current = current.plusMonths(1);
+            }
+        }
+
+        return resultList;
+    }
+
+    @Override
+    protected LocalDate getStartDateForMonthly(LocalDate defaultStartDate) {
+        /// defaultStartDate 를 항상 매 월 1일로 받도록.
+        List<MonthlyReportDto> dtoList = getMonthlyReportService().findAllLatestByInverter();
+
+        if(dtoList.isEmpty()) {
+            return getFirstInverterTime(defaultStartDate.atStartOfDay()).toLocalDate();
+        }
+
+        return TimeTruncater.getOldestDateOrDefault(
+                dtoList,
+                defaultStartDate,
+                MonthlyReportDto::getBaseDate
+        );
+    }
+
+    @Override
+    protected LocalDate getEndDateForMonthly(LocalDate defaultEndDate, LocalDate startDate) {
+        return TimeTruncater.getOlderDate(startDate.plusMonths(1), defaultEndDate);
     }
 
     @Override
