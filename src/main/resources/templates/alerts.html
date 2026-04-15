@@ -52,9 +52,18 @@
                         <div class="flex-1 text-base text-gray-400 font-medium" th:text="${alert.resolvedAt != null ? #temporals.format(alert.resolvedAt, 'yyyy-MM-dd HH:mm:ss') : '진행 중...'}">--</div>
                         <div class="w-40 text-sm font-bold text-gray-600 uppercase" th:text="${alert.location}">Location</div>
                         <div class="w-32">
-                            <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border"
-                                  th:classappend="${alert.severity >= 3 ? 'bg-red-50 text-red-500 border-red-100' : 'bg-green-50 text-green-500 border-green-100'}"
-                                  th:text="${alert.message}">정상</span>
+                            <button type="button"
+                                    class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border"
+                                    th:attr="data-id=${alert.id}"
+                                    th:classappend="
+                                    ${alert.status == 1} ? 'bg-red-50 text-red-500 border-red-100' :
+                                    (${alert.status == 2} ? 'bg-yellow-50 text-yellow-600 border-yellow-100' :
+                                    'bg-green-50 text-green-500 border-green-100')"
+                                                            th:text="
+                                    ${alert.status == 1} ? '이상 발생' :
+                                    (${alert.status == 2} ? '확인중' : '해결완료')"
+                                    onclick="changeAlertStatus(this)">
+                            </button>
                         </div>
                     </div>
                 </th:block>
@@ -65,5 +74,26 @@
         </div>
     </div>
 </div>
-<th:block layout:fragment="script"></th:block>
+<th:block layout:fragment="script">
+    <script>
+        async function changeAlertStatus(el) {
+            const id = el.dataset.id;
+
+            try {
+                const response = await fetch(`/test/alert/${id}/status`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error('상태 변경 실패');
+                }
+
+                location.reload();
+            } catch (e) {
+                alert('상태 변경 중 오류가 발생했습니다.');
+                console.error(e);
+            }
+        }
+    </script>
+</th:block>
 </html>
