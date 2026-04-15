@@ -6,6 +6,9 @@ import com.suncontrol.core.dto.asset.PanelDto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 @Getter
 @Setter
 public class PanelVo {
@@ -16,6 +19,8 @@ public class PanelVo {
     private PanelModel model;
     private int count;
     private PanelManufacturer manufacturer;
+    // 상수 분리
+    private static final BigDecimal ONE_THOUSAND = BigDecimal.valueOf(1000);
 
     public PanelVo(PanelDto dto) {
         this.inverterId = dto.getInverterId();
@@ -26,5 +31,24 @@ public class PanelVo {
 
     public String getName() {
         return model.getName();
+    }
+
+    public int getUnitCapacity() {
+        return model.getCapacity(); // W
+    }
+
+    // 계산 로직
+    public BigDecimal getExpectedCapacityKw() {
+        return toKw(getTotalCapacityW());
+    }
+
+    // 내부 계산
+    private BigDecimal getTotalCapacityW() {
+        return BigDecimal.valueOf(getUnitCapacity())
+                .multiply(BigDecimal.valueOf(count));
+    }
+
+    private BigDecimal toKw(BigDecimal watt) {
+        return watt.divide(ONE_THOUSAND, 2, RoundingMode.HALF_UP);
     }
 }
