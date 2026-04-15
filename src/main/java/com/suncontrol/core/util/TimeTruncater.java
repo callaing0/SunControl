@@ -46,7 +46,7 @@ public class TimeTruncater {
     }
 
     public static String getBaseMonth(LocalDateTime time) {
-        return getBaseMonth(time.truncatedTo(ChronoUnit.DAYS));
+        return getBaseMonth(time.toLocalDate());
     }
 
     public static <T> LocalDate getOldestDateOrDefault(

@@ -95,6 +95,10 @@ public class DailyReportDto {
         this.incidentCount = stoppedDto.getIncidentCount();
     }
 
+    public StoppedDto getStoppedDto() {
+        return new StoppedDto(stoppedTime, incidentCount);
+    }
+
     public String getBaseMonth() {
         return TimeTruncater.getBaseMonth(baseDate);
     }

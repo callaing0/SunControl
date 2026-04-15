@@ -35,6 +35,17 @@
     <select id="findAllByMonthBetween" resultType="com.suncontrol.core.entity.report.MonthlyReport">
         SELECT * FROM monthly_report
         WHERE base_month >= #{start}
-        AND base_month < #{end}
+        AND base_month <![CDATA[ < ]]> #{end}
+    </select>
+
+
+
+    <select id="findAllLatestByInverter" resultType="com.suncontrol.core.entity.report.MonthlyReport">
+        SELECT * FROM monthly_report r1
+        WHERE r1.base_month = (
+        SELECT MAX(r2.base_month)
+        FROM monthly_report r2
+        WHERE r2.inverter_id = r1.inverter_id
+        )
     </select>
 </mapper>

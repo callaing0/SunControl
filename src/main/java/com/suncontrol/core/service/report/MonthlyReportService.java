@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -31,6 +32,20 @@ public class MonthlyReportService {
         String startMonth = TimeTruncater.getBaseMonth(start);
         String endMonth = TimeTruncater.getBaseMonth(end);
 
-        List<MonthlyReport> entities = repository.findAllByMonthBetween(startMonth, endMonth);
+        return entityToDto(repository.findAllByMonthBetween(startMonth, endMonth));
+    }
+
+    public List<MonthlyReportDto> findAllLatestByInverter() {
+
+        return entityToDto(repository.findAllLatestByInverter());
+    }
+
+    private List<MonthlyReportDto> entityToDto(List<MonthlyReport> entities) {
+        if(entities==null || entities.isEmpty()){
+            log.warn("no monthly report found");
+            return Collections.emptyList();
+        }
+
+        return DataCollectorsUtil.toDataList(entities, MonthlyReportDto::new);
     }
 }

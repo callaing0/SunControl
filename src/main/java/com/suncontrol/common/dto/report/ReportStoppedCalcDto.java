@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 public class ReportStoppedCalcDto extends ReportCalcDto{
 
-    public ReportStoppedCalcDto(LocalDateTime baseTime, GenerationValuesDto previous, List<GenerationValuesDto> list, int baseTerm, LocalDateTime createdAt) {
+    public ReportStoppedCalcDto(LocalDateTime baseTime, BigDecimal previous, List<GenerationValuesDto> list, int baseTerm, LocalDateTime createdAt) {
         super(baseTime, previous, list, baseTerm, createdAt);
     }
 

@@ -59,24 +59,13 @@ public abstract class AbstractGenerationReportService {
             log.error("{} : error with daily reports", e.getMessage());
             throw e;
         }
-//
-//        /// 일간 통계 구하기
-//        Map<Long, List<DailyReportDto>> dailyReports = dailyReport(hourlyReports, reportDataType);
-//        try {
-//            //TODO : 맵을 평탄화 해서 보내줄 것임
-////            dailyReportService.saveAll(dailyReports);
-//        } catch (Exception e){
-//            log.error("{} : error with daily reports", e.getMessage());
-//        }
-//
-//        /// 월간 통계 구하기
-//        Map<Long, List<MonthlyReportDto>> monthlyReports = monthlyReport(dailyReports);
-//        try {
-//            //TODO : 맵을 평탄화 해서 보내줄 것임
-////            monthlyReportService.saveAll(monthlyReports);
-//        } catch (Exception e){
-//            log.error("{} : error with monthly reports", e.getMessage());
-//        }
+
+        try {
+            monthlyProcess();
+        } catch (Exception e){
+            log.error("{} : error with monthly reports", e.getMessage());
+            throw e;
+        }
     }
 
     protected abstract Map<LocalDateTime, Map<Long, List<GenerationLogDto>>> getRawSource(LocalDateTime start, LocalDateTime end);
@@ -139,8 +128,9 @@ public abstract class AbstractGenerationReportService {
 
         String startMonth = TimeTruncater.getBaseMonth(startDate);
         String endMonth = TimeTruncater.getBaseMonth(endDate);
+        log.info("{} 부터 {} 까지 월간통계생성", startDate, endDate);
         if(startMonth.equals(endMonth)) {
-            log.debug("월말 결산은 매 월 1일에만 진행함");
+            log.warn("월말 결산은 매 월 1일에만 진행함");
             return;
         }
 

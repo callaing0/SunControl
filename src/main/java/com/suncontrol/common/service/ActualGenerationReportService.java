@@ -104,7 +104,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                 HourlyReportDto previous = prevInnerMap.get(inverter.getInverterId());
                 List<GenerationLogDto> genList = genLogInnverMap.get(inverter.getInverterId());
                 if(genList == null || genList.isEmpty()) {
-                    log.warn("{} inverter 의 {} 기록없음", inverter.getInverterId(), currentTime);
+                    log.debug("{} inverter 의 {} 기록없음", inverter.getInverterId(), currentTime);
                     continue;
                 }
                 /// 지금의 기록이 "이 인버터의 최초 기록" 인지 판별하는 변수
@@ -117,7 +117,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                 GenerationValuesDto result =
                         new ReportCalcDto(
                                 currentTime,
-                                (previous != null) ? previous.getValuesDto() : null,
+                                (previous != null) ? previous.getValueActual() : null,
                                 DataCollectorsUtil.toDataList(
                                         genList,
                                         GenerationLogDto::getValuesDto
@@ -198,7 +198,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                         new ReportStoppedCalcDto(
                                 current.atStartOfDay(),
                                 (previous != null) ?
-                                        previous.getValuesDto() : null,
+                                        previous.getValueActual() : null,
                                 DataCollectorsUtil.toDataList(
                                         sources,
                                         HourlyReportDto::getValuesDto
@@ -234,34 +234,67 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
 
     @Override
     protected List<MonthlyReportDto> monthlyReport(LocalDate start, LocalDate end) {
-        log.info("{} 부터 {} 까지 월간통계생성", start, end);
 
         /// 통계 생성용 원천 데이터 불러오기
-        Map<String, Map<Long, List<DailyReportDto>>> dailyReportMap = DataCollectorsUtil.groupToNestedListMap(
+        Map<Long, Map<String, List<DailyReportDto>>> dailyReportMap = DataCollectorsUtil.groupToNestedListMap(
                 getDailyReportService().findAllByDateBetween(start, end, ReportDataType.ACTUAL_SNAPSHOT.getDayOffset()),
-                DailyReportDto::getBaseMonth,
-                DailyReportDto::getInverterId
+                DailyReportDto::getInverterId,
+                DailyReportDto::getBaseMonth
         );
         /// 비교용 전월 데이터
-        Map<String, Map<Long, MonthlyReportDto>> previousMap = DataCollectorsUtil.groupToMap(
+        Map<Long, Map<String, MonthlyReportDto>> previousMap = DataCollectorsUtil.groupToMap(
                 getMonthlyReportService().findAllByMonthBetween(start.minusMonths(1), end.minusMonths(1)),
-                MonthlyReportDto::getBaseMonth,
-                MonthlyReportDto::getInverterId
+                MonthlyReportDto::getInverterId,
+                MonthlyReportDto::getBaseMonth
         );
         /// 루프를 위한 인버터 리스트
         List<InverterMeta> inverterList = getInverterList();
+        /// 결과값 저장하는 리스트
+        List<MonthlyReportDto> resultList = new ArrayList<>();
 
         for(InverterMeta inverter : inverterList) {
+            Long inverterId = inverter.getInverterId();
+            Map<String, List<DailyReportDto>> dailyInnerMap = dailyReportMap.getOrDefault(inverterId, Collections.emptyMap());
+            Map<String, MonthlyReportDto> prevInnerMap = previousMap.getOrDefault(inverterId, Collections.emptyMap());
 
+            LocalDate current = start;
+            while(current.isBefore(end)) {
+                String currentMonth = TimeTruncater.getBaseMonth(current);
+                String prevMonth = TimeTruncater.getBaseMonth(current.minusMonths(1));
+
+                List<DailyReportDto> dailyList = dailyInnerMap.get(currentMonth);
+                MonthlyReportDto currentReport = prevInnerMap.get(currentMonth);
+
+                if(dailyList == null || dailyList.isEmpty() || currentReport != null) {
+                    continue;
+                }
+                MonthlyReportDto previous = prevInnerMap.get(prevMonth);
+                currentReport = new MonthlyReportDto();
+
+                ReportStoppedCalcDto resultSet = new ReportStoppedCalcDto(
+                        current.atStartOfDay(),
+                        previous != null ? previous.getValueActual() : null,
+                        DataCollectorsUtil.toDataList(
+                                dailyList,
+                                DailyReportDto::getValuesDto
+                        ),
+                        StaticValues.DAY_SECONDS * current.lengthOfMonth(),
+                        previous != null ? null : inverter.getCreatedAt()
+                );
+
+                resultList.add(new MonthlyReportDto(resultSet.getValues(), DataCollectorsUtil.toDataList(dailyList, DailyReportDto::getStoppedDto), inverter.getCapacity()));
+
+                current = current.plusMonths(1);
+            }
         }
 
-        return List.of();
+        return resultList;
     }
 
     @Override
     protected LocalDate getStartDateForMonthly(LocalDate defaultStartDate) {
         /// defaultStartDate 를 항상 매 월 1일로 받도록.
-        List<DailyReportDto> dtoList = getDailyReportService().findAllLatestByInverter(ReportDataType.ACTUAL_SNAPSHOT.getDayOffset());
+        List<MonthlyReportDto> dtoList = getMonthlyReportService().findAllLatestByInverter();
 
         if(dtoList.isEmpty()) {
             return getFirstInverterTime(defaultStartDate.atStartOfDay()).toLocalDate();
@@ -270,7 +303,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
         return TimeTruncater.getOldestDateOrDefault(
                 dtoList,
                 defaultStartDate,
-                DailyReportDto::getBaseDate
+                MonthlyReportDto::getBaseDate
         );
     }
 
