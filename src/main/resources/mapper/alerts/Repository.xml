@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.suncontrol.mapper.Repository">
-
-    <resultMap id="AlertMap" type="com.suncontrol.domain.dto.AlertResponseDTO">
-        <id property="id" column="alert_id" />
-        <result property="detectTime" column="detect_time" />
-        <result property="location" column="location" />
-        <result property="status" column="message" />
-    </resultMap>
 
     <select id="findAll" resultType="com.suncontrol.domain.dto.AlertResponseDTO">
         SELECT
             id,
             inverter_id AS inverterId,
-            status,           -- 여긴 숫자(Integer)가 들어가야 함!
+            status,
             alert_type AS alertType,
             severity,
-            message,          -- 여기에 'DB연결 테스트'가 들어감!
+            message,
             created_at AS createdAt,
             resolved_at AS resolvedAt
         FROM alert_log
+        ORDER BY created_at DESC
     </select>
 
+<<<<<<< HEAD
+    <select id="findById" resultType="com.suncontrol.core.entity.log.AlertLog">
+        SELECT * FROM alert_log WHERE id = #{id}
+    </select>
+
+    <update id="updateAlertProcess">
+=======
     <select id="findAlertById" parameterType="long" resultType="com.suncontrol.core.entity.log.AlertLog">
         SELECT
             id,
@@ -40,12 +40,17 @@
     </select>
 
     <update id="updateAlertStatus" parameterType="com.suncontrol.core.entity.log.AlertLog">
+>>>>>>> e72f951594a083b65644eebb43878e2fdcb9ee3e
         UPDATE alert_log
         SET
             status = #{status},
             checked_at = #{checkedAt},
+<<<<<<< HEAD
+            resolved_at = #{resolvedAt}
+=======
             resolved_at = #{resolvedAt},
             duration_seconds = #{durationSeconds}
+>>>>>>> e72f951594a083b65644eebb43878e2fdcb9ee3e
         WHERE id = #{id}
     </update>
 </mapper>

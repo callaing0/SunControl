@@ -1,5 +1,6 @@
 package com.suncontrol.domain.service;
 
+import com.suncontrol.core.constant.alert.AlertStatus;
 import com.suncontrol.domain.dto.AlertResponseDTO;
 import com.suncontrol.mapper.Repository;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +25,9 @@ public class AlertListService {
             return repository.findAll();
         }
         return repository.findByLocation(location);
+    }
+
+    public List<AlertResponseDTO> getAlertListByStatus(AlertStatus alertStatus) {
+        return List.of();
     }
 }

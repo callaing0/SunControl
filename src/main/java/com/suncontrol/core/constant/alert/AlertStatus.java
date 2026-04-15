@@ -1,32 +1,17 @@
 package com.suncontrol.core.constant.alert;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum AlertStatus {
-    ABNORMAL(1, "이상 발생"),
-    CHECKING(2, "확인중"),
-    RESOLVED(3, "해결완료");
+    PENDING(0,"대기"),      // 신규 발생, 아직 아무도 확인 안 함
+    PROCESSING(1,"확인 중"),  // 관리자가 인지하고 조치 중
+    RESOLVED(2,"조치완료");     // 조치 완료 및 상황 종료
 
     private final int code;
-    private final String label;
 
-    public static AlertStatus fromCode(int code) {
-        for (AlertStatus status : values()) {
-            if (status.code == code) {
-                return status;
-            }
-        }
-        throw new IllegalArgumentException("알 수 없는 AlertStatus code: " + code);
-    }
-
-    public AlertStatus next() {
-        return switch (this) {
-            case ABNORMAL -> CHECKING;
-            case CHECKING -> RESOLVED;
-            case RESOLVED -> RESOLVED;
-        };
-    }
+    @com.fasterxml.jackson.annotation.JsonValue
+    private final String description;
 }
