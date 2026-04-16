@@ -40,17 +40,16 @@
 
         <div class="grid grid-cols-4 gap-6 mb-8">
             <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[220px]">
-                <div class="flex justify-between items-end mb-6 italic uppercase">
+                <div class="flex justify-between items-end mb-6 italic uppercase ">
                     <div class="flex items-center">
                         <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
-                        <span class="text-xl font-black text-gray-800">현재 출력량</span>
+                        <span class="text-xl font-black text-gray-800">현재 출력량(kW)</span>
                     </div>
                     <span></span>
                 </div>
-                <div class="bg-gray-50 rounded-2xl min-h-[110px] px-6 py-6 flex items-center">
+                <div class="bg-gray-50 rounded-2xl min-h-[110px] px-6 py-6 flex items-center justify-center">
                     <span class="text-2xl font-black text-gray-900 leading-none">
                         <span th:text="${summary != null and summary.currentPower != null ? summary.currentPower : '--'}">--</span>
-                        <span class="text-sm text-gray-500 ml-1 italic uppercase">kW</span>
                     </span>
                 </div>
             </div>
@@ -59,14 +58,13 @@
                 <div class="flex justify-between items-end mb-6 italic uppercase">
                     <div class="flex items-center">
                         <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
-                        <span class="text-xl font-black text-gray-800">금일 누적 발전량</span>
+                        <span class="text-xl font-black text-gray-800">금일 누적 발전량(kwh)</span>
                     </div>
                     <span></span>
                 </div>
-                <div class="bg-gray-50 rounded-2xl min-h-[110px] px-6 py-6 flex items-center">
+                <div class="bg-gray-50 rounded-2xl min-h-[110px] px-6 py-6 flex items-center justify-center">
                     <span class="text-2xl font-black text-gray-900 leading-none">
                         <span th:text="${summary != null and summary.dailyAccumulation != null ? summary.dailyAccumulation : '--'}">--</span>
-                        <span class="text-sm text-gray-500 ml-1 italic uppercase">kWh</span>
                     </span>
                 </div>
             </div>
@@ -75,14 +73,13 @@
                 <div class="flex justify-between items-end mb-6 italic uppercase">
                     <div class="flex items-center">
                         <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
-                        <span class="text-xl font-black text-gray-800">현재 출력 효율</span>
+                        <span class="text-xl font-black text-gray-800">현재 출력 효율(%)</span>
                     </div>
                     <span></span>
                 </div>
-                <div class="bg-gray-50 rounded-2xl min-h-[110px] px-6 py-6 flex items-center">
+                <div class="bg-gray-50 rounded-2xl min-h-[110px] px-6 py-6 flex items-center justify-center">
                     <span class="text-2xl font-black text-gray-900 leading-none">
                         <span th:text="${summary != null and summary.efficiency != null ? #numbers.formatDecimal(summary.efficiency, 1, 2) : '--'}">--</span>
-                        <span class="text-sm text-gray-500 ml-1 italic uppercase">%</span>
                     </span>
                 </div>
             </div>

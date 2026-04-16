@@ -15,9 +15,9 @@ import java.math.BigDecimal;
 @ToString(callSuper = true)
 public class PlantInfoVo extends PlantVo {
     /// 내비게이션 메뉴용,
-    private District district;
-    private BigDecimal totalValue;
-    private DeviceStatus status;
+    private District district; // 시/군/구 기초단체
+    private BigDecimal totalValue; // 인버터 총 출력량 합계
+    private DeviceStatus status; // 상태
 
     public PlantInfoVo(PlantInfoView view) {
         super(view == null ? null : new PlantDto(view.getPlant()));

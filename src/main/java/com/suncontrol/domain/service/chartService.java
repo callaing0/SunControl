@@ -13,4 +13,10 @@ public interface chartService {
     List<chartDto> getGenerationTrend(Long plantId, LocalDate selectedDate);
 
     List<chartDto> getWeatherEfficiency(Long plantId, LocalDate selectedDate);
+
+    List<chartSummaryDto> getMonthlySummary(Long plantId, String month);
+
+    List<chartDto> getMonthlyTrend(Long plantId);
+
+    List<chartDto> getMonthlyWeather(Long plantId, String month);
 }

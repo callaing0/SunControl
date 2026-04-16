@@ -25,6 +25,37 @@ public enum District {
             new BigDecimal("36.362285"), new BigDecimal("127.35625")),
     DAEJEON_DAEDEOK("30230", Province.DAEJEON, "대덕구",
             new BigDecimal("36.346705"), new BigDecimal("127.41556")),
+
+    SEOUL_GANGNAM("11680", Province.SEOUL, "강남구",
+            new BigDecimal("37.517236"), new BigDecimal("127.047325")),
+
+    CHUNGNAM_CHEONAN("44131", Province.CHUNGNAM, "천안시 동남구",
+            new BigDecimal("36.815147"), new BigDecimal("127.113893")),
+
+    CHUNGBUK_CHEONGJU("43111", Province.CHUNGBUK, "청주시 상당구",
+            new BigDecimal("36.635684"), new BigDecimal("127.49167")),
+
+    INCHEON_NAMDONG("28200", Province.INCHEON, "남동구",
+            new BigDecimal("37.447368"), new BigDecimal("126.731620")),
+
+    GANGWON_CHUNCHEON("42110", Province.GANGWON, "춘천시",
+            new BigDecimal("37.881315"), new BigDecimal("127.729970")),
+
+    BUSAN_HAEUNDAE("26350", Province.BUSAN, "해운대구",
+            new BigDecimal("35.163177"), new BigDecimal("129.163634")),
+
+    DAEGU_SUSEONG("27260", Province.DAEGU, "수성구",
+            new BigDecimal("35.858165"), new BigDecimal("128.630625")),
+
+    GWANGJU_BUKGU("29170", Province.GWANGJU, "북구",
+            new BigDecimal("35.174047"), new BigDecimal("126.911963")),
+
+    ULSAN_NAMGU("31140", Province.ULSAN, "남구",
+            new BigDecimal("35.543798"), new BigDecimal("129.330109")),
+
+    JEJU_JEJU("50110", Province.JEJU, "제주시",
+            new BigDecimal("33.499621"), new BigDecimal("126.531188")),
+
     OUT_OF_SERVICE(null, null, "서비스 지역 이탈",
             null, null);
     // TODO: 다른 행정구역도 추가

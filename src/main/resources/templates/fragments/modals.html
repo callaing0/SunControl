@@ -46,7 +46,9 @@
             </div>
 
             <div class="space-y-2">
-                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">주소 *</label>
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">
+                    주소 * <span class="ml-1 normal-case not-italic font-bold text-gray-300">카카오 주소 API 제공</span>
+                </label>
                 <div class="flex gap-3">
                     <input type="text" id="addressDisplay" placeholder="주소를 검색해 주세요" class="flex-1 bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 outline-none font-bold text-gray-700" readonly>
                     <input type="hidden" id="address" name="address">
@@ -61,8 +63,35 @@
             </div>
 
             <div class="grid grid-cols-2 gap-6 pt-2">
-                <input type="number" name="azimuth" placeholder="방향 0°" value="0" min="-90" max="90" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 text-center font-black italic" required>
-                <input type="number" name="tilt" placeholder="각도 30°" value="30" min="20" max="40" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 text-center font-black italic text-blue-600" required>
+
+                <!-- 설치 방향 -->
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">
+                        설치 방향 *
+                    </label>
+                        <input type="number"
+                               name="azimuth"
+                               placeholder="-90 ~ 90°"
+                               min="-90"
+                               max="90"
+                               class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 pr-12 text-center font-black italic outline-none focus:border-yellow-400 focus:bg-white transition-all"
+                               required>
+                </div>
+
+                <!-- 설치 각도 -->
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">
+                        설치 각도 *
+                    </label>
+                        <input type="number"
+                               name="tilt"
+                               placeholder="20 ~ 40°"
+                               min="20"
+                               max="40"
+                               class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 pr-12 text-center font-black italic text-blue-600 outline-none focus:border-yellow-400 focus:bg-white transition-all"
+                               required>
+                </div>
+
             </div>
 
             <button type="submit" class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-[900] text-lg shadow-xl shadow-yellow-400/20 hover:bg-yellow-500 transition-all active:scale-95 italic uppercase mt-4">
@@ -89,8 +118,8 @@
         <form class="space-y-6" id="inverterForm" method="post">
             <input type="hidden" name="plantId" th:value="${selectedPlant != null ? selectedPlant.id : null}">
             <input type="hidden" name="serial" th:value="${serial}">
-            <input type="hidden" name="type" value="DUMMY">
 
+            <!-- 발전소명 -->
             <div class="space-y-2">
                 <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">발전소명 *</label>
                 <input type="text"
@@ -100,9 +129,44 @@
                        class="w-full bg-gray-100 border-2 border-transparent rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
             </div>
 
+            <!-- 타입 -->
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">인버터 타입 *</label>
+                <select name="type"
+                        th:disabled="${selectedPlant == null}"
+                        class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 outline-none focus:border-yellow-400 focus:bg-white transition-all font-bold text-gray-700"
+                        required>
+                    <option value="">타입을 선택하세요</option>
+                    <option th:each="type : ${myPage != null ? myPage.inverterTypes : T(java.util.Collections).emptyList()}"
+                            th:value="${type.label}"
+                            th:text="${type.label}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- 정격용량 / 변환효율 -->
             <div class="grid grid-cols-2 gap-6">
-                <input type="number" step="0.001" name="ratedCapacity" placeholder="용량(kW)" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-6 text-center font-[900] text-2xl italic" required>
-                <input type="number" step="0.01" name="efficiency" placeholder="효율(%)" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-6 text-center font-[900] text-2xl text-blue-600 italic" value="100.00">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">정격 용량 *</label>
+                    <input type="number"
+                           step="0.001"
+                           name="ratedCapacity"
+                           placeholder="kW"
+                           class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-6 text-center font-[900] text-2xl italic outline-none focus:border-yellow-400 focus:bg-white transition-all
+                                  placeholder:text-sm placeholder:font-normal placeholder:text-gray-400"
+                           required>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">변환 효율 *</label>
+                    <input type="number"
+                           step="0.01"
+                           name="efficiency"
+                           placeholder="%"
+                           class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-6 text-center font-[900] text-2xl text-blue-600 italic outline-none focus:border-yellow-400 focus:bg-white transition-all
+                                  placeholder:text-sm placeholder:font-normal placeholder:text-gray-400"
+                           required>
+                </div>
             </div>
 
             <button type="submit"
@@ -116,63 +180,129 @@
 
 <!-- 패널 등록 -->
 <div th:fragment="panelModal" id="panelModal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-bg">
-    <div class="bg-white rounded-[45px] shadow-2xl w-[650px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
+    <div class="bg-white rounded-[45px] shadow-2xl w-[700px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
         <button type="button" onclick="closeModal('panelModal')" class="absolute top-10 right-10 text-gray-300 hover:text-gray-600 active:scale-90">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
 
-        <h3 class="text-3xl font-[900] text-gray-800 text-center italic uppercase mb-8">패널 등록</h3>
+        <header class="mb-10 text-center border-b border-gray-50 pb-8">
+            <h3 class="text-3xl font-[900] text-gray-800 tracking-tighter italic uppercase">패널 등록</h3>
+            <p class="text-[11px] text-gray-400 mt-2 font-black uppercase tracking-widest italic">Panel Configuration</p>
+        </header>
 
-        <form class="space-y-5" id="panelForm" method="post">
+        <form class="space-y-6" id="panelForm" method="post">
             <input type="hidden" id="panelPlantId" th:value="${selectedPlant != null ? selectedPlant.id : ''}">
 
-            <input type="text"
-                   th:value="${selectedPlant != null ? selectedPlant.name : ''}"
-                   placeholder="발전소를 먼저 선택하세요"
-                   readonly
-                   class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500">
+            <!-- 발전소명 -->
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">발전소명 *</label>
+                <input type="text"
+                       th:value="${selectedPlant != null ? selectedPlant.name : ''}"
+                       placeholder="발전소를 먼저 선택하세요"
+                       readonly
+                       class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+            </div>
 
+            <!-- 인버터 -->
             <div class="space-y-2">
                 <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">인버터 *</label>
                 <select id="panelInverterId"
-                        class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 font-bold text-gray-700 outline-none"
-                        th:disabled="${selectedPlant == null or myPage == null or myPage.inverters == null or #lists.isEmpty(myPage.inverters)}"
+                        class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 font-bold text-gray-700 outline-none focus:border-yellow-400 focus:bg-white transition-all"
+                        th:disabled="${myPage == null or myPage.inverters == null or #lists.isEmpty(myPage.inverters)}"
                         required>
                     <option value="">인버터를 선택하세요</option>
 
-                    <th:block th:if="${myPage != null and myPage.inverters != null}">
-                        <option th:each="inv : ${myPage.inverters}"
-                                th:value="${inv.id}"
-                                th:text="${inv.name != null ? inv.name : '인버터'}">
-                        </option>
-                    </th:block>
+                    <option th:each="inv : ${myPage != null && myPage.inverters != null ? myPage.inverters : T(java.util.Collections).emptyList()}"
+                            th:value="${inv.id}"
+                            th:text="${inv.serial != null ? inv.serial : '인버터'}"
+                            th:attr="data-serial=${inv.serial != null ? inv.serial : ''},
+                                     data-rated-capacity=${inv.ratedCapacity != null ? inv.ratedCapacity : 0}">
+                    </option>
                 </select>
             </div>
 
+            <!-- 인버터 S/N / 모델명 -->
             <div class="grid grid-cols-2 gap-6">
-                <input type="text"
-                       id="panelModelName"
-                       name="modelName"
-                       placeholder="모델명"
-                       class="w-full bg-gray-50 rounded-[25px] p-5 font-black text-center italic"
-                       required>
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">인버터 S/N</label>
+                    <input type="text"
+                           id="panelInverterSerial"
+                           placeholder="자동 입력"
+                           readonly
+                           class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+                </div>
 
-                <input type="number"
-                       id="panelCount"
-                       name="count"
-                       placeholder="수량"
-                       class="w-full bg-gray-50 rounded-[25px] p-5 font-black text-center text-blue-600 italic"
-                       min="1"
-                       value="1"
-                       required>
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">모델명 *</label>
+                    <select id="panelModelName"
+                            name="modelName"
+                            class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 font-bold text-gray-700 outline-none focus:border-yellow-400 focus:bg-white transition-all"
+                            required>
+                        <option value="">모델을 선택하세요</option>
+                        <option th:each="model : ${myPage != null ? myPage.panelModels : T(java.util.Collections).emptyList()}"
+                                th:value="${model.name}"
+                                th:text="${model.name}"
+                                th:attr="data-capacity=${model.capacity},data-efficiency=${model.efficiency}">
+                        </option>
+                    </select>
+                </div>
             </div>
 
+            <!-- 정격용량 / 출력용량 -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">정격 용량</label>
+                    <input type="text"
+                           id="panelRatedCapacity"
+                           placeholder="자동 입력"
+                           readonly
+                           class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">출력 용량</label>
+                    <input type="text"
+                           id="panelOutputCapacity"
+                           placeholder="자동 입력"
+                           readonly
+                           class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+                </div>
+            </div>
+
+            <!-- 설계용량 / 수량 -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">설계 용량</label>
+                    <input type="text"
+                           id="panelDesignCapacity"
+                           placeholder="자동 계산 후 표시"
+                           readonly
+                           class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">수량 *</label>
+                    <input type="number"
+                           id="panelCount"
+                           name="count"
+                           placeholder="수량"
+                           class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 font-black text-center text-blue-600 italic outline-none focus:border-yellow-400 focus:bg-white transition-all"
+                           min="1"
+                           value="1"
+                           required>
+                </div>
+            </div>
+
+            <p class="text-[11px] text-gray-400 font-bold px-2">
+                설계 용량 = 선택한 패널 출력 용량 × 수량
+            </p>
+
             <button type="submit"
-                    th:classappend="${selectedPlant == null or myPage == null or myPage.inverters == null or #lists.isEmpty(myPage.inverters)} ? 'btn-disabled' : ''"
-                    class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-black italic uppercase">
-                <span th:text="${selectedPlant == null ? '발전소 선택 필요' : (myPage == null or myPage.inverters == null or #lists.isEmpty(myPage.inverters)) ? '인버터 등록 필요' : '패널 등록하기'}"></span>
+                    th:classappend="${myPage == null or myPage.inverters == null or #lists.isEmpty(myPage.inverters)} ? 'btn-disabled' : ''"
+                    class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-black italic uppercase shadow-lg shadow-yellow-400/20 hover:bg-yellow-500 active:scale-95 transition-all">
+                <span th:text="${myPage == null or myPage.inverters == null or #lists.isEmpty(myPage.inverters) ? '인버터 등록 필요' : '패널 등록하기'}"></span>
             </button>
         </form>
     </div>
@@ -403,6 +533,11 @@
                         return;
                     }
 
+                    if (!type) {
+                        alert('인버터 타입을 선택해 주세요.');
+                        return;
+                    }
+
                     if (!ratedCapacity) {
                         alert('용량을 입력해 주세요.');
                         return;
@@ -442,13 +577,67 @@
                 });
             }
 
+            const panelInverterId = document.getElementById('panelInverterId');
+            const panelInverterSerial = document.getElementById('panelInverterSerial');
+            const panelModelName = document.getElementById('panelModelName');
+            const panelRatedCapacity = document.getElementById('panelRatedCapacity');
+            const panelOutputCapacity = document.getElementById('panelOutputCapacity');
+            const panelDesignCapacity = document.getElementById('panelDesignCapacity');
+            const panelCountInput = document.getElementById('panelCount');
+
+            function updatePanelInfo() {
+                let inverterRatedCapacity = 0;
+                let panelCapacity = 0;
+
+                if (panelInverterId && panelInverterSerial) {
+                    const selectedInverter = panelInverterId.options[panelInverterId.selectedIndex];
+
+                    panelInverterSerial.value = selectedInverter ? (selectedInverter.dataset.serial || '') : '';
+                    inverterRatedCapacity = Number(selectedInverter?.dataset?.ratedCapacity || 0);
+
+                    if (panelRatedCapacity) {
+                        panelRatedCapacity.value = inverterRatedCapacity ? `${inverterRatedCapacity} kW` : '';
+                    }
+                }
+
+                if (panelModelName) {
+                    const selectedModel = panelModelName.options[panelModelName.selectedIndex];
+                    panelCapacity = Number(selectedModel?.dataset?.capacity || 0);
+
+                    if (panelOutputCapacity) {
+                        panelOutputCapacity.value = panelCapacity ? `${panelCapacity} W` : '';
+                    }
+                }
+
+                const count = Number(panelCountInput?.value || 0);
+                const designCapacity = panelCapacity * count;
+
+                if (panelDesignCapacity) {
+                    panelDesignCapacity.value = designCapacity ? `${designCapacity} W` : '';
+                }
+            }
+
+            if (panelInverterId) {
+                panelInverterId.addEventListener('change', updatePanelInfo);
+            }
+
+            if (panelModelName) {
+                panelModelName.addEventListener('change', updatePanelInfo);
+            }
+
+            if (panelCountInput) {
+                panelCountInput.addEventListener('input', updatePanelInfo);
+            }
+
+            updatePanelInfo();
+
             // 패널 등록
             const panelForm = document.getElementById('panelForm');
             if (panelForm) {
                 panelForm.addEventListener('submit', async function (e) {
                     e.preventDefault();
 
-                    console.log("🔥 패널 fetch 실행");
+                    console.log("패널 fetch 실행");
 
                     const plantId = document.getElementById('panelPlantId')?.value?.trim();
                     const inverterId = document.getElementById('panelInverterId')?.value?.trim();
@@ -466,7 +655,7 @@
                     }
 
                     if (!modelName) {
-                        alert('패널 모델명을 입력해 주세요.');
+                        alert('패널 모델을 선택해 주세요.');
                         return;
                     }
 
