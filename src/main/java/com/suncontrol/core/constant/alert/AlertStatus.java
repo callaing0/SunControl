@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum AlertStatus {
-    PENDING(0,"대기"),
+    PENDING(0,"장애 발생"),
     PROCESSING(1,"확인 중"),
     RESOLVED(2,"조치완료");
 
