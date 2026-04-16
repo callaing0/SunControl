@@ -23,15 +23,15 @@
 
         <div class="mb-10 px-2 flex justify-between items-end">
             <div>
-                <h2 class="text-3xl font-black text-gray-800 tracking-tighter italic uppercase">실시간 대시보드</h2>
+                <h2 class="text-3xl font-black text-gray-800 tracking-tighter italic ">실시간 대시보드</h2>
                 <div class="flex items-center mt-1">
-                    <p class="text-sm text-gray-400 font-bold uppercase tracking-widest">
+                    <p class="text-sm text-gray-400 font-bold  tracking-widest">
                         전체 발전소의 운영 현황을 실시간으로 모니터링합니다.
                     </p>
                 </div>
             </div>
             <div class="text-right">
-                <span class="text-[10px] font-black text-gray-400 bg-gray-50 px-5 py-2.5 rounded-full uppercase tracking-widest border border-gray-200 shadow-sm flex items-center gap-2">
+                <span class="text-[10px] font-black text-gray-400 bg-gray-50 px-5 py-2.5 rounded-full tracking-widest border border-gray-200 shadow-sm flex items-center gap-2">
                     <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                     SYSTEM LIVE: <span id="liveClock">0000-00-00 00:00:00</span>
                 </span>
@@ -40,7 +40,7 @@
 
         <div class="grid grid-cols-4 gap-6 mb-8">
             <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[220px]">
-                <div class="flex justify-between items-end mb-6 italic uppercase ">
+                <div class="flex justify-between items-end mb-6 italic">
                     <div class="flex items-center">
                         <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
                         <span class="text-xl font-black text-gray-800">현재 출력량(kW)</span>
@@ -55,10 +55,10 @@
             </div>
 
             <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[220px]">
-                <div class="flex justify-between items-end mb-6 italic uppercase">
+                <div class="flex justify-between items-end mb-6 italic">
                     <div class="flex items-center">
                         <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
-                        <span class="text-xl font-black text-gray-800">금일 누적 발전량(kwh)</span>
+                        <span class="text-xl font-black text-gray-800">금일 누적 발전량(kWh)</span>
                     </div>
                     <span></span>
                 </div>
@@ -70,7 +70,7 @@
             </div>
 
             <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[220px]">
-                <div class="flex justify-between items-end mb-6 italic uppercase">
+                <div class="flex justify-between items-end mb-6 italic">
                     <div class="flex items-center">
                         <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
                         <span class="text-xl font-black text-gray-800">현재 출력 효율(%)</span>
@@ -85,31 +85,31 @@
             </div>
 
             <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[220px]">
-                <div class="flex justify-between items-end mb-6 italic uppercase">
+                <div class="flex justify-between items-end mb-6 italic">
                     <div class="flex items-center">
                         <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
                         <span class="text-xl font-black text-gray-800">기상 정보</span>
                     </div>
-                    <span class="text-[10px] text-white font-black bg-[#111827] px-3 py-1 rounded-full border border-[#1f2937] uppercase tracking-widest"
+                    <span class="text-[10px] text-white font-black bg-[#111827] px-3 py-1 rounded-full border border-[#1f2937] tracking-widest"
                           th:text="${summary != null and summary.location != null ? summary.location : '--'}">Seoul</span>
                 </div>
 
                 <div class="bg-gray-50 rounded-2xl min-h-[110px] px-6 py-6 flex flex-col justify-center gap-3">
-                    <div class="flex justify-between items-center text-[11px] font-black uppercase text-gray-500">
+                    <div class="flex justify-between items-center text-[11px] font-black text-gray-500">
                         <span>일출/일몰</span>
                         <span class="text-gray-900 font-black"
                               th:text="${summary != null and summary.sunTime != null ? summary.sunTime : '--'}">--</span>
                     </div>
 
-                    <div class="flex justify-between items-center text-[11px] font-black uppercase text-gray-500">
+                    <div class="flex justify-between items-center text-[11px] font-black text-gray-500">
                         <span>일사량</span>
                         <span class="text-gray-900 font-black">
                             <span th:text="${summary != null and summary.insolation != null ? summary.insolation : '--'}">--</span>
-                            <span class="text-[10px] text-gray-500 ml-1 italic uppercase">kWh/m²</span>
+                            <span class="text-[10px] text-gray-500 ml-1 italic">kWh/m²</span>
                         </span>
                     </div>
 
-                    <div class="flex justify-between items-center text-[11px] font-black uppercase text-gray-500">
+                    <div class="flex justify-between items-center text-[11px] font-black text-gray-500">
                         <span>온도</span>
                         <span class="text-gray-900 font-black"
                               th:text="${summary != null and summary.weatherStatus != null ? summary.weatherStatus : '--'}">--</span>
@@ -121,7 +121,7 @@
         <div class="p-0 space-y-8 mt-0">
             <div class="flex gap-8 items-stretch">
                 <div class="flex-[3] bg-white p-10 rounded-[45px] shadow-sm border border-gray-100 self-stretch flex flex-col transition-all">
-                    <h3 class="text-xl font-black text-gray-800 mb-6 flex items-center italic uppercase">
+                    <h3 class="text-xl font-black text-gray-800 mb-6 flex items-center italic">
                         <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
                         시간별 발전량 / 일사량 추이
                     </h3>
@@ -136,15 +136,15 @@
                                 <span class="text-3xl opacity-50">📡</span>
                             </div>
 
-                            <p class="text-gray-500 font-black italic uppercase tracking-tight text-base">
+                            <p class="text-gray-500 font-black italic tracking-tight text-base">
                                 현재 수집된 차트 데이터가 없습니다.
                             </p>
 
-                            <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest mt-3">
+                            <p class="text-[11px] text-gray-400 font-bold tracking-widest mt-3">
                                 일사량 데이터가 수집되면 발전량 차트와 함께 표시됩니다.
                             </p>
 
-                            <div class="mt-5 px-4 py-2 rounded-full bg-white border border-gray-200 text-[10px] font-black text-gray-400 uppercase tracking-widest shadow-sm">
+                            <div class="mt-5 px-4 py-2 rounded-full bg-white border border-gray-200 text-[10px] font-black text-gray-400 tracking-widest shadow-sm">
                                 Waiting for irradiance data
                             </div>
                         </div>
@@ -154,7 +154,7 @@
                 <!-- 오른쪽 카드 묶음 복구 -->
                 <div class="flex-1 flex flex-col gap-6">
                     <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex-[1.2] flex flex-col justify-center">
-                        <div class="flex justify-between items-end mb-6 italic uppercase">
+                        <div class="flex justify-between items-end mb-6 italic">
                             <div class="flex items-center">
                                 <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
                                 <span class="text-xl font-black text-gray-800">수익 예측</span>
@@ -168,26 +168,26 @@
                         </div>
 
                         <div class="bg-gray-50 rounded-2xl min-h-[110px] px-6 py-6 flex flex-col justify-center gap-3">
-                            <div class="flex justify-between items-center text-[11px] font-black uppercase text-gray-500">
+                            <div class="flex justify-between items-center text-[11px] font-black text-gray-500">
                                 <span>예상 발전량</span>
                                 <span class="text-gray-900 font-black">
                         <span th:text="${summary != null and summary.predGen != null ? summary.predGen : '--'}">--</span>
-                        <span class="text-[10px] text-gray-500 ml-1 italic uppercase">kWh</span>
+                        <span class="text-[10px] text-gray-500 ml-1 italic ">kWh</span>
                     </span>
                             </div>
 
-                            <div class="flex justify-between items-center text-[11px] font-black uppercase text-gray-500">
+                            <div class="flex justify-between items-center text-[11px] font-black  text-gray-500">
                                 <span>판매 단가</span>
                                 <span class="text-gray-900 font-black">
                         <span th:text="${summary != null and summary.unitPrice != null ? summary.unitPrice : '--'}">--</span>
-                        <span class="text-[10px] text-gray-500 ml-1 italic uppercase">원</span>
+                        <span class="text-[10px] text-gray-500 ml-1 italic ">원</span>
                     </span>
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex-[0.75] flex flex-col justify-center">
-                        <div class="flex justify-between items-end mb-6 italic uppercase">
+                        <div class="flex justify-between items-end mb-6 italic ">
                             <div class="flex items-center">
                                 <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
                                 <span class="text-xl font-black text-gray-800">환경 기여도</span>
@@ -199,13 +199,13 @@
                         </div>
 
                         <div class="bg-gray-50 rounded-2xl min-h-[110px] px-6 py-6 flex flex-col justify-center gap-3">
-                            <div class="flex justify-between items-center text-[11px] font-black uppercase text-gray-500">
+                            <div class="flex justify-between items-center text-[11px] font-black text-gray-500">
                                 <span>CO2 절감</span>
                                 <span class="text-gray-900 font-black">
                         <span th:text="${summary != null and summary.co2Reduction != null
                                         ? #numbers.formatDecimal(summary.co2Reduction, 1, 2)
                                         : '--'}">--</span>
-                        <span class="text-[10px] text-gray-500 ml-1 italic uppercase">kg</span>
+                        <span class="text-[10px] text-gray-500 ml-1 italic">kg</span>
                     </span>
                             </div>
                         </div>
@@ -214,7 +214,7 @@
             </div>
 
             <div id="inverterSection" class="bg-white p-10 rounded-[45px] shadow-sm border border-gray-100 w-full">
-                <div class="flex items-center mb-8 px-2 italic uppercase">
+                <div class="flex items-center mb-8 px-2 italic ">
                     <div class="flex items-center">
                         <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
                         <h3 class="text-xl font-black text-gray-800">인버터별 실시간 상태</h3>
@@ -228,7 +228,7 @@
 
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <span class="text-[10px] text-gray-300 uppercase tracking-widest block font-black">Inverter Unit</span>
+                                    <span class="text-[10px] text-gray-300 tracking-widest block font-black">Inverter Unit</span>
                                     <span class="text-lg font-black text-blue-600 block italic mt-2"
                                           th:text="${inverter.serial}">INV-001</span>
                                 </div>
@@ -242,7 +242,7 @@
                             </div>
 
                             <div class="mt-5 pt-4 border-t border-gray-200 flex items-center justify-between">
-                                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Status</span>
+                                <span class="text-[10px] font-black  tracking-widest text-gray-400">Status</span>
                                 <span class="text-sm font-black"
                                       th:with="s=${inverter.status}"
                                       th:classappend="${s == 11 ? 'text-green-600' :
@@ -261,7 +261,7 @@
                     <th:block th:if="${inverters == null or #lists.isEmpty(inverters)}">
                         <div class="w-full py-20 border-2 border-dashed border-gray-100 rounded-[40px] flex flex-col items-center justify-center text-center opacity-60">
                             <span class="text-4xl mb-4">⚙️</span>
-                            <p class="text-gray-400 font-bold italic uppercase">등록된 인버터 장비가 없습니다.</p>
+                            <p class="text-gray-400 font-bold italic ">등록된 인버터 장비가 없습니다.</p>
                         </div>
                     </th:block>
                 </div>
