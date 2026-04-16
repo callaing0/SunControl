@@ -22,7 +22,7 @@ public class ReportCalcDto {
     private final BigDecimal previous;
     private final List<GenerationValuesDto> list;
     private final int baseTerm;
-    private final LocalDateTime createdAt;
+    private final LocalDateTime prevTime;
 
     protected GenerationValuesDto getBaseValues() {
         GenerationValuesDto dto = new GenerationValuesDto();
@@ -36,20 +36,11 @@ public class ReportCalcDto {
         return dto;
     }
 
-    protected LocalDateTime getPrevTime() {
-        /// 데이터 수집 목표시간 : 이전 텀의 대표시각 ~ 이번 텀의 대표시각
-        /// createdAt != null인 케이스 : "해당 인버터의 첫번째 기록"
-        return Objects.requireNonNullElseGet(
-                createdAt,
-                () -> TimeTruncater.truncateToPreviousTerm(baseTime, baseTerm)
-        );
-    }
-
     public GenerationValuesDto getValues() {
         GenerationValuesDto dto = getBaseValues();
         BigDecimal actual = BigDecimal.ZERO;
         BigDecimal expected = BigDecimal.ZERO;
-        LocalDateTime prevTime = getPrevTime();
+        LocalDateTime prevTime = this.prevTime;
 
         for(GenerationValuesDto value : list) {
             long term = Duration.between(prevTime, value.getBaseTime()).getSeconds();

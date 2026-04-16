@@ -68,6 +68,7 @@
             resultType="com.suncontrol.core.entity.log.GenerationLog">
         SELECT * FROM generation_log
         WHERE base_time BETWEEN #{start} and #{end}
+        ORDER BY base_time ASC
     </select>
 
     <update id="updateStatus"
