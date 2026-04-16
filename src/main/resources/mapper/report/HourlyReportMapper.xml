@@ -48,6 +48,7 @@
         SELECT * FROM hourly_report
         WHERE day_offset = #{dayOffset}
         AND base_time BETWEEN #{start} AND #{end}
+        ORDER BY base_time ASC
     </select>
 
 </mapper>

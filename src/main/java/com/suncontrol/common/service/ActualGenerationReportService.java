@@ -101,7 +101,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                             (inverterId, Collections.emptyMap());
             // 상세로직
             while(!currentTime.isAfter(end)) {
-                HourlyReportDto previous = prevInnerMap.get(currentTime.minusDays(1));
+                HourlyReportDto oneDayPrevious = prevInnerMap.get(currentTime.minusDays(1));
                 List<GenerationLogDto> genList = genLogInnverMap.get(currentTime);
                 if(genList == null || genList.isEmpty()) {
                     log.debug("{} inverter 의 {} 기록없음", inverterId, currentTime);
@@ -115,17 +115,18 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                                 inverter.getCreatedAt(),
                                 StaticValues.HOUR_SECONDS)
                         .isEqual(currentTime);
+                LocalDateTime prevTime = isFirst ? inverter.getCreatedAt() : currentTime.minusHours(1);
 
                 GenerationValuesDto resultSet =
                         new ReportCalcDto(
                                 currentTime,
-                                (previous != null) ? previous.getValueActual() : null,
+                                (oneDayPrevious != null) ? oneDayPrevious.getValueActual() : null,
                                 DataCollectorsUtil.toDataList(
                                         genList,
                                         GenerationLogDto::getValuesDto
                                         ),
                                 StaticValues.HOUR_SECONDS,
-                                (isFirst) ? null : inverter.getCreatedAt()
+                                prevTime
                                 )
                                 .getValues();
                 HourlyReportDto result = new HourlyReportDto(
@@ -191,8 +192,8 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                 List<HourlyReportDto> sources = sourceInnerMap.getOrDefault(current, Collections.emptyList());
 
                 if(sources == null || sources.isEmpty()) {
-                    log.warn("{} inverter 의 {} 기록없음", inverter.getInverterId(), current);
-                    current.plusDays(1);
+                    log.debug("{} inverter 의 {} 기록없음", inverter.getInverterId(), current);
+                    current = current.plusDays(1);
                     continue;
                 }
 
@@ -207,7 +208,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                                 ),
                                 StaticValues.DAY_SECONDS,
                                 (previous != null) ?
-                                        null :
+                                        previous.getBaseDate().atStartOfDay() :
                                         inverter.getCreatedAt()
                         );
 

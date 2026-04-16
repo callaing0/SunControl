@@ -36,6 +36,7 @@
         SELECT * FROM monthly_report
         WHERE base_month >= #{start}
         AND base_month <![CDATA[ < ]]> #{end}
+        ORDER BY base_month ASC
     </select>
 
 
@@ -47,5 +48,6 @@
         FROM monthly_report r2
         WHERE r2.inverter_id = r1.inverter_id
         )
+        ORDER BY base_month ASC
     </select>
 </mapper>
