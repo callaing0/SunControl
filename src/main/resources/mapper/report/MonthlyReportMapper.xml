@@ -34,8 +34,7 @@
 
     <select id="findAllByMonthBetween" resultType="com.suncontrol.core.entity.report.MonthlyReport">
         SELECT * FROM monthly_report
-        WHERE base_month >= #{start}
-        AND base_month <![CDATA[ < ]]> #{end}
+        WHERE base_month BETWEEN #{start} AND #{end}
         ORDER BY base_month ASC
     </select>
 

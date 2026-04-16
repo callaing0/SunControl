@@ -9,6 +9,7 @@ import com.suncontrol.core.util.TimeTruncater;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class MonthlyReportDto {
     private Long inverterId;
     private String baseMonth;
@@ -58,6 +60,11 @@ public class MonthlyReportDto {
 
     public LocalDate getBaseDate() {
         return YearMonth.parse(baseMonth).atDay(1);
+    }
+
+    public LocalDate getBaseDateOfNext() {
+        LocalDate baseDate = getBaseDate();
+        return !LocalDate.now().isBefore(baseDate) ? baseDate.plusMonths(1) : baseDate;
     }
 
     public MonthlyReportDto(GenerationValuesDto dto, List<StoppedDto> stoppedDtoList, BigDecimal capacity) {

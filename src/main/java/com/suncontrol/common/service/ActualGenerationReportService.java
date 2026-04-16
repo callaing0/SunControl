@@ -264,11 +264,13 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
             while(current.isBefore(end)) {
                 String currentMonth = TimeTruncater.getBaseMonth(current);
                 String prevMonth = TimeTruncater.getBaseMonth(current.minusMonths(1));
+                log.info("{} 인버터의 {} 데이터 생성", inverterId, currentMonth);
 
                 List<DailyReportDto> dailyList = dailyInnerMap.get(currentMonth);
                 MonthlyReportDto currentReport = prevInnerMap.get(currentMonth);
 
                 if(dailyList == null || dailyList.isEmpty() || currentReport != null) {
+                    current = current.plusMonths(1);
                     continue;
                 }
                 MonthlyReportDto previous = prevInnerMap.get(prevMonth);
@@ -306,7 +308,10 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
         return TimeTruncater.getOldestDateOrDefault(
                 dtoList,
                 defaultStartDate,
-                MonthlyReportDto::getBaseDate
+                dto -> {
+                    LocalDate next = dto.getBaseDate().plusMonths(1); // 단순 전진
+                    return next.isAfter(LocalDate.now()) ? LocalDate.now().withDayOfMonth(1) : next;
+                }
         );
     }
 

@@ -7,6 +7,7 @@ import com.suncontrol.core.util.DataCollectorsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import java.util.List;
 public class DailyReportService {
     private final DailyReportRepository repository;
 
+    @Transactional
     public void saveAll(List<DailyReportDto> dailyReportDtoList) {
         if(dailyReportDtoList == null || dailyReportDtoList.isEmpty()) {
             log.warn("no daily reports found");
