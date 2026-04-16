@@ -31,4 +31,24 @@ public interface chartRepository {
 
     Integer selectStoppedTime(@Param("plantId") Long plantId,
                               @Param("selectedDate") LocalDate selectedDate);
+
+    BigDecimal selectMonthlyTotal(@Param("plantId") Long plantId,
+                                  @Param("month") String month);
+
+    BigDecimal selectMonthlyPrevious(@Param("plantId") Long plantId,
+                                     @Param("month") String month);
+
+    BigDecimal selectMonthlyAverage(@Param("plantId") Long plantId,
+                                    @Param("month") String month);
+
+    BigDecimal selectMonthlyExpected(@Param("plantId") Long plantId,
+                                     @Param("month") String month);
+
+    Integer selectMonthlyStopped(@Param("plantId") Long plantId,
+                                 @Param("month") String month);
+
+    List<chartDto> selectMonthlyTrend(@Param("plantId") Long plantId);
+
+    List<chartDto> selectMonthlyWeather(@Param("plantId") Long plantId,
+                                        @Param("month") String month);
 }

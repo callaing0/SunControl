@@ -29,7 +29,6 @@ public class chartController {
             HttpSession session
     ) {
         Long memberId = (Long) session.getAttribute("memberId");
-        System.out.println("memberId = " + memberId);
 
         if (selectedDate == null) {
             selectedDate = LocalDate.now();
@@ -46,7 +45,6 @@ public class chartController {
 
         Long selectedPlantId = (Long) session.getAttribute("selectedPlantId");
         Long resolvedPlantId = plantSelectionService.resolveSelectedPlantId(memberId, selectedPlantId);
-        System.out.println("resolvedPlantId = " + resolvedPlantId);
 
         if (resolvedPlantId == null) {
             model.addAttribute("statsSummary", List.of());
@@ -59,15 +57,56 @@ public class chartController {
 
         session.setAttribute("selectedPlantId", resolvedPlantId);
 
-        List<chartDto> generationTrend = chartService.getGenerationTrend(resolvedPlantId, selectedDate);
-        List<chartDto> weatherEfficiency = chartService.getWeatherEfficiency(resolvedPlantId, selectedDate);
-
         model.addAttribute("statsSummary", chartService.getStatsSummary(resolvedPlantId, selectedDate));
-        model.addAttribute("generationTrend", generationTrend);
-        model.addAttribute("weatherEfficiency", weatherEfficiency);
+        model.addAttribute("generationTrend", chartService.getGenerationTrend(resolvedPlantId, selectedDate));
+        model.addAttribute("weatherEfficiency", chartService.getWeatherEfficiency(resolvedPlantId, selectedDate));
         model.addAttribute("selectedDate", selectedDate);
         model.addAttribute("menu", "stats");
 
         return "chart";
+    }
+
+    @GetMapping("/chartMonthly")
+    public String monthlyChart(
+            @RequestParam(value = "selectedMonth", required = false) String selectedMonth,
+            Model model,
+            HttpSession session
+    ) {
+        Long memberId = (Long) session.getAttribute("memberId");
+
+        if (selectedMonth == null || selectedMonth.isBlank()) {
+            selectedMonth = LocalDate.now().minusMonths(1).toString().substring(0, 7);
+        }
+
+        if (memberId == null) {
+            model.addAttribute("statsSummary", List.of());
+            model.addAttribute("generationTrend", List.of());
+            model.addAttribute("weatherDistribution", List.of());
+            model.addAttribute("selectedMonth", selectedMonth);
+            model.addAttribute("menu", "stats");
+            return "chartMonthly";
+        }
+
+        Long selectedPlantId = (Long) session.getAttribute("selectedPlantId");
+        Long resolvedPlantId = plantSelectionService.resolveSelectedPlantId(memberId, selectedPlantId);
+
+        if (resolvedPlantId == null) {
+            model.addAttribute("statsSummary", List.of());
+            model.addAttribute("generationTrend", List.of());
+            model.addAttribute("weatherDistribution", List.of());
+            model.addAttribute("selectedMonth", selectedMonth);
+            model.addAttribute("menu", "stats");
+            return "chartMonthly";
+        }
+
+        session.setAttribute("selectedPlantId", resolvedPlantId);
+
+        model.addAttribute("statsSummary", chartService.getMonthlySummary(resolvedPlantId, selectedMonth));
+        model.addAttribute("generationTrend", chartService.getMonthlyTrend(resolvedPlantId));
+        model.addAttribute("weatherDistribution", chartService.getMonthlyWeather(resolvedPlantId, selectedMonth));
+        model.addAttribute("selectedMonth", selectedMonth);
+        model.addAttribute("menu", "stats");
+
+        return "chartMonthly";
     }
 }
