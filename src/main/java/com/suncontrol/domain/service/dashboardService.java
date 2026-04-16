@@ -10,4 +10,6 @@ public interface dashboardService {
     dashboardSummaryDto getDashboardSummary(Long memberId, Long plantId);
 
     List<DashboardInverterDto> getInverters(Long memberId, Long plantId);
+
+    String getLastUpdateTime();
 }

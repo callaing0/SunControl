@@ -212,4 +212,11 @@ public class dashboardServiceImpl implements dashboardService {
 
         return temperature.setScale(1, RoundingMode.HALF_UP).toPlainString() + "°C";
     }
+
+    public String getLastUpdateTime() {
+        LocalDateTime last = dashboardRepository.selectLastUpdateTime();
+        return last != null
+                ? last.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+                : "--:--:--";
+    }
 }

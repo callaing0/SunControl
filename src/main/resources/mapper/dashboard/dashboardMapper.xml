@@ -139,4 +139,12 @@
         ORDER BY HOUR(r.base_time)
     </select>
 
+    <select id="selectLastUpdateTime" resultType="java.time.LocalDateTime">
+        SELECT GREATEST(
+                       (SELECT MAX(updated_at) FROM generation_log),
+                       (SELECT MAX(updated_at) FROM radiation_log),
+                       (SELECT MAX(updated_at) FROM weather_log)
+               )
+    </select>
+
 </mapper>
