@@ -30,4 +30,21 @@ public class AlertListService {
     public List<AlertResponseDTO> getAlertListByStatus(AlertStatus alertStatus) {
         return List.of();
     }
+
+    public Integer getGlobalStatus() {
+
+        List<AlertResponseDTO> alerts = repository.findAll();
+
+        if (alerts == null || alerts.isEmpty()) {
+            return 2; // 정상
+        }
+
+        boolean hasError = alerts.stream().anyMatch(a -> a.getStatus() == 0);
+        if (hasError) return 0;
+
+        boolean hasProcessing = alerts.stream().anyMatch(a -> a.getStatus() == 1);
+        if (hasProcessing) return 1;
+
+        return 2;
+    }
 }
