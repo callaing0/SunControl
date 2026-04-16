@@ -5,6 +5,10 @@
 
 <mapper namespace="com.suncontrol.core.repository.report.chartRepository">
 
+    <!-- ========================= -->
+    <!-- 일별 통계 -->
+    <!-- ========================= -->
+
     <!-- 총 발전량 -->
     <select id="selectTotalGeneration" resultType="java.math.BigDecimal">
         SELECT ROUND(COALESCE(SUM(dr.value_actual), 0), 2)
@@ -68,13 +72,12 @@
             AND p.is_deleted = 0
             AND DATE(gl.base_time) = #{selectedDate}
             AND gl.weather_code IN (1, 2, 3, 4, 5)
-            ) g
-        ON wc.weather_code = g.weather_code
+            ) g ON wc.weather_code = g.weather_code
         GROUP BY wc.weather_code
         ORDER BY wc.weather_code
     </select>
 
-    <!-- 증감률 -->
+    <!-- 전일 발전량 -->
     <select id="selectPreviousGeneration" resultType="java.math.BigDecimal">
         SELECT ROUND(COALESCE(SUM(dr.value_actual), 0), 2)
         FROM daily_report dr
@@ -85,7 +88,7 @@
           AND dr.base_date = DATE_SUB(#{selectedDate}, INTERVAL 1 DAY)
     </select>
 
-    <!-- 평균 발전량 -->
+    <!-- 최근 7일 평균 발전량 -->
     <select id="selectAverageGeneration" resultType="java.math.BigDecimal">
         SELECT ROUND(COALESCE(AVG(dr.value_actual), 0), 2)
         FROM daily_report dr
@@ -93,8 +96,7 @@
                  INNER JOIN plant p ON i.plant_id = p.id
         WHERE p.id = #{plantId}
           AND p.is_deleted = 0
-          AND dr.base_date BETWEEN DATE_SUB(#{selectedDate}, INTERVAL 7 DAY)
-            AND #{selectedDate}
+          AND dr.base_date BETWEEN DATE_SUB(#{selectedDate}, INTERVAL 7 DAY) AND #{selectedDate}
     </select>
 
     <!-- 인버터 가동 중지 시간 -->
@@ -106,6 +108,111 @@
         WHERE p.id = #{plantId}
           AND p.is_deleted = 0
           AND dr.base_date = #{selectedDate}
+    </select>
+
+    <!-- ========================= -->
+    <!-- 월별 통계 -->
+    <!-- ========================= -->
+
+    <!-- 기간 누적 발전량 -->
+    <select id="selectMonthlyTotal" resultType="java.math.BigDecimal">
+        SELECT ROUND(COALESCE(SUM(mr.value_actual), 0), 2)
+        FROM monthly_report mr
+                 INNER JOIN inverter i ON mr.inverter_id = i.id
+                 INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
+          AND mr.base_month = #{month}
+    </select>
+
+    <!-- 전월 값 -->
+    <select id="selectMonthlyPrevious" resultType="java.math.BigDecimal">
+        SELECT ROUND(COALESCE(SUM(mr.value_previous), 0), 2)
+        FROM monthly_report mr
+                 INNER JOIN inverter i ON mr.inverter_id = i.id
+                 INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
+          AND mr.base_month = #{month}
+    </select>
+
+    <!-- 월 평균 발전량 -->
+    <select id="selectMonthlyAverage" resultType="java.math.BigDecimal">
+        SELECT ROUND(COALESCE(AVG(mr.value_actual), 0), 2)
+        FROM monthly_report mr
+                 INNER JOIN inverter i ON mr.inverter_id = i.id
+                 INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
+          AND mr.base_month = #{month}
+    </select>
+
+    <!-- 기상 보정 기대값 -->
+    <select id="selectMonthlyExpected" resultType="java.math.BigDecimal">
+        SELECT ROUND(COALESCE(SUM(mr.value_expected), 0), 2)
+        FROM monthly_report mr
+                 INNER JOIN inverter i ON mr.inverter_id = i.id
+                 INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
+          AND mr.base_month = #{month}
+    </select>
+
+    <!-- 월별 가동 중지 시간 -->
+    <select id="selectMonthlyStopped" resultType="int">
+        SELECT COALESCE(SUM(mr.stopped_time), 0)
+        FROM monthly_report mr
+                 INNER JOIN inverter i ON mr.inverter_id = i.id
+                 INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
+          AND mr.base_month = #{month}
+    </select>
+
+    <!-- 발전량 추이(월별) : 최근 12개월 -->
+    <select id="selectMonthlyTrend" resultType="com.suncontrol.domain.dto.chartDto">
+        SELECT mr.base_month AS label,
+               ROUND(COALESCE(SUM(mr.value_actual), 0), 2) AS value
+        FROM monthly_report mr
+            INNER JOIN inverter i ON mr.inverter_id = i.id
+            INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
+        GROUP BY mr.base_month
+        ORDER BY mr.base_month
+            LIMIT 12
+    </select>
+
+    <!-- 기상 조건별 발전 분포(월별) -->
+    <select id="selectMonthlyWeather" resultType="com.suncontrol.domain.dto.chartDto">
+        SELECT
+            CASE wc.weather_code
+                WHEN '01' THEN '맑음'
+                WHEN '02' THEN '구름 조금'
+                WHEN '03' THEN '흐림'
+                WHEN '04' THEN '비'
+                WHEN '05' THEN '눈'
+                ELSE '기타'
+                END AS label,
+            ROUND(COALESCE(AVG(dr.performance_ratio), 0), 2) AS value
+        FROM (
+            SELECT '01' AS weather_code
+            UNION ALL SELECT '02'
+            UNION ALL SELECT '03'
+            UNION ALL SELECT '04'
+            UNION ALL SELECT '05'
+            ) wc
+            LEFT JOIN daily_report dr
+        ON wc.weather_code = dr.weather_code
+            LEFT JOIN inverter i
+            ON dr.inverter_id = i.id
+            LEFT JOIN plant p
+            ON i.plant_id = p.id
+        WHERE p.id = #{plantId}
+          AND p.is_deleted = 0
+          AND DATE_FORMAT(dr.base_date, '%Y-%m') = #{month}
+        GROUP BY wc.weather_code
+        ORDER BY wc.weather_code
     </select>
 
 </mapper>

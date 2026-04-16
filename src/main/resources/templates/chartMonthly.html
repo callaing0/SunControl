@@ -4,7 +4,7 @@
       layout:decorate="~{layout/layout}">
 <head>
     <meta charset="UTF-8">
-    <title>SolarGuard | Statistics</title>
+    <title>SolarGuard | Monthly Statistics</title>
 
     <th:block layout:fragment="css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -29,48 +29,51 @@
                 <h2 class="text-3xl font-black text-gray-800 tracking-tighter italic uppercase">발전 통계 분석</h2>
                 <div class="flex items-center mt-1">
                     <p class="text-sm text-gray-400 font-bold uppercase tracking-widest">
-                        기간 누적 발전량, 증감률, 평균 발전량, 기상보정기대값, 인버터 가동 중지 시간을 분석합니다.
+                        기간 누적 발전량, 전월대비 증감률, 월 평균 발전량, 기상 보정 기대값, 가동 중지시간을 분석합니다.
                     </p>
                 </div>
             </div>
         </div>
 
         <!-- 필터 영역 -->
-        <form method="get" th:action="@{/chart}" id="chartFilterForm" class="mb-10 px-2 flex flex-wrap items-center gap-4">
+        <form method="get" th:action="@{/chart/monthly}" id="chartMonthlyFilterForm" class="mb-10 px-2 flex flex-wrap items-center gap-4">
             <div class="bg-gray-50 p-1.5 rounded-2xl border border-gray-100 flex items-center shadow-sm">
                 <a th:href="@{/chart}"
-                   class="px-10 py-3.5 bg-yellow-400 text-black rounded-xl font-black shadow-lg shadow-yellow-400/20 italic uppercase tracking-wide">
+                   class="px-10 py-3.5 text-gray-400 font-black hover:text-gray-600 transition-colors italic uppercase tracking-wide">
                     일별
                 </a>
 
                 <a th:href="@{/chartMonthly}"
-                   class="px-10 py-3.5 text-gray-400 font-black hover:text-gray-600 transition-colors italic uppercase tracking-wide">
+                   class="px-10 py-3.5 bg-yellow-400 text-black rounded-xl font-black shadow-lg shadow-yellow-400/20 italic uppercase tracking-wide">
                     월별
                 </a>
             </div>
 
             <div class="flex items-center gap-3">
                 <button type="button"
-                        id="prevDateBtn"
+                        id="prevMonthBtn"
                         class="bg-white px-6 py-3.5 rounded-2xl border border-gray-200 text-gray-700 font-black hover:bg-gray-50 transition-all shadow-sm active:scale-95">
-                    이전일
+                    이전월
                 </button>
+
                 <button type="button"
-                        id="todayBtn"
+                        id="currentMonthBtn"
                         class="bg-yellow-400 px-6 py-3.5 rounded-2xl text-black font-black hover:brightness-95 transition-all shadow-sm active:scale-95">
-                    오늘
+                    이번달
                 </button>
+
                 <button type="button"
-                        id="nextDateBtn"
+                        id="nextMonthBtn"
                         class="bg-white px-6 py-3.5 rounded-2xl border border-gray-200 text-gray-700 font-black hover:bg-gray-50 transition-all shadow-sm active:scale-95">
-                    다음일
+                    다음월
                 </button>
+
                 <div class="bg-gray-50 rounded-2xl border border-gray-100 shadow-sm px-6 py-3.5 flex items-center">
-                    <input type="date"
-                           id="selectedDate"
-                           name="selectedDate"
-                           th:value="${selectedDate}"
-                           th:attr="max=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                    <input type="month"
+                           id="selectedMonth"
+                           name="selectedMonth"
+                           th:value="${selectedMonth != null ? selectedMonth : #temporals.format(#temporals.createNow(), 'yyyy-MM')}"
+                           th:attr="max=${#temporals.format(#temporals.createNow(), 'yyyy-MM')}"
                            class="bg-transparent font-black text-gray-700 outline-none italic uppercase">
                 </div>
             </div>
@@ -81,40 +84,19 @@
             <th:block th:if="${statsSummary != null and !#lists.isEmpty(statsSummary)}">
                 <div th:each="stat : ${statsSummary}"
                      class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[210px]">
-                    <div class="flex justify-between items-end mb-6 italic uppercase">
-                        <div class="flex items-center">
-                            <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
 
-                            <div class="flex items-baseline gap-2">
+                    <div class="flex items-center mb-6 italic uppercase">
+                        <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
                         <span class="text-lg font-black text-gray-800"
-                              th:text="${stat.title}">Analysis Item</span>
-
-                                <!-- kWh -->
-                                <span class="text-lg font-black text-gray-800"
-                                      th:if="${#strings.contains(stat.title, '발전량') or #strings.contains(stat.title, '기상보정기대값')}">
-                                    (kWh)
-                                </span>
-
-                                <!-- % -->
-                                <span class="text-lg font-black text-gray-800"
-                                      th:if="${#strings.contains(stat.title, '증감률') or #strings.contains(stat.title, '효율')}">
-                                    (%)
-                                </span>
-
-                                <!-- sec -->
-                                <span class="text-lg font-black text-gray-800"
-                                      th:if="${#strings.contains(stat.title, '가동 중지 시간') or #strings.contains(stat.title, '중지 시간')}">
-                                    (sec)
-                                </span>
-                            </div>
-                        </div>
-                        <span></span>
+                              th:text="${stat.title}">
+                    Analysis Item
+                </span>
                     </div>
 
                     <div class="bg-gray-50 rounded-2xl min-h-[100px] px-6 py-6 flex items-center justify-center text-center">
                 <span class="text-2xl font-black text-gray-900 leading-none italic"
-                      th:text="${#strings.replace(#strings.replace(#strings.replace(stat.value, 'kWh', ''), '%', ''), 'sec', '')}">
-                    0,000
+                      th:text="${stat.value}">
+                    0
                 </span>
                     </div>
                 </div>
@@ -123,31 +105,10 @@
             <th:block th:if="${statsSummary == null or #lists.isEmpty(statsSummary)}">
                 <div th:each="i : ${#numbers.sequence(1, 5)}"
                      class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[210px]">
-                    <div class="flex justify-between items-end mb-6 italic uppercase">
-                        <div class="flex items-center">
-                            <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
-                            <span class="text-lg font-black text-gray-300">WAITING DATA</span>
-                        </div>
-                        <span></span>
+                    <div class="flex items-center mb-6 italic uppercase">
+                        <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
+                        <span class="text-lg font-black text-gray-300">WAITING DATA</span>
                     </div>
-
-                    <div class="bg-gray-50 rounded-2xl min-h-[100px] px-6 py-6 flex items-center justify-center text-center">
-                        <span class="text-2xl font-black text-gray-300 leading-none italic">--</span>
-                    </div>
-                </div>
-            </th:block>
-
-            <th:block th:if="${statsSummary == null or #lists.isEmpty(statsSummary)}">
-                <div th:each="i : ${#numbers.sequence(1, 5)}"
-                     class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[210px]">
-                    <div class="flex justify-between items-end mb-6 italic uppercase">
-                        <div class="flex items-center">
-                            <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
-                            <span class="text-lg font-black text-gray-300">WAITING DATA</span>
-                        </div>
-                        <span></span>
-                    </div>
-
                     <div class="bg-gray-50 rounded-2xl min-h-[100px] px-6 py-6 flex items-center justify-center text-center">
                         <span class="text-2xl font-black text-gray-300 leading-none italic">--</span>
                     </div>
@@ -157,41 +118,43 @@
 
         <!-- 차트 영역 -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1 min-h-[520px]">
-            <!-- 발전량 추이 -->
+            <!-- 발전량 추이(월별) -->
             <div class="bg-white p-10 rounded-[45px] shadow-sm border border-gray-100 flex flex-col transition-all">
                 <h3 class="text-xl font-black text-gray-800 mb-6 flex items-center italic uppercase">
                     <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
-                    발전량 추이
+                    월별 발전량 추이
                 </h3>
 
                 <div class="flex-1 chart-container flex items-center justify-center min-h-0">
-                    <canvas id="timeGenChart" th:if="${generationTrend != null and !#lists.isEmpty(generationTrend)}"></canvas>
+                    <canvas id="monthlyGenChart"
+                            th:if="${generationTrend != null and !#lists.isEmpty(generationTrend)}"></canvas>
 
                     <div th:if="${generationTrend == null or #lists.isEmpty(generationTrend)}" class="text-center">
                         <div class="text-5xl mb-4 opacity-20">📈</div>
-                        <p class="text-gray-400 font-bold italic uppercase">분석할 발전량 데이터가 없습니다.</p>
+                        <p class="text-gray-400 font-bold italic uppercase">월별 발전량 데이터가 없습니다.</p>
                         <p class="text-[10px] text-gray-300 uppercase tracking-widest mt-2">
-                            Waiting for generation statistics...
+                            Waiting for monthly generation statistics...
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- 기상 조건별 효율 -->
+            <!-- 기상 조건별 발전 분포(월별) -->
             <div class="bg-white p-10 rounded-[45px] shadow-sm border border-gray-100 flex flex-col transition-all">
                 <h3 class="text-xl font-black text-gray-800 mb-6 flex items-center italic uppercase">
                     <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
-                    기상 조건별 발전 효율
+                    월별 기상 조건별 발전 효율
                 </h3>
 
                 <div class="flex-1 chart-container flex items-center justify-center min-h-0">
-                    <canvas id="weatherDistChart" th:if="${weatherEfficiency != null and !#lists.isEmpty(weatherEfficiency)}"></canvas>
+                    <canvas id="monthlyWeatherChart"
+                            th:if="${weatherDistribution != null and !#lists.isEmpty(weatherDistribution)}"></canvas>
 
-                    <div th:if="${weatherEfficiency == null or #lists.isEmpty(weatherEfficiency)}" class="text-center">
+                    <div th:if="${weatherDistribution == null or #lists.isEmpty(weatherDistribution)}" class="text-center">
                         <div class="text-5xl mb-4 opacity-20">☁️</div>
-                        <p class="text-gray-400 font-bold italic uppercase">기상 조건 데이터가 집계되지 않았습니다.</p>
+                        <p class="text-gray-400 font-bold italic uppercase">월별 기상 분포 데이터가 없습니다.</p>
                         <p class="text-[10px] text-gray-300 uppercase tracking-widest mt-2">
-                            Waiting for weather efficiency logs...
+                            Waiting for monthly weather distribution logs...
                         </p>
                     </div>
                 </div>
@@ -204,33 +167,33 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         const generationTrend = /*[[${generationTrend}]]*/ [];
-        const weatherEfficiency = /*[[${weatherEfficiency}]]*/ [];
+        const weatherDistribution = /*[[${weatherDistribution}]]*/ [];
 
         const weatherMap = {
             "맑음": "☀️ 맑음",
-            "구름": "⛅ 구름",
+            "구름 조금": "⛅ 구름 조금",
             "흐림": "☁️ 흐림",
             "비": "🌧️ 비",
             "눈": "❄️ 눈"
         };
 
         const weatherColorMap = {
-            "맑음": "#facc15",
-            "구름": "#9ca3af",
-            "흐림": "#6b7280",
-            "비": "#3b82f6",
+            "맑음": "#f59e0b",
+            "구름 조금": "#eab308",
+            "흐림": "#94a3b8",
+            "비": "#2563eb",
             "눈": "#93c5fd"
         };
 
-        const timeGenCtx = document.getElementById('timeGenChart');
-        if (timeGenCtx && generationTrend.length > 0) {
-            new Chart(timeGenCtx, {
+        const monthlyGenCtx = document.getElementById('monthlyGenChart');
+        if (monthlyGenCtx && Array.isArray(generationTrend) && generationTrend.length > 0) {
+            new Chart(monthlyGenCtx, {
                 type: 'line',
                 data: {
-                    labels: generationTrend.map(item => item.label),
+                    labels: generationTrend.map(item => item.label || ''),
                     datasets: [{
                         label: '발전량 (kWh)',
-                        data: generationTrend.map(item => item.value),
+                        data: generationTrend.map(item => item.value ?? 0),
                         borderColor: '#facc15',
                         backgroundColor: 'rgba(250, 204, 21, 0.12)',
                         fill: true,
@@ -280,16 +243,16 @@
             });
         }
 
-        const weatherCtx = document.getElementById('weatherDistChart');
-        if (weatherCtx && weatherEfficiency.length > 0) {
-            new Chart(weatherCtx, {
+        const monthlyWeatherCtx = document.getElementById('monthlyWeatherChart');
+        if (monthlyWeatherCtx && Array.isArray(weatherDistribution) && weatherDistribution.length > 0) {
+            new Chart(monthlyWeatherCtx, {
                 type: 'bar',
                 data: {
-                    labels: weatherEfficiency.map(item => weatherMap[item.label] || item.label),
+                    labels: weatherDistribution.map(item => weatherMap[item.label] || item.label || '기타'),
                     datasets: [{
-                        label: '평균 효율 (%)',
-                        data: weatherEfficiency.map(item => item.value),
-                        backgroundColor: weatherEfficiency.map(item => weatherColorMap[item.label] || '#3b82f6'),
+                        label: '평균 발전 성능 (%)',
+                        data: weatherDistribution.map(item => item.value ?? 0),
+                        backgroundColor: weatherDistribution.map(item => weatherColorMap[item.label] || '#3b82f6'),
                         borderRadius: 12,
                         barPercentage: 0.55
                     }]
@@ -313,8 +276,12 @@
                     scales: {
                         y: {
                             beginAtZero: true,
+                            max: 100,
                             grid: { color: '#f8fafc' },
                             ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                },
                                 font: {
                                     size: 10,
                                     weight: 'bold'
@@ -335,59 +302,67 @@
             });
         }
 
-        const form = document.getElementById('chartFilterForm');
-        const dateInput = document.getElementById('selectedDate');
-        const prevDateBtn = document.getElementById('prevDateBtn');
-        const todayBtn = document.getElementById('todayBtn');
-        const nextDateBtn = document.getElementById('nextDateBtn');
+        const form = document.getElementById('chartMonthlyFilterForm');
+        const monthInput = document.getElementById('selectedMonth');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const currentMonthBtn = document.getElementById('currentMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
 
-        function formatDate(date) {
+        function formatMonth(date) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+            return `${year}-${month}`;
         }
 
-        function changeDate(days) {
-            if (!dateInput.value) return;
+        function parseMonthValue(value) {
+            if (!value || !value.includes('-')) return null;
+            const [year, month] = value.split('-').map(Number);
+            if (!year || !month) return null;
+            return new Date(year, month - 1, 1);
+        }
 
-            const currentDate = new Date(dateInput.value + 'T00:00:00');
-            currentDate.setDate(currentDate.getDate() + days);
+        function changeMonth(diff) {
+            if (!monthInput || !monthInput.value) return;
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const current = parseMonthValue(monthInput.value);
+            if (!current) return;
 
-            if (currentDate > today) {
-                dateInput.value = formatDate(today);
+            current.setMonth(current.getMonth() + diff);
+
+            const now = new Date();
+            const maxMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+            if (current > maxMonth) {
+                monthInput.value = formatMonth(maxMonth);
             } else {
-                dateInput.value = formatDate(currentDate);
+                monthInput.value = formatMonth(current);
             }
 
             form.submit();
         }
 
-        if (dateInput) {
-            dateInput.addEventListener('change', function () {
+        if (monthInput) {
+            monthInput.addEventListener('change', function () {
                 form.submit();
             });
         }
 
-        if (prevDateBtn) {
-            prevDateBtn.addEventListener('click', function () {
-                changeDate(-1);
+        if (prevMonthBtn) {
+            prevMonthBtn.addEventListener('click', function () {
+                changeMonth(-1);
             });
         }
 
-        if (todayBtn) {
-            todayBtn.addEventListener('click', function () {
-                dateInput.value = formatDate(new Date());
+        if (currentMonthBtn) {
+            currentMonthBtn.addEventListener('click', function () {
+                monthInput.value = formatMonth(new Date());
                 form.submit();
             });
         }
 
-        if (nextDateBtn) {
-            nextDateBtn.addEventListener('click', function () {
-                changeDate(1);
+        if (nextMonthBtn) {
+            nextMonthBtn.addEventListener('click', function () {
+                changeMonth(1);
             });
         }
         /*]]>*/
