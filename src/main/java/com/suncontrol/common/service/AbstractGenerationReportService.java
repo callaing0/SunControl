@@ -130,8 +130,7 @@ public abstract class AbstractGenerationReportService {
         String endMonth = TimeTruncater.getBaseMonth(endDate);
         log.info("{} 부터 {} 까지 월간통계생성", startDate, endDate);
         if(startMonth.equals(endMonth)) {
-            log.warn("월말 결산은 매 월 1일에만 진행함");
-            return;
+            log.warn("중간 집계를 생성합니다.");
         }
 
         List<MonthlyReportDto> monthlyReportDtoList = monthlyReport(startDate, endDate);

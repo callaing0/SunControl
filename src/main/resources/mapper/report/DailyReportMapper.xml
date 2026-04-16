@@ -52,5 +52,6 @@
         WHERE base_date
         BETWEEN #{start} AND #{end}
         AND day_offset = #{dayOffset}
+        ORDER BY base_date ASC
     </select>
 </mapper>

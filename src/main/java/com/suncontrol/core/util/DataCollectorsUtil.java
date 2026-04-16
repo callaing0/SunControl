@@ -102,8 +102,10 @@ public class DataCollectorsUtil {
                 .collect(
                         Collectors.groupingBy(
                                 key1Mapper,
+                                LinkedHashMap::new,
                                 Collectors.groupingBy(
                                         key2Mapper,
+                                        LinkedHashMap::new,
                                         Collectors.mapping(
                                                 valueMapper,
                                                 Collectors.toList()

@@ -101,7 +101,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                             (inverterId, Collections.emptyMap());
             // 상세로직
             while(!currentTime.isAfter(end)) {
-                HourlyReportDto previous = prevInnerMap.get(currentTime.minusDays(1));
+                HourlyReportDto oneDayPrevious = prevInnerMap.get(currentTime.minusDays(1));
                 List<GenerationLogDto> genList = genLogInnverMap.get(currentTime);
                 if(genList == null || genList.isEmpty()) {
                     log.debug("{} inverter 의 {} 기록없음", inverterId, currentTime);
@@ -115,17 +115,18 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                                 inverter.getCreatedAt(),
                                 StaticValues.HOUR_SECONDS)
                         .isEqual(currentTime);
+                LocalDateTime prevTime = isFirst ? inverter.getCreatedAt() : currentTime.minusHours(1);
 
                 GenerationValuesDto resultSet =
                         new ReportCalcDto(
                                 currentTime,
-                                (previous != null) ? previous.getValueActual() : null,
+                                (oneDayPrevious != null) ? oneDayPrevious.getValueActual() : null,
                                 DataCollectorsUtil.toDataList(
                                         genList,
                                         GenerationLogDto::getValuesDto
                                         ),
                                 StaticValues.HOUR_SECONDS,
-                                (isFirst) ? null : inverter.getCreatedAt()
+                                prevTime
                                 )
                                 .getValues();
                 HourlyReportDto result = new HourlyReportDto(
@@ -191,8 +192,8 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                 List<HourlyReportDto> sources = sourceInnerMap.getOrDefault(current, Collections.emptyList());
 
                 if(sources == null || sources.isEmpty()) {
-                    log.warn("{} inverter 의 {} 기록없음", inverter.getInverterId(), current);
-                    current.plusDays(1);
+                    log.debug("{} inverter 의 {} 기록없음", inverter.getInverterId(), current);
+                    current = current.plusDays(1);
                     continue;
                 }
 
@@ -207,7 +208,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                                 ),
                                 StaticValues.DAY_SECONDS,
                                 (previous != null) ?
-                                        null :
+                                        previous.getBaseDate().atStartOfDay() :
                                         inverter.getCreatedAt()
                         );
 
@@ -263,11 +264,13 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
             while(current.isBefore(end)) {
                 String currentMonth = TimeTruncater.getBaseMonth(current);
                 String prevMonth = TimeTruncater.getBaseMonth(current.minusMonths(1));
+                log.info("{} 인버터의 {} 데이터 생성", inverterId, currentMonth);
 
                 List<DailyReportDto> dailyList = dailyInnerMap.get(currentMonth);
                 MonthlyReportDto currentReport = prevInnerMap.get(currentMonth);
 
                 if(dailyList == null || dailyList.isEmpty() || currentReport != null) {
+                    current = current.plusMonths(1);
                     continue;
                 }
                 MonthlyReportDto previous = prevInnerMap.get(prevMonth);
@@ -305,7 +308,10 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
         return TimeTruncater.getOldestDateOrDefault(
                 dtoList,
                 defaultStartDate,
-                MonthlyReportDto::getBaseDate
+                dto -> {
+                    LocalDate next = dto.getBaseDate().plusMonths(1); // 단순 전진
+                    return next.isAfter(LocalDate.now()) ? LocalDate.now().withDayOfMonth(1) : next;
+                }
         );
     }
 
