@@ -36,6 +36,7 @@ public class dashboardController {
         model.addAttribute("summary", dashboardService.getDashboardSummary(memberId, resolvedPlantId));
         model.addAttribute("inverters", dashboardService.getInverters(memberId, resolvedPlantId));
         model.addAttribute("menu", "dashboard");
+        model.addAttribute("lastUpdateTime", dashboardService.getLastUpdateTime());
 
         return "dashboard";
     }

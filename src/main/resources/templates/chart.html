@@ -77,32 +77,30 @@
         </form>
 
         <!-- 요약 카드 -->
-        <div class="grid grid-cols-5 gap-6 mb-10">
+        <div class="grid grid-cols-5 gap-5 mb-10">
             <th:block th:if="${statsSummary != null and !#lists.isEmpty(statsSummary)}">
                 <div th:each="stat : ${statsSummary}"
-                     class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[210px]">
-                    <div class="flex justify-between items-end mb-6 italic uppercase">
-                        <div class="flex items-center">
-                            <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
+                     class="bg-white p-6 rounded-[36px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[190px]">
 
-                            <div class="flex items-baseline gap-2">
-                        <span class="text-lg font-black text-gray-800"
-                              th:text="${stat.title}">Analysis Item</span>
+                    <div class="flex justify-between items-end mb-5 italic uppercase">
+                        <div class="flex items-center min-w-0">
+                            <span class="w-1.5 h-5 bg-yellow-400 rounded-full mr-3 shrink-0"></span>
 
-                                <!-- kWh -->
-                                <span class="text-lg font-black text-gray-800"
+                            <div class="flex items-baseline gap-1.5 min-w-0 flex-wrap">
+                                <span class="text-[15px] font-black text-gray-800 leading-tight break-keep"
+                                      th:text="${stat.title}">Analysis Item</span>
+
+                                <span class="text-[13px] font-black text-gray-500"
                                       th:if="${#strings.contains(stat.title, '발전량') or #strings.contains(stat.title, '기상보정기대값')}">
                                     (kWh)
                                 </span>
 
-                                <!-- % -->
-                                <span class="text-lg font-black text-gray-800"
+                                <span class="text-[13px] font-black text-gray-500"
                                       th:if="${#strings.contains(stat.title, '증감률') or #strings.contains(stat.title, '효율')}">
                                     (%)
                                 </span>
 
-                                <!-- sec -->
-                                <span class="text-lg font-black text-gray-800"
+                                <span class="text-[13px] font-black text-gray-500"
                                       th:if="${#strings.contains(stat.title, '가동 중지 시간') or #strings.contains(stat.title, '중지 시간')}">
                                     (sec)
                                 </span>
@@ -111,45 +109,28 @@
                         <span></span>
                     </div>
 
-                    <div class="bg-gray-50 rounded-2xl min-h-[100px] px-6 py-6 flex items-center justify-center text-center">
-                <span class="text-2xl font-black text-gray-900 leading-none italic"
-                      th:text="${#strings.replace(#strings.replace(#strings.replace(stat.value, 'kWh', ''), '%', ''), 'sec', '')}">
-                    0,000
-                </span>
+                    <div class="bg-gray-50 rounded-2xl min-h-[92px] px-5 py-5 flex items-center justify-center text-center">
+                        <span class="text-[24px] font-black text-gray-900 leading-none italic break-keep"
+                              th:text="${#strings.replace(#strings.replace(#strings.replace(stat.value, 'kWh', ''), '%', ''), 'sec', '')}">
+                            0,000
+                        </span>
                     </div>
                 </div>
             </th:block>
 
             <th:block th:if="${statsSummary == null or #lists.isEmpty(statsSummary)}">
                 <div th:each="i : ${#numbers.sequence(1, 5)}"
-                     class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[210px]">
-                    <div class="flex justify-between items-end mb-6 italic uppercase">
+                     class="bg-white p-6 rounded-[36px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[190px]">
+                    <div class="flex justify-between items-end mb-5 italic uppercase">
                         <div class="flex items-center">
-                            <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
-                            <span class="text-lg font-black text-gray-300">WAITING DATA</span>
+                            <span class="w-1.5 h-5 bg-yellow-400 rounded-full mr-3"></span>
+                            <span class="text-[15px] font-black text-gray-300">WAITING DATA</span>
                         </div>
                         <span></span>
                     </div>
 
-                    <div class="bg-gray-50 rounded-2xl min-h-[100px] px-6 py-6 flex items-center justify-center text-center">
-                        <span class="text-2xl font-black text-gray-300 leading-none italic">--</span>
-                    </div>
-                </div>
-            </th:block>
-
-            <th:block th:if="${statsSummary == null or #lists.isEmpty(statsSummary)}">
-                <div th:each="i : ${#numbers.sequence(1, 5)}"
-                     class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[210px]">
-                    <div class="flex justify-between items-end mb-6 italic uppercase">
-                        <div class="flex items-center">
-                            <span class="w-1.5 h-6 bg-yellow-400 rounded-full mr-3"></span>
-                            <span class="text-lg font-black text-gray-300">WAITING DATA</span>
-                        </div>
-                        <span></span>
-                    </div>
-
-                    <div class="bg-gray-50 rounded-2xl min-h-[100px] px-6 py-6 flex items-center justify-center text-center">
-                        <span class="text-2xl font-black text-gray-300 leading-none italic">--</span>
+                    <div class="bg-gray-50 rounded-2xl min-h-[92px] px-5 py-5 flex items-center justify-center text-center">
+                        <span class="text-[24px] font-black text-gray-300 leading-none italic">--</span>
                     </div>
                 </div>
             </th:block>
