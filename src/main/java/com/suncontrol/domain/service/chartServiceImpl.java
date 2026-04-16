@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +32,7 @@ public class chartServiceImpl implements chartService {
 
         if (previousGeneration.compareTo(BigDecimal.ZERO) > 0) {
             changeRate = totalGeneration.subtract(previousGeneration)
-                    .divide(previousGeneration, 4, BigDecimal.ROUND_HALF_UP)
+                    .divide(previousGeneration, 4, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100));
         }
 
@@ -41,7 +42,7 @@ public class chartServiceImpl implements chartService {
                 totalGeneration.stripTrailingZeros().toPlainString() + " kWh"));
 
         summaryList.add(createSummary("대비 증감률",
-                changeRate.setScale(2, BigDecimal.ROUND_HALF_UP) + " %"));
+                changeRate.setScale(2, RoundingMode.HALF_UP) + " %"));
 
         summaryList.add(createSummary("평균 발전량",
                 averageGeneration.stripTrailingZeros().toPlainString() + " kWh"));
@@ -89,7 +90,12 @@ public class chartServiceImpl implements chartService {
         list.add(createSummary("전월대비 증감률", changeRate.setScale(2, BigDecimal.ROUND_HALF_UP) + " %"));
         list.add(createSummary("월 평균 발전량", avg.stripTrailingZeros().toPlainString() + " kWh"));
         list.add(createSummary("기상 보정 기대값", expected.stripTrailingZeros().toPlainString() + " kWh"));
-        list.add(createSummary("가동 중지시간", (stopped == null ? 0 : stopped) + " min"));
+        int stoppedSeconds = (stopped == null ? 0 : stopped);
+        BigDecimal stoppedMinutes = BigDecimal.valueOf(stoppedSeconds)
+                .divide(BigDecimal.valueOf(60), 1, RoundingMode.HALF_UP);
+
+        list.add(createSummary("가동 중지시간",
+                stoppedMinutes.stripTrailingZeros().toPlainString() + " min"));
 
         return list;
     }
