@@ -82,7 +82,7 @@
                 <div th:each="stat : ${statsSummary}"
                      class="bg-white p-6 rounded-[36px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[190px]">
 
-                    <div class="flex justify-between items-end mb-5 italic uppercase">
+                    <div class="flex justify-between items-end mb-5 italic">
                         <div class="flex items-center min-w-0">
                             <span class="w-1.5 h-5 bg-yellow-400 rounded-full mr-3 shrink-0"></span>
 
@@ -121,7 +121,7 @@
             <th:block th:if="${statsSummary == null or #lists.isEmpty(statsSummary)}">
                 <div th:each="i : ${#numbers.sequence(1, 5)}"
                      class="bg-white p-6 rounded-[36px] shadow-sm border border-gray-100 flex flex-col justify-center min-h-[190px]">
-                    <div class="flex justify-between items-end mb-5 italic uppercase">
+                    <div class="flex justify-between items-end mb-5 italic">
                         <div class="flex items-center">
                             <span class="w-1.5 h-5 bg-yellow-400 rounded-full mr-3"></span>
                             <span class="text-[15px] font-black text-gray-300">WAITING DATA</span>
