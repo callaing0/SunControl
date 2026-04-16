@@ -17,7 +17,6 @@ public enum Role {
     ROLE_ADMIN("ADMIN"),
     ROLE_USER("USER");
     private final String role;
-    // TODO : 계정 권한
     public static final List<Role> LIST =
             Arrays.asList(Role.values());
 

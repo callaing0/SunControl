@@ -12,5 +12,4 @@ public interface RadiationLogRepository {
     int saveAll(List<RadiationLog> entities);
 
     List<RadiationLog> findLatestLogs(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
-    //todo
 }

@@ -13,5 +13,5 @@ public interface DailyWeatherRepository {
 
     List<DailyWeather> findLatestLogs(
             @Param("start") LocalDate start, @Param("end") LocalDate end);
-    //todo
+
 }

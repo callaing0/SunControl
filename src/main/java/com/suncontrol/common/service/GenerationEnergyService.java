@@ -149,7 +149,7 @@ public class GenerationEnergyService {
                     inverterStart = inverterStart.isBefore(start) ? start : inverterStart;
 
                     // region 6. 세부 로직 호출
-                /// TODO : getResult 파라미터 추가 (날씨정보 묶음 & 인버터 스펙)
+                ///  getResult 파라미터 추가 (날씨정보 묶음 & 인버터 스펙)
                     GenerationResultSet result =
                             getResult(
                                     inverterStart, end, inverter,
@@ -187,7 +187,7 @@ public class GenerationEnergyService {
 
     public Map<Long, List<GenerationResultDto>> getPredict
             (LocalDateTime start, LocalDateTime end) {
-        /// TODO
+        /// TODO 예측모델 구현
         return Collections.emptyMap();
     }
 
