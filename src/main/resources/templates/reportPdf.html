@@ -27,27 +27,27 @@
     <div class="grid grid-cols-3 border-b border-gray-200 text-center">
       <div class="p-5 border-r border-gray-100">
         <p class="text-gray-400 font-bold text-xs mb-1 uppercase">리포트 생성일시</p>
-        <p class="text-[#152257] font-bold text-lg">2026-03-20 15:00:00</p>
+        <p th:text="${reportPdfDto. createdDate}" class="text-[#152257] font-bold text-lg">2026-03-20 15:00:00</p>
       </div>
       <div class="p-5 border-r border-gray-100">
         <p class="text-gray-400 font-bold text-xs mb-1 uppercase">분석 기간</p>
-        <p class="text-[#152257] font-bold text-lg">2026-03-01 ~ 2026-03-31</p>
+        <p th:text="${reportPdfDto.anlaysisPeriod}" class="text-[#152257] font-bold text-lg">2026-03-01 ~ 2026-03-31</p>
       </div>
       <div class="p-5">
         <p class="text-gray-400 font-bold text-xs mb-1 uppercase">발전소명</p>
-        <p class="text-[#152257] font-bold text-lg">대전 태양광 발전소 A</p>
+        <p th:text="${reportPdfDto.plantName}"class="text-[#152257] font-bold text-lg">대전 태양광 발전소 A</p>
       </div>
       <div class="p-5 border-t border-r border-gray-100">
         <p class="text-gray-400 font-bold text-xs mb-1 uppercase">주소</p>
-        <p class="text-[#152257] font-bold text-sm">대전광역시 유성구 ...</p>
+        <p th:text="${reportPdfDto.plantAddress}"class="text-[#152257] font-bold text-sm">대전광역시 유성구 ...</p>
       </div>
       <div class="p-5 border-t border-r border-gray-100">
         <p class="text-gray-400 font-bold text-xs mb-1 uppercase">설비 용량</p>
-        <p class="text-[#FB8C00] font-black text-xl italic">100 kW</p>
+        <p th:text="${reportPdfDto.capacity}" class="text-[#FB8C00] font-black text-xl italic">100 kW</p>
       </div>
       <div class="p-5 border-t border-gray-100">
         <p class="text-gray-400 font-bold text-xs mb-1 uppercase">담당자명</p>
-        <p class="text-[#152257] font-bold text-lg font-bold">박지연</p>
+        <p th:text="${reportPdfDto.name}" class="text-[#152257] font-bold text-lg font-bold">박지연</p>
       </div>
     </div>
 
@@ -60,27 +60,27 @@
       <div class="grid grid-cols-5 gap-3">
         <div class="bg-[#F8FAFF] border border-blue-100 rounded-2xl p-4 text-center">
           <p class="text-blue-400 font-bold text-xs mb-2">당월 발전량</p>
-          <p class="text-[#152257] font-black text-xl">122.4 kWh</p>
+          <p th:text="${reportPdfDto.valueActual}" class="text-[#152257] font-black text-xl">122.4 kWh</p>
           <p class="text-gray-400 text-[10px] mt-1">목표 150 kWh</p>
         </div>
         <div class="bg-[#F8FAFF] border border-blue-100 rounded-2xl p-4 text-center">
           <p class="text-blue-400 font-bold text-xs mb-2">전월 대비 증감</p>
-          <p class="text-green-500 font-black text-xl">+8.3%</p>
+          <p th:text="${reportPdfDto.increaseRate}" class="text-green-500 font-black text-xl">+8.3%</p>
           <p class="text-gray-400 text-[10px] mt-1">+9.4 kWh 증가</p>
         </div>
         <div class="bg-[#F8FAFF] border border-blue-100 rounded-2xl p-4 text-center">
           <p class="text-blue-400 font-bold text-xs mb-2">목표 달성률</p>
-          <p class="text-[#FB8C00] font-black text-xl">81.6%</p>
+          <p th:text="${reportPdfDto.performanceRatio}" class="text-[#FB8C00] font-black text-xl">81.6%</p>
           <p class="text-gray-400 text-[10px] mt-1">잔여 27.6 kWh</p>
         </div>
         <div class="bg-[#F8FAFF] border border-blue-100 rounded-2xl p-4 text-center">
           <p class="text-blue-400 font-bold text-xs mb-2">장애 발생</p>
-          <p class="text-red-500 font-black text-xl">2건</p>
+          <p th:text="${reportPdfDto.incidentCount}" class="text-red-500 font-black text-xl">2건</p>
           <p class="text-gray-400 text-[10px] mt-1">처리중 1건</p>
         </div>
         <div class="bg-[#F8FAFF] border border-blue-100 rounded-2xl p-4 text-center">
           <p class="text-blue-400 font-bold text-xs mb-2">월 가동 시간</p>
-          <p class="text-[#FB8C00] font-black text-xl">468 h</p>
+          <p th:text="${reportPdfDto.stoppedTime}" class="text-[#FB8C00] font-black text-xl">468 h</p>
           <p class="text-gray-400 text-[10px] mt-1">목표 600h · 78%</p>
         </div>
       </div>
@@ -154,11 +154,11 @@
         </thead>
         <tbody class="text-center font-medium">
         <tr class="border-b border-gray-200 bg-[#F8FAFF]">
-          <td class="py-4 text-gray-600">2026-03-08 09:14</td>
-          <td class="font-bold text-[#152257]">INV-B3</td>
-          <td>출력 저하</td>
-          <td class="font-bold text-red-500">처리 중</td>
-          <td class="text-xs">즉시 조치 필요</td>
+          <td th:text="${incidentReportDto.detectTime}" class="py-4 text-gray-600">2026-03-08 09:14</td>
+          <td th:text="${incidentReportDto.InverterId}" class="font-bold text-[#152257]">INV-B3</td>
+          <td th:text="${incidentReportDto.type}">출력 저하</td>
+          <td th:text="${incidentReportDto.statusCode}" class="font-bold text-red-500">처리 중</td>
+          <td th:text="${incidentReportDto.Comments}" class="text-xs">즉시 조치 필요</td>
         </tr>
         <tr class="border-b border-gray-200">
           <td class="py-4 text-gray-600">2026-03-12 14:30</td>
