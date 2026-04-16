@@ -4,16 +4,20 @@
 
     <select id="findAll" resultType="com.suncontrol.domain.dto.AlertResponseDTO">
         SELECT
-            id,
-            inverter_id AS inverterId,
-            status,
-            alert_type AS alertType,
-            severity,
-            message,
-            created_at AS createdAt,
-            resolved_at AS resolvedAt
-        FROM alert_log
-        ORDER BY created_at DESC
+            a.id,
+            a.inverter_id AS inverterId,
+            a.status,
+            a.alert_type AS alertType,
+            a.severity,
+            a.message,
+            a.created_at AS createdAt,
+            a.resolved_at AS resolvedAt,
+            /* 인버터가 속한 발전소의 이름을 위치 정보로 가져옴 */
+            p.name AS location
+        FROM alert_log a
+                 LEFT JOIN inverter i ON a.inverter_id = i.id
+                 LEFT JOIN plant p ON i.plant_id = p.id
+        ORDER BY a.created_at DESC
     </select>
 
     <select id="findById" resultType="com.suncontrol.core.entity.log.AlertLog">
