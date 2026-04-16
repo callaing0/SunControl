@@ -51,4 +51,15 @@ public class DailyReportService {
 
         return DataCollectorsUtil.toDataList(entities, DailyReportDto::new);
     }
+
+
+    public List<DailyReportDto> findAllByDateBetween(Long id,LocalDate start, LocalDate end, Integer dayOffset) {
+        List<DailyReport> entities = repository.findAllByDateBetween(start, end, dayOffset);
+
+        if(entities == null || entities.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return DataCollectorsUtil.toDataList(entities, DailyReportDto::new);
+    }
 }

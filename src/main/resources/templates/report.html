@@ -71,13 +71,19 @@ layout:decorate="~{layout/layout}">
         <td class="text-center border-b"><span>장애 발생</span></td>
         <td class="text-center border-b"><span>가동 정지 시간</span></td>
       </tr>
-      <tr class="text-[25px]">
-        <td class="text-center py-5"><span th:text="${monDailyReportDto.monthDay}">03-19</span></td>
-        <td class="text-center"><span th:text="${monDailyReportDto.valueActual}">187.3</span></td>
-        <td class="text-center"><span th:text="${monDailyReportDto.changeRate}">+8.2%</span></td>
-        <td class="text-center"><span th:text="${monDailyReportDto.performanceRatio}">89.2%</span></td>
-        <td class="text-center"><span th:text="${monDailyReportDto.incidentCount}">장애 1건</span></td>
-        <td class="text-center"><span th:text="${monDailyReportDto.stoppedTime}">2</span></td>
+      <tr th:each="daily:${dailyReportDtoList}" class="text-[25px]">
+        <td class="text-center py-5"><span th:text="${daily.baseDate}">03-19</span></td>
+        <td class="text-center"><span th:text="${daily.valueActual}">187.3</span></td>
+        <td class="text-center"><span th:with="percent=${daily.valuePrevious != 0 ? (daily.valueActual - daily.valuePrevious) / daily.valuePrevious * 100 : 0}"
+                                            th:text="${#numbers.formatDecimal(percent, 1, 1) + '%'}">
+                                                      0.0%
+                                </span>
+        <td class="text-center"><span th:with="ratio=${daily.valueExpected != 0 ? (1.0 * daily.valueActual / daily.valueExpected) * 100 : 0}"
+                                      th:text="${#numbers.formatDecimal(ratio, 1, 1) + '%'}">
+                                                0.0%
+                                </span></td>
+        <td class="text-center"><span th:text="${'장애'+daily.incidentCount+'건'}">장애 1건</span></td>
+        <td class="text-center"><span th:text="${daily.stoppedTime}">2</span></td>
       </tr>
     </table>
   </div>

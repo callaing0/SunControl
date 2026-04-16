@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class MonDailyReportDto {
-    private LocalDate monthDay=LocalDate.of(2026,03,12); // 날짜
+    private LocalDate monthDay=LocalDate.of(2026,3,12); // 날짜
     private Double valueActual=155.5;// 발전량
     private Double changeRate=5.2; // 전일대비
     private Double performanceRatio=60.2; // 목표 달성도
