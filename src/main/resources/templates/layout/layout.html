@@ -31,18 +31,124 @@
 </main>
 
 <div id="toast-container" class="fixed bottom-10 right-10 z-[200] space-y-4"></div>
+<div id="emergency-toast-container" class="fixed top-10 right-10 z-[300] space-y-4"></div>
 
 <div id="modal-area">
     <div th:replace="~{fragments/modals :: logoutModal}"></div>
     <div th:replace="~{fragments/modals :: confirmModal}"></div>
     <div th:replace="~{fragments/modals :: plantModal}"></div>
-<!--    <div th:replace="~{fragments/modals :: inverterModal}"></div>-->
-<!--    <div th:replace="~{fragments/modals :: panelModal}"></div>-->
     <div th:replace="~{fragments/modals :: passwordModal}"></div>
     <div th:replace="~{fragments/plantModal :: plantSelectModal}"></div>
 </div>
 
-<script>
+<script th:inline="javascript">
+
+    // --- ⬇️타 팀원 코드 추가⬇️ ---
+
+    /*<![CDATA[*/
+    let sseRetryCount = 0;
+
+    // 1. 긴급 상단 알림 (빨간색 팝업)
+    window.showEmergencyToast = function(message) {
+        const container = document.getElementById('emergency-toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = "bg-red-500 text-white p-6 rounded-[30px] shadow-2xl border-4 border-red-700 min-w-[420px] animate-bounce mb-4 cursor-pointer hover:scale-105 transition-all toast-animate";
+        toast.innerHTML = `
+        <div class="flex items-center gap-5">
+            <div class="text-4xl">🚨</div>
+            <div class="flex-1">
+                <h4 class="text-[14px] font-[900] uppercase italic tracking-tighter text-white opacity-80">Critical Alert</h4>
+                <p class="text-[13px] font-bold mt-1 text-white break-all leading-relaxed">${message}</p>
+            </div>
+        </div>`;
+        toast.onclick = () => { location.href = '/alerts'; };
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 8000);
+    };
+
+    // 2. 통합 SSE 연결 시스템
+    function initGlobalSSE() {
+        if (window.emergencySource) {
+            window.emergencySource.close();
+            window.emergencySource = null;
+        }
+
+        console.log("실시간 감시 시스템 연결 중...");
+        window.emergencySource = new EventSource('/api/notifications/subscribe');
+
+        window.emergencySource.addEventListener('alertUpdate', function(event) {
+            console.log("서버 알람 수신:", event.data);
+            window.showEmergencyToast(event.data);
+        });
+
+        window.emergencySource.addEventListener('ping', function(event) {
+            console.log("연결 유지 중...");
+            sseRetryCount = 0;
+        });
+
+        window.emergencySource.onerror = function() {
+            console.error("연결 끊김. 재연결 시도 중...");
+            if(window.emergencySource) window.emergencySource.close();
+            window.emergencySource = null;
+
+            let waitTime = sseRetryCount < 5 ? 3000 : 10000;
+            sseRetryCount++;
+            setTimeout(initGlobalSSE, waitTime);
+        };
+    }
+
+    // 3. 기존 팀원 로직 (하단 알림 및 모달)
+    function showToast(message, isError = false) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        const icon = isError ? '❌' : '⚡';
+        const iconColor = isError ? 'text-red-500' : 'text-yellow-400';
+        toast.className = 'bg-gray-900 text-white px-8 py-5 rounded-[25px] shadow-2xl flex items-center space-x-4 min-w-[320px] toast-animate border border-white/10';
+        toast.innerHTML = `<span class="text-xl ${iconColor}">${icon}</span><div class="flex flex-col"><span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 italic">System Notification</span><span class="text-sm font-black tracking-tighter">${message}</span></div>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+    }
+
+    function openModal(id) {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        modal.classList.remove('flex'); modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    // 🚀 실행부: 여기서 딱 한 번만 실행되게 정리함
+    document.addEventListener('DOMContentLoaded', function() {
+        initGlobalSSE(); // SSE 시작
+
+        // 이벤트 리스너들
+        document.addEventListener('click', function (event) {
+            const modalWrapper = event.target.closest('[data-modal-id]');
+            if (modalWrapper && event.target === modalWrapper) closeModal(modalWrapper.dataset.modalId);
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key !== 'Escape') return;
+            document.querySelectorAll('[data-modal-id]').forEach(function (modal) {
+                if (!modal.classList.contains('hidden')) closeModal(modal.dataset.modalId);
+            });
+        });
+    });
+
+    // layout.html 스크립트 안의 주소를 이렇게 바꿔보세요
+    window.emergencySource = new EventSource('/api/notifications/subscribe?t=' + new Date().getTime());
+    /*]]>*/
+
+    // --- 기존 팀원 로직 유지 ---
+
     function showToast(message, isError = false) {
         const container = document.getElementById('toast-container');
         if (!container) return;
@@ -59,7 +165,6 @@
                 <span class="text-sm font-black tracking-tighter">${message}</span>
             </div>
         `;
-
         container.appendChild(toast);
 
         setTimeout(() => {
@@ -71,7 +176,6 @@
     function openModal(id) {
         const modal = document.getElementById(id);
         if (!modal) return;
-
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         document.body.style.overflow = 'hidden';
@@ -80,11 +184,15 @@
     function closeModal(id) {
         const modal = document.getElementById(id);
         if (!modal) return;
-
         modal.classList.remove('flex');
         modal.classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
+
+    // DOM 로드 완료 시 SSE 시작
+    document.addEventListener('DOMContentLoaded', function() {
+        initGlobalSSE();
+    });
 
     document.addEventListener('click', function (event) {
         const modalWrapper = event.target.closest('[data-modal-id]');
@@ -95,13 +203,14 @@
 
     document.addEventListener('keydown', function (event) {
         if (event.key !== 'Escape') return;
-
         document.querySelectorAll('[data-modal-id]').forEach(function (modal) {
             if (!modal.classList.contains('hidden')) {
                 closeModal(modal.dataset.modalId);
             }
         });
     });
+
+    /*]]>*/
 </script>
 <th:block th:replace="~{fragments/modals :: script}"></th:block>
 <th:block layout:fragment="script"></th:block>
