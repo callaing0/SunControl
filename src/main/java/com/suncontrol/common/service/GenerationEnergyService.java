@@ -194,9 +194,14 @@ public class GenerationEnergyService {
     private GenerationResultSet getResult
             (LocalDateTime start, LocalDateTime end, InverterGenerationDto inv,
              WeatherContext context, int termSecond) {
-        log.info("{} 인버터 {}부터 {}까지의 기록생성", inv.getId(), start, end);
         List<GenerationResultDto> resultList = new ArrayList<>();
         LocalDateTime current = start;
+
+        if(current.isBefore(inv.getCreatedAt())) {
+            current = TimeTruncater.truncateToNextTerm
+                    (inv.getCreatedAt(), termSecond);
+        }
+        log.info("{} 인버터 {}부터 {}까지의 기록생성", inv.getId(), current, end);
 
         BigDecimal lastAccumEnergy = inv.getLastAccumEnergy();
         while(!current.isAfter(end)) {

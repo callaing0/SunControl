@@ -33,7 +33,7 @@ public class MonthlyReportService {
     public List<MonthlyReportDto> findAllByMonthBetween(LocalDate start, LocalDate end) {
         String startMonth = TimeTruncater.getBaseMonth(start);
         String endMonth = TimeTruncater.getBaseMonth(end);
-        log.info("start month: {}, end month: {}", startMonth, endMonth);
+        log.info("이전 데이터 조회, start month: {}, end month: {}", startMonth, endMonth);
 
         return entityToDto(repository.findAllByMonthBetween(startMonth, endMonth));
     }
