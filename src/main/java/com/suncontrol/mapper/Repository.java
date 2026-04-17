@@ -26,4 +26,6 @@ public interface Repository {
     List<AlertResponseDTO> findByLocation(String location);
 
     int updateStatus(Long id, int status);
+
+    Object findAllAlerts();
 }
