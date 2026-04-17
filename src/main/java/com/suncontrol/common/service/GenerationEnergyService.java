@@ -72,14 +72,15 @@ public class GenerationEnergyService {
                 );
         LocalDateTime now = LocalDateTime.now();
 
+        log.info(recentGenerated.toString());
         log.info("collect data at  {}", now);
         LocalDateTime defaultStart = TimeTruncater.getOldestTimeOrDefault
                 (inverterList, now, InverterDto::getBaseTime);
         LocalDateTime start = TimeTruncater
                 .getOldestTimeOrDefault(nextStartTimes, defaultStart);
-        log.info("collect data from {}", start);
         /// 시작시간을 발전량 생성 기준으로 "평탄화" (당시 시각의 다음 시간대)
-        start = TimeTruncater.truncateToNextTerm(start, termSeconds);
+        start = TimeTruncater.truncateToTerm(start, termSeconds);
+        log.info("collect data from {}", start);
         /// 끝시간 : 시작시간 1달 후 또는 현재 중 적은 값
         LocalDateTime monthLater = start.plusMonths(1);
         LocalDateTime end = TimeTruncater.getOldestTimeOrDefault(
@@ -88,7 +89,7 @@ public class GenerationEnergyService {
         end = TimeTruncater.truncateToTerm(end, termSeconds);
         log.info("collect data to {}", end);
 
-        if(start.isAfter(end)) {
+        if(start.minusMinutes(1).isAfter(end)) {
             log.info("생성할 발전데이터가 없습니다");
             return;
         }
