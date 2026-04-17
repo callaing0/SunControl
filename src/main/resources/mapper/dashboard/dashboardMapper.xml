@@ -70,12 +70,12 @@
     <select id="selectTodayGeneration" resultType="com.suncontrol.domain.dto.DashboardGenerationDto">
         SELECT
             i.plant_id AS plantId,
-            ROUND(COALESCE(SUM(dr.value_actual), 0), 2) AS dailyAccumulation,
-            ROUND(COALESCE(SUM(dr.value_expected), 0), 2) AS predGen
+            ROUND(COALESCE(SUM(hr.value_actual), 0), 2) AS dailyAccumulation,
+            ROUND(COALESCE(SUM(hr.value_expected), 0), 2) AS predGen
         FROM inverter i
-                 LEFT JOIN daily_report dr
-                           ON dr.inverter_id = i.id
-                               AND dr.base_date = CURDATE()
+                 LEFT JOIN hourly_report hr
+                           ON hr.inverter_id = i.id
+                               AND DATE(hr.base_time) = CURDATE()
         WHERE i.plant_id = #{plantId}
         GROUP BY i.plant_id
     </select>
