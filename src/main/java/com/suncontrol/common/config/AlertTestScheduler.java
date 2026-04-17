@@ -8,11 +8,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Component
 public class AlertTestScheduler {
 
-    // 30초마다 "나 살아있어"라고 브라우저에 신호 보냄 (끊김 방지 핵심)
     @Scheduled(fixedRate = 30000)
     public void keepAlive() {
         NotificationController.emitters.forEach((id, emitter) -> {
             try {
+                // 🚨 broadcast 대신 ping만 쏴서 연결만 유지하세요!
                 emitter.send(SseEmitter.event().name("ping").data("keep-alive"));
             } catch (Exception e) {
                 NotificationController.emitters.remove(id);
