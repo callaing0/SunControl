@@ -38,7 +38,6 @@ public abstract class AbstractGenerationReportService {
 
     /// 통계 작성하는 프로세스 메서드
     /// 파라미터 예시 ) ReportDataType.ACTUAL_SNAPSHOT 등
-    /// TODO : 시간 파라미터를 받을 게 아니고 process가 돌릴 시간을 결정해야 할거같은데?
     public void process(ReportDataType reportDataType){
         /// 잘못된 파라미터 요청이 들어오면 뱉어버린다.
         if(reportDataType == ReportDataType.UNKNOWN) {

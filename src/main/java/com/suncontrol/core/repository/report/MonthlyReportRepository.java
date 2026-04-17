@@ -13,5 +13,4 @@ public interface MonthlyReportRepository {
     List<MonthlyReport> findAllByMonthBetween(@Param("start") String startMonth,@Param("end") String endMonth);
 
     List<MonthlyReport> findAllLatestByInverter();
-    //todo
 }

@@ -72,14 +72,15 @@ public class GenerationEnergyService {
                 );
         LocalDateTime now = LocalDateTime.now();
 
+        log.info(recentGenerated.toString());
         log.info("collect data at  {}", now);
         LocalDateTime defaultStart = TimeTruncater.getOldestTimeOrDefault
                 (inverterList, now, InverterDto::getBaseTime);
         LocalDateTime start = TimeTruncater
                 .getOldestTimeOrDefault(nextStartTimes, defaultStart);
-        log.info("collect data from {}", start);
         /// 시작시간을 발전량 생성 기준으로 "평탄화" (당시 시각의 다음 시간대)
-        start = TimeTruncater.truncateToNextTerm(start, termSeconds);
+        start = TimeTruncater.truncateToTerm(start, termSeconds);
+        log.info("collect data from {}", start);
         /// 끝시간 : 시작시간 1달 후 또는 현재 중 적은 값
         LocalDateTime monthLater = start.plusMonths(1);
         LocalDateTime end = TimeTruncater.getOldestTimeOrDefault(
@@ -88,7 +89,7 @@ public class GenerationEnergyService {
         end = TimeTruncater.truncateToTerm(end, termSeconds);
         log.info("collect data to {}", end);
 
-        if(start.isAfter(end)) {
+        if(start.minusMinutes(1).isAfter(end)) {
             log.info("생성할 발전데이터가 없습니다");
             return;
         }
@@ -149,7 +150,7 @@ public class GenerationEnergyService {
                     inverterStart = inverterStart.isBefore(start) ? start : inverterStart;
 
                     // region 6. 세부 로직 호출
-                /// TODO : getResult 파라미터 추가 (날씨정보 묶음 & 인버터 스펙)
+                ///  getResult 파라미터 추가 (날씨정보 묶음 & 인버터 스펙)
                     GenerationResultSet result =
                             getResult(
                                     inverterStart, end, inverter,
@@ -187,16 +188,21 @@ public class GenerationEnergyService {
 
     public Map<Long, List<GenerationResultDto>> getPredict
             (LocalDateTime start, LocalDateTime end) {
-        /// TODO
+        /// TODO 예측모델 구현
         return Collections.emptyMap();
     }
 
     private GenerationResultSet getResult
             (LocalDateTime start, LocalDateTime end, InverterGenerationDto inv,
              WeatherContext context, int termSecond) {
-        log.info("{} 인버터 {}부터 {}까지의 기록생성", inv.getId(), start, end);
         List<GenerationResultDto> resultList = new ArrayList<>();
         LocalDateTime current = start;
+
+        if(current.isBefore(inv.getCreatedAt())) {
+            current = TimeTruncater.truncateToNextTerm
+                    (inv.getCreatedAt(), termSecond);
+        }
+        log.info("{} 인버터 {}부터 {}까지의 기록생성", inv.getId(), current, end);
 
         BigDecimal lastAccumEnergy = inv.getLastAccumEnergy();
         while(!current.isAfter(end)) {

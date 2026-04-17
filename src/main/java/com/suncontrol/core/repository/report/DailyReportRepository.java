@@ -14,5 +14,4 @@ public interface DailyReportRepository {
     List<DailyReport> findAllLatestByInverter(@Param("dayOffset") Integer dayOffset);
 
     List<DailyReport> findAllByDateBetween(@Param("start") LocalDate start,@Param("end") LocalDate end,@Param("dayOffset") Integer dayOffset);
-    //todo
 }

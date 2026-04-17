@@ -14,5 +14,4 @@ public interface WeatherLogRepository {
     List<WeatherLog> findLatestLogs(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     WeatherLog findLatestLogOfAll();
-    //todo
 }

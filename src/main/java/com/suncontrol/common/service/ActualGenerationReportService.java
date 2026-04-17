@@ -92,7 +92,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
         for(InverterMeta inverter : inverterList) {
             Long inverterId = inverter.getInverterId();
             LocalDateTime currentTime =
-                    TimeTruncater.truncateToNextTerm(start, StaticValues.HOUR_SECONDS);
+                    TimeTruncater.truncateToTerm(start, StaticValues.HOUR_SECONDS);
             Map<LocalDateTime, HourlyReportDto> prevInnerMap =
                     previousMap.getOrDefault
                             (inverterId, new HashMap<>());
