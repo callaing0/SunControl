@@ -34,8 +34,8 @@
 
     <select id="findAllByMonthBetween" resultType="com.suncontrol.core.entity.report.MonthlyReport">
         SELECT * FROM monthly_report
-        WHERE base_month BETWEEN #{start} AND #{end}
-        ORDER BY base_month ASC
+        WHERE base_month >= #{start}
+        AND base_month <![CDATA[ < ]]> #{end}
     </select>
 
 
@@ -47,6 +47,12 @@
         FROM monthly_report r2
         WHERE r2.inverter_id = r1.inverter_id
         )
-        ORDER BY base_month ASC
+    </select>
+
+    <select id="findByInverterIdAndBaseMonth" resultType="com.suncontrol.core.entity.report.MonthlyReport">
+        select * from monthly_report
+        where inverter_id = #{inverter_id}
+        and  base_month = #{base_month}
+
     </select>
 </mapper>
