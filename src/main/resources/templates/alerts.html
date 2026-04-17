@@ -3,31 +3,26 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <div layout:fragment="content">
-    <div id="toastContainer" class="fixed top-10 right-10 z-[110] flex flex-col gap-4"></div>
-
     <div class="mt-10 bg-white rounded-[50px] shadow-sm border border-gray-100 p-12 flex-1 flex flex-col min-h-[82vh]">
+
         <div class="mb-10 px-2 flex justify-between items-end">
             <div>
                 <h2 class="text-3xl font-[900] text-gray-800 tracking-tighter italic uppercase">알람 이력</h2>
-                <p class="text-sm text-gray-400 font-bold mt-1 tracking-tight">실시간 장애 추적 시스템</p>
+                <p class="text-sm text-gray-400 font-bold mt-1 tracking-tight">실시간 장애 추적 시스템 (Team Project)</p>
             </div>
 
-            <button th:if="${not #lists.isEmpty(alerts)}"
-                    th:onclick="|testPush(${alerts[0].status})|"
-                    class="bg-red-500 text-white px-6 py-2 rounded-full font-black text-xs hover:bg-black transition-all shadow-lg">
-                🚨 즉시 알림 테스트
-            </button>
+            <div class="flex gap-3">
+                <button th:if="${not #lists.isEmpty(alerts)}"
+                        th:onclick="|testPush(${alerts[0].status})|"
+                        class="bg-red-500 text-white px-6 py-2 rounded-full font-black text-xs hover:bg-black transition-all shadow-lg">
+                    🚨 즉시 알림 테스트
+                </button>
 
-            <button th:if="${#lists.isEmpty(alerts)}"
-                    onclick="testPush(0)"
-                    class="bg-red-500 text-white px-6 py-2 rounded-full font-black text-xs hover:bg-black transition-all shadow-lg">
-                🚨 즉시 알림 테스트
-            </button>
-
-            <div th:if="${alerts != null and !#lists.isEmpty(alerts)}" class="text-right">
-                <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-5 py-2.5 rounded-full border border-blue-100 uppercase tracking-widest shadow-sm">
-                    Total Logs: <span th:text="${#lists.size(alerts)}">0</span>
-                </span>
+                <div th:if="${alerts != null and !#lists.isEmpty(alerts)}" class="text-right">
+                    <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-5 py-2.5 rounded-full border border-blue-100 uppercase tracking-widest shadow-sm">
+                        Total Logs: <span th:text="${#lists.size(alerts)}">0</span>
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -44,54 +39,24 @@
             <div class="flex-1 flex flex-col relative divide-y divide-gray-50 overflow-y-auto custom-scroll">
                 <th:block th:if="${alerts != null and !#lists.isEmpty(alerts)}">
                     <div th:each="alert : ${alerts}"
-                         class="flex py-7 px-12 text-center items-center text-lg font-black text-gray-700 hover:bg-gray-50 transition-colors duration-200">
-
-                        <div class="w-24 text-base font-bold text-gray-400"
-                             th:text="${alert.id}">1</div>
-
-                        <div class="w-32 text-base font-bold text-blue-600"
-                             th:text="${alert.getInverterNumber()}">260401</div>
-
-                        <div class="flex-1 text-base text-gray-800"
-                             th:text="${alert.createdAt != null ? #temporals.format(alert.createdAt, 'yyyy-MM-dd HH:mm:ss') : '--'}">
-                        </div>
-
-                        <div class="flex-1 text-base text-gray-400"
-                             th:text="${alert.resolvedAt != null ? #temporals.format(alert.resolvedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}">
-                        </div>
-
-                        <div class="w-40 text-sm font-bold text-gray-600 uppercase"
-                             th:text="${alert.location != null ? alert.location : '-'}">
-                        </div>
-
+                         class="flex py-7 px-12 text-center items-center text-lg font-black text-gray-700 hover:bg-gray-50 transition-colors">
+                        <div class="w-24 text-base font-bold text-gray-400" th:text="${alert.id}"></div>
+                        <div class="w-32 text-base font-bold text-blue-600" th:text="${alert.getInverterNumber()}"></div>
+                        <div class="flex-1 text-base text-gray-800" th:text="${alert.createdAt != null ? #temporals.format(alert.createdAt, 'yyyy-MM-dd HH:mm:ss') : '--'}"></div>
+                        <div class="flex-1 text-base text-gray-400" th:text="${alert.resolvedAt != null ? #temporals.format(alert.resolvedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}"></div>
+                        <div class="w-40 text-sm font-bold text-gray-600 uppercase" th:text="${alert.location}"></div>
                         <div class="w-36 flex justify-center border-l border-gray-100 pl-4">
-
-                            <!-- 장애 발생 / 확인중 -->
-                            <form th:if="${alert.status != 2}"
-                                  th:action="@{/alerts/{id}/status(id=${alert.id})}"
-                                  method="post">
-
+                            <form th:if="${alert.status != 2}" th:action="@{/alerts/{id}/status(id=${alert.id})}" method="post">
                                 <button type="submit"
-                                        class="min-w-[110px] px-4 py-2 rounded-full text-[11px] font-black tracking-wide shadow-sm border transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95"
-                                        th:classappend="${alert.status == 0}
-                                            ? ' bg-red-500 text-white border-red-600 hover:bg-red-600 '
-                                            : ' bg-amber-400 text-white border-amber-500 hover:bg-amber-500 '"
-                                        th:text="${alert.status == 0 ? '장애 발생' : '확인중'}">
-                                    상태
-                                </button>
+                                        class="min-w-[110px] px-4 py-2 rounded-full text-[11px] font-black shadow-sm border transition-all hover:scale-105"
+                                        th:classappend="${alert.status == 0 ? 'bg-red-500 text-white' : 'bg-amber-400 text-white'}"
+                                        th:text="${alert.status == 0 ? '장애 발생' : '확인 중'}"></button>
                             </form>
-
-                            <!-- 조치 완료 -->
-                            <span th:if="${alert.status == 2}"
-                                  class="inline-flex items-center justify-center min-w-[110px] px-4 py-2 rounded-full text-[11px] font-black tracking-wide shadow-sm border bg-emerald-500 text-white border-emerald-600">
-                                ✅ 조치 완료
-                            </span>
+                            <span th:if="${alert.status == 2}" class="min-w-[110px] px-4 py-2 rounded-full text-[11px] font-black border bg-emerald-500 text-white">✅ 조치 완료</span>
                         </div>
                     </div>
                 </th:block>
-
-                <div th:if="${alerts == null or #lists.isEmpty(alerts)}"
-                     class="flex-1 flex items-center justify-center text-gray-300 font-bold italic text-3xl">
+                <div th:if="${alerts == null or #lists.isEmpty(alerts)}" class="flex-1 flex items-center justify-center text-gray-300 font-bold italic text-3xl">
                     NO ALARM LOGS DETECTED
                 </div>
             </div>
@@ -101,62 +66,26 @@
 
 <th:block layout:fragment="script">
     <script th:inline="javascript">
-        window.testPush = function(currentStatus) {
-            console.log("현재 감지된 상태값:", currentStatus);
+        /*<![CDATA[*/
+        // ✅ 전역 함수 선언 - 중복 없이 딱 하나만 존재해야 합니다.
+        window.testPush = function(status) {
+            console.log("테스트 실행 - 상태:", status);
 
-            // 조치 완료(2)이면 알림 차단
-            if (Number(currentStatus) === 2) {
-                console.warn("차단: 이미 조치 완료된 상태입니다.");
+            if (Number(status) === 2) {
+                console.warn("이미 조치 완료된 로그입니다.");
                 return;
             }
 
-            showEmergencyToast("🚨 [장애발생] 인버터:260401 | 통신이상 감지됨");
+            // window.showEmergencyToast가 정의되어 있는지 확인
+            if (window.showEmergencyToast && typeof window.showEmergencyToast === 'function') {
+                window.showEmergencyToast("🚨 알림 시스템 정상 가동! 다른 탭에서도 유지됩니다.");
+            } else {
+                console.error("Layout의 알림 함수를 찾을 수 없습니다.");
+                alert("Layout 파일에 showEmergencyToast 함수가 정의되지 않았습니다.");
+            }
         };
-
-        function connectSSE() {
-            const eventSource = new EventSource('/api/notifications/subscribe');
-
-            eventSource.addEventListener('alertUpdate', function(event) {
-                const msg = event.data;
-                if (!/조치|완료|정상/.test(msg)) {
-                    showEmergencyToast(msg);
-                }
-            });
-
-            eventSource.onerror = function() {
-                eventSource.close();
-                setTimeout(connectSSE, 3000);
-            };
-        }
-
-        connectSSE();
-
-        function showEmergencyToast(message) {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
-
-            const toast = document.createElement('div');
-            toast.className = "bg-red-500 text-white p-6 rounded-[30px] shadow-2xl border-4 border-red-700 min-w-[400px] animate-bounce mb-4 cursor-pointer hover:scale-105 transition-transform";
-
-            toast.innerHTML = `
-                <div class="flex items-center gap-5">
-                    <div class="text-4xl">🚨</div>
-                    <div class="flex-1">
-                        <h4 class="text-[14px] font-[900] uppercase italic tracking-tighter text-white opacity-80">Critical Alert</h4>
-                        <p class="text-[13px] font-bold mt-1 text-white break-all leading-relaxed">${message}</p>
-                        <p class="text-[10px] text-white mt-2 font-black uppercase tracking-widest opacity-60 italic text-right">Click to View</p>
-                    </div>
-                </div>
-            `;
-
-            toast.onclick = () => location.reload();
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-x-full');
-                setTimeout(() => toast.remove(), 500);
-            }, 8000);
-        }
+        /*]]>*/
     </script>
 </th:block>
+</html>>
 </html>

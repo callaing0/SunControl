@@ -185,9 +185,9 @@
 
                 <div th:if="${hasInverters}" class="overflow-hidden rounded-[28px] border border-gray-100 bg-gray-50">
                     <table class="w-full text-sm">
-                        <thead class="bg-gray-100 text-gray-500 uppercase text-[11px]">
+                        <thead class="bg-gray-100 text-gray-500 text-[11px]">
                         <tr>
-                            <th class="px-4 py-3 text-center">S/N</th>
+                            <th class="px-4 py-3 text-center uppercase">S/N</th>
                             <th class="px-4 py-3 text-center">상태</th>
                             <th class="px-4 py-3 text-center">출력(kW)</th>
                             <th class="px-4 py-3 text-center">정격용량(kW)</th>
@@ -269,7 +269,7 @@
                          class="panel-group hidden overflow-hidden rounded-[28px] border border-gray-100 bg-gray-50">
 
                         <table class="w-full text-sm" th:if="${panelEntry.value != null and !#lists.isEmpty(panelEntry.value)}">
-                            <thead class="bg-gray-100 text-gray-500 uppercase text-[11px]">
+                            <thead class="bg-gray-100 text-gray-500 text-[11px]">
                             <tr>
                                 <th class="px-4 py-3 text-center">구분</th>
                                 <th class="px-4 py-3 text-center">모델명</th>

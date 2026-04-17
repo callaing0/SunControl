@@ -62,7 +62,7 @@
                             <span class="text-xs">⚡</span>
                         </button>
 
-                        <p class="mt-4 text-[10px] text-gray-400 text-center font-medium">
+                        <p class="mt-4 text-[10px] text-gray-500 text-center font-medium">
                             * 실시간 자산 현황입니다.
                         </p>
                     </form>
@@ -118,10 +118,10 @@
                 <table class="w-full text-left border-collapse">
                     <thead class="sticky top-0 bg-white z-10">
                     <tr class="border-b-2 border-gray-50">
-                        <th class="py-5 text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">시설명</th>
-                        <th class="py-5 text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">주소</th>
-                        <th class="py-5 text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">정격 용량</th>
-                        <th class="py-5 text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">현재 출력</th>
+                        <th class="py-5 text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] text-center">시설명</th>
+                        <th class="py-5 text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] text-center">주소</th>
+                        <th class="py-5 text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] text-center">정격 용량</th>
+                        <th class="py-5 text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] text-center">현재 출력</th>
                     </tr>
                     </thead>
 
@@ -147,7 +147,7 @@
                                   th:text="${plant.capacitySum != null ? plant.capacitySum : 0}">
                                 0
                             </span>
-                            <span class="text-[10px] font-black text-gray-300 ml-1 uppercase">kW</span>
+                            <span class="text-[10px] font-black text-gray-400 ml-1 ">kW</span>
                         </td>
 
                         <!-- 현재 출력 -->
@@ -156,7 +156,7 @@
                                   th:text="${plant.totalValue != null ? plant.totalValue : 0}">
                                 0
                             </span>
-                            <span class="text-[10px] font-black text-blue-200 ml-1 uppercase">kWh</span>
+                            <span class="text-[10px] font-black text-blue-400 ml-1 ">kWh</span>
                         </td>
 
                     </tr>
