@@ -3,6 +3,82 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.core.repository.log.GenerationLogRepository">
+<mapper namespace="com.suncontrol.core.repository.log.GenerationLogRepository">
+    <insert id="saveAll" parameterType="com.suncontrol.core.entity.log.GenerationLog">
+        INSERT INTO generation_log
+        (
+        inverter_id, base_time, value_expected, value_actual,
+        performance_ratio, expected_ratio, capacity_factor,
+        accum_energy, weather_code, status
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.inverterId}, #{item.baseTime},
+            #{item.valueExpected}, #{item.valueActual},
+            #{item.performanceRatio}, #{item.expectedRatio}, #{item.capacityFactor},
+            #{item.accumEnergy}, #{item.weatherCode}, #{item.status}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        value_expected = VALUES(value_expected),
+        value_actual = VALUES(value_actual),
+        performance_ratio = VALUES(performance_ratio),
+        expected_ratio = VALUES(expected_ratio),
+        capacity_factor = VALUES(capacity_factor),
+        accum_energy = VALUES(accum_energy),
+        weather_code = VALUES(weather_code),
+        status = VALUES(status),
+        updated_at = NOW()
+    </insert>
 
+    <select id="findLastsOf" resultType="com.suncontrol.core.dto.log.LastGeneratedTime">
+        SELECT inverter_id, MAX(base_time) as base_time
+        FROM generation_log
+        GROUP BY inverter_id
+    </select>
+
+    <select id="findAllByStatus"
+            resultType="com.suncontrol.core.entity.log.GenerationLog">
+        SELECT * FROM generation_log
+        WHERE status = #{status}
+    </select>
+
+    <select id="findAllByNotStatus"
+            resultType="com.suncontrol.core.entity.log.GenerationLog">
+        SELECT * FROM generation_log
+        WHERE status != #{status}
+    </select>
+
+    <select id="findAllBetweenTimeByStatus"
+            resultType="com.suncontrol.core.entity.log.GenerationLog">
+        SELECT * FROM generation_log
+        WHERE status = #{status}
+        AND base_time BETWEEN #{start} AND #{end}
+    </select>
+
+    <select id="findAllBetweenTimeByNotStatus"
+            resultType="com.suncontrol.core.entity.log.GenerationLog">
+        SELECT * FROM generation_log
+        WHERE status != #{status}
+        AND base_time BETWEEN #{start} AND #{end}
+    </select>
+
+    <select id="findAllByTimeBetween"
+            resultType="com.suncontrol.core.entity.log.GenerationLog">
+        SELECT * FROM generation_log
+        WHERE base_time BETWEEN #{start} and #{end}
+        ORDER BY base_time ASC
+    </select>
+
+    <update id="updateStatus"
+            parameterType="com.suncontrol.core.dto.log.GenerationLogUpdateStatusDto">
+
+        <foreach collection="list" item="item" separator=";">
+            UPDATE generation_log
+            SET status = #{item.status}
+            WHERE inverter_id = #{item.inverterId}
+            AND base_time = #{item.baseTime}
+        </foreach>
+    </update>
 </mapper>

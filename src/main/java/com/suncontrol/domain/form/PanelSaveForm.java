@@ -4,7 +4,7 @@ import com.suncontrol.core.constant.asset.PanelManufacturer;
 import com.suncontrol.core.constant.asset.PanelModel;
 import com.suncontrol.core.dto.asset.InverterCapSurplusDto;
 import com.suncontrol.core.dto.asset.PanelDto;
-import com.suncontrol.core.dto.asset.component.InverterBaseDto;
+import com.suncontrol.core.dto.component.InverterBaseDto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,10 +20,12 @@ public class PanelSaveForm {
     /// 패널 등록 form
 
     @NotNull
-    private InverterBaseDto inverter;
+    private Long inverterId;
+    @NotNull
+    private Long plantId;
     @NotBlank(message = "패널 모델을 입력해주세요")
     private String modelName;
-    @NotBlank(message = "시스템에 등록된 패널 모델이 아닙니다")
+    @NotNull(message = "시스템에 등록된 패널 모델이 아닙니다")
     @Setter(AccessLevel.NONE)
     private PanelModel model;
     @NotBlank(message = "패널 제조사를 입력해주세요")
@@ -38,12 +40,6 @@ public class PanelSaveForm {
     private int count;
 
 /// InverterCapSurplusDto 용 가상필드
-    public void setPlantId(Long plantId) {
-        this.inverter.setPlantId(plantId);
-    }
-    public Long getPlantId() {
-        return this.inverter.getPlantId();
-    }
     public BigDecimal getMeasuredCapSurplus() {
         /// 패널 용량 W 단위를 인버터 용량 kW 단위로 변환
         return model != null ? BigDecimal
@@ -53,13 +49,8 @@ public class PanelSaveForm {
                 : null; /// 모델을 못찾으면 null로 반환
     }
 /// InverterCapSurplusDto 및 PanelSaveDto 용 가상필드
-    public void setInverterId(Long inverterId) {
-        this.inverter.setInverterId(inverterId);
-    }
-    public Long getInverterId() {
-        return this.inverter.getInverterId();
-    }
-    public void setModel(String modelName) {
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
         this.model = PanelModel.getByName(modelName);
     }
     private PanelManufacturer getManufacturer() {
@@ -87,7 +78,7 @@ public class PanelSaveForm {
     /// INSERT, UPDATE 할 핵심 내용을 두 dto로 분리 추출하도록 한다.
 
     /// panel 테이블에 저장될 내용
-    public PanelDto getPanelDto() {
+    public PanelDto toDto() {
         /*
          * TODO : 시스템에 등록되어 있지 않은 모델/제조사/용량/효율 을 감지하고
          * TODO : '기존에 없던 새 패널 정보' 를 시스템에 추가 할 수 있어야 한다
@@ -99,12 +90,12 @@ public class PanelSaveForm {
         return dto;
     }
     /// inverter 테이블에 업데이트 될 내용
-    public InverterCapSurplusDto getInverterCapSurplusDto() {
-        InverterCapSurplusDto dto = new InverterCapSurplusDto();
-        dto.setPlantId(getPlantId());
-        dto.setInverterId(getInverterId());
-        dto.setMeasuredCapSurplus(getMeasuredCapSurplus());
-        return dto;
+    public InverterCapSurplusDto toInvCapDto() {
+        return InverterCapSurplusDto.builder()
+                .plantId(plantId)
+                .inverterId(inverterId)
+                .measuredCapSurplus(getMeasuredCapSurplus())
+                .build();
     }
 
 }

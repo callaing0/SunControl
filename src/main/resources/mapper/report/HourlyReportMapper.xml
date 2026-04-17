@@ -3,6 +3,52 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.core.repository.report.HourlyReportRepository">
+<mapper namespace="com.suncontrol.core.repository.report.HourlyReportRepository">
+    <insert id="saveAll" parameterType="com.suncontrol.core.entity.report.HourlyReport">
+        INSERT INTO hourly_report (
+        inverter_id, base_time, day_offset,
+        value_expected, value_actual, value_previous,
+        performance_ratio, expected_ratio, capacity_factor, accum_energy,
+        weather_code, status
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.inverterId}, #{item.baseTime}, #{item.dayOffset},
+            #{item.valueExpected}, #{item.valueActual}, #{item.valuePrevious},
+            #{item.performanceRatio}, #{item.expectedRatio}, #{item.capacityFactor}, #{item.accumEnergy},
+            #{item.weatherCode}, #{item.status}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        value_expected = VALUES(value_expected),
+        value_actual = VALUES(value_actual),
+        value_previous = VALUES(value_previous),
+        performance_ratio = VALUES(performance_ratio),
+        expected_ratio = VALUES(expected_ratio),
+        capacity_factor = VALUES(capacity_factor),
+        accum_energy = VALUES(accum_energy),
+        weather_code = VALUES(weather_code),
+        status = VALUES(status),
+        updated_at = NOW()
+    </insert>
+
+    <select id="findAllLatestByInverter" resultType="com.suncontrol.core.entity.report.HourlyReport">
+        SELECT * FROM hourly_report r1
+        WHERE r1.day_offset = #{dayOffset}
+        AND r1.base_time = (
+            SELECT MAX(r2.base_time)
+            FROM hourly_report r2
+            WHERE r2.inverter_id = r1.inverter_id
+            AND r2.day_offset = #{dayOffset}
+        )
+    </select>
+
+    <select id="findAllByBaseTimeBetween" resultType="com.suncontrol.core.entity.report.HourlyReport">
+        SELECT * FROM hourly_report
+        WHERE day_offset = #{dayOffset}
+        AND base_time BETWEEN #{start} AND #{end}
+        ORDER BY base_time ASC
+    </select>
 
 </mapper>

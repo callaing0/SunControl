@@ -5,4 +5,34 @@
 
 <mapper namespace="com.suncontrol.core.repository.asset.PanelRepository">
 
+    <insert id="save" parameterType="com.suncontrol.core.entity.asset.Panel">
+        INSERT INTO panel (inverter_id, model_name, count, created_at, updated_at)
+        VALUES (#{inverterId}, #{modelName}, #{count}, #{createdAt}, #{updatedAt})
+    </insert>
+    <select id="findAllByInverterIds" resultType="com.suncontrol.core.entity.asset.Panel">
+        SELECT * FROM panel WHERE inverter_id IN (
+        <foreach collection="list" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+    <select id="findAllofInverters" resultType="com.suncontrol.core.entity.asset.Panel">
+        SELECT
+        <!--
+        TODO :
+         일단 id = 0, inverterId = 0 인 '발전소의 모든 패널내역'
+         나중에 '패널정보'를 별도 테이블로 다루게된다면 JOIN 해서
+         GROUP BY 한 모델의 id를 입력하도록 하자
+         -->
+        0 as id,
+        0 as inverter_id,
+        model_name,
+        COUNT(*) as count
+        FROM panel WHERE inverter_id IN (
+        <foreach collection="list" item="item" separator=",">
+            #{item}
+        </foreach>
+        ) GROUP BY model_name
+    </select>
+
 </mapper>

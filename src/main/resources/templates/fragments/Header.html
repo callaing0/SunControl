@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<header th:fragment="header"
+        class="h-20 flex items-center justify-end px-12 space-x-6 bg-white/40 backdrop-blur-md border-b border-gray-100/50 sticky top-0 z-[40]">
+
+    <div th:if="${menu == 'dashboard'}"
+         class="flex items-center space-x-2 bg-gray-50/50 px-5 py-2.5 rounded-2xl border border-gray-100 shadow-sm">
+        <span class="flex h-2 w-2 rounded-full bg-blue-400 animate-pulse"></span>
+        <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">Last Update :</span>
+        <span id="headerClock"
+              th:text="${lastUpdateTime != null ? lastUpdateTime : '00:00:00'}"
+              class="text-xs font-[900] text-gray-700 italic">
+        00:00:00
+    </span>
+    </div>
+
+    <div class="flex items-center justify-center rounded-2xl font-[900] shadow-lg italic uppercase transition-transform hover:scale-105"
+         style="width: 160px; height: 44px; font-size: 12px; letter-spacing: -0.03em;"
+         th:classappend="${globalAlertStatus == 0
+        ? ' bg-red-500 text-white shadow-red-500/20 '
+        : (globalAlertStatus == 1
+            ? ' bg-amber-400 text-white shadow-amber-400/20 '
+            : ' bg-[#22c55e] text-white shadow-green-500/20 ')}">
+
+        <span class="mr-2 text-[10px]">●</span>
+
+        <span th:switch="${globalAlertStatus}">
+        <span th:case="0">알람 상태 확인</span>
+        <span th:case="1">조치 진행중</span>
+        <span th:case="2">정상 가동중</span>
+        <span th:case="*">정상 가동중</span>
+    </span>
+    </div>
+
+    <div class="flex items-center justify-center bg-[#1e293b] text-white rounded-2xl font-[900] shadow-xl shadow-gray-200 cursor-pointer italic uppercase transition-all hover:bg-black active:scale-95 group"
+         style="width: 160px; height: 44px; font-size: 12px; letter-spacing: -0.03em;">
+
+        <span class="mr-2 opacity-50 group-hover:opacity-100 transition-opacity"
+              th:text="${session.user != null and #strings.contains(session.user.role, 'ADMIN') ? '🛠' : '👤'}">
+        </span>
+
+        <span th:text="${session.user == null ? 'SYSTEM USER' : (#strings.contains(session.user.role, 'ADMIN') ? '관리자' : '일반 사용자')}">
+        </span>
+    </div>
+</header>
+
+</html>

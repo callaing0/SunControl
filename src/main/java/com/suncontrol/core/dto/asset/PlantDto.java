@@ -30,6 +30,10 @@ public class PlantDto {
     private int tilt;
     private LocalDateTime createdAt;
 
+    public Long getPlantId() {
+        return this.id;
+    }
+
     /// 발전소 DB 조회용 생성자
     public PlantDto(Plant entity) {
         this.memberId = entity.getMemberId();
@@ -43,5 +47,6 @@ public class PlantDto {
         this.azimuth = entity.getAzimuth();
         this.tilt = entity.getTilt();
         this.createdAt = entity.getCreatedAt();
+        this.isMain = entity.isMain();
     }
 }

@@ -4,14 +4,53 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.suncontrol.core.repository.asset.InverterRepository">
+    <resultMap id="InverterMap" type="Inverter">
+        <result column="status_code" property="status"
+                typeHandler="com.suncontrol.core.handler.DeviceStatusTypeHandler"
+                javaType="com.suncontrol.core.constant.asset.DeviceStatus"
+        />
+    </resultMap>
+    <select id="findAllByStatusCodeBetween"
+            resultMap="InverterMap">
+        SELECT * FROM inverter WHERE status_code BETWEEN #{start} AND #{end}
+    </select>
     <insert id="save" parameterType="com.suncontrol.core.entity.asset.Inverter">
         INSERT INTO inverter (plant_id, rated_capacity, type, efficiency, serial)
         VALUES (#{plantId}, #{ratedCapacity}, #{type}, #{efficiency}, #{serial})
     </insert>
-    <update id="updateCap" parameterType="com.suncontrol.core.dto.asset.InverterCapSurplusDto">
+    <update id="updateCap"
+            parameterType="com.suncontrol.core.dto.asset.InverterCapSurplusDto">
         UPDATE inverter SET
-        measured_cap = measured_cap + #{measuredCapSurplus}
+        measured_capacity = measured_capacity + #{measuredCapSurplus},
         updated_at = NOW()
-        WHERE id = #{id} AND plant_id #{plantId}
+        WHERE id = #{id} AND plant_id = #{plantId}
     </update>
+    <update id="updateLastAccumAndStatus">
+        UPDATE inverter
+        SET
+        last_accum_energy = CASE id
+        <foreach collection="list" item="item">
+            WHEN #{item.id} THEN #{item.lastAccumEnergy}
+        </foreach>
+        END,
+        current_power = CASE id
+        <foreach collection="list" item="item">
+            WHEN #{item.id} THEN #{item.currentPower}
+        </foreach>
+        END,
+        status_code = CASE id
+        <foreach collection="list" item="item">
+            WHEN #{item.id} THEN #{item.statusCode}
+        </foreach>
+        END,
+        updated_at = NOW()
+        WHERE id IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </update>
+    <select id = "findAllByPlantId"
+            resultType="com.suncontrol.core.entity.asset.Inverter">
+        SELECT * FROM inverter WHERE plant_id = #{plantId}
+    </select>
 </mapper>

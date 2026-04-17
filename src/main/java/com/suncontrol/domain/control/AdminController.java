@@ -1,8 +1,10 @@
-package com.suncontrol.domain.api;
+package com.suncontrol.domain.control;
 
+import com.suncontrol.core.service.asset.PlantService;
 import com.suncontrol.domain.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -12,10 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminController {
 
     private final MemberService memberService;
+    private final PlantService plantService;
 
     // 관리자 페이지 화면 반환
-    @GetMapping("/")
-    public String showAdminPage() {
-        return "admin"; // 관리자페이지 html 과 이름 맞는지 확인 부탁드립니다!
+    @GetMapping({"", "/"})
+    public String showAdminPage(Model model) {
+        model.addAttribute("userList", memberService.findAll());
+        //관리자 페이지 발전 수동 데이터 발전소 선택을 위한 추가 코드
+        model.addAttribute("plantList", plantService.findAllActive());
+        return "admin";
     }
-}
+    }

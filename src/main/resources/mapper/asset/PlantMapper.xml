@@ -6,9 +6,9 @@
 <mapper namespace="com.suncontrol.core.repository.asset.PlantRepository">
     <insert id="save" parameterType="com.suncontrol.core.entity.asset.Plant">
         INSERT INTO plant (member_id, name, address, latitude, longitude,
-            province_code, district_code, azimuth, tilt)
+            province_code, district_code, azimuth, tilt, is_main)
         values (#{memberId}, #{name}, #{address}, #{latitude}, #{longitude},
-            #{province.code}, #{district.code}, #{azimuth}, #{tilt})
+            #{province.code}, #{district.code}, #{azimuth}, #{tilt}, #{isMain})
     </insert>
     <update id="resetMain">
         UPDATE plant SET is_main = 0 WHERE member_id = #{memberId}
@@ -21,5 +21,24 @@
             SELECT 1 FROM plant
             WHERE id = #{id} AND member_id = #{memberId}
         )
+    </select>
+    <select id ="findAllByIsDeletedFalse"
+            resultType="com.suncontrol.core.entity.asset.Plant">
+        SELECT * FROM plant WHERE is_deleted = 0
+    </select>
+    <select id ="findAllByMemberIdAndIsDeletedFalse"
+            resultType="com.suncontrol.core.entity.asset.Plant">
+        SELECT * FROM plant WHERE is_deleted = 0 AND member_id = #{memberId}
+    </select>
+    <select id = "findPlantInfoViewById"
+            resultType="com.suncontrol.core.entity.view.PlantInfoView">
+        SELECT * FROM plant_info_view WHERE id = #{id}
+    </select>
+    <select id="countPlantsAndSumTotalAccum"
+            resultType="com.suncontrol.core.dto.asset.MainSummaryDto">
+        SELECT
+        COUNT(*) AS count,
+        COALESCE(SUM(accum_total), 0) AS accumTotal
+        FROM plant_info_view
     </select>
 </mapper>

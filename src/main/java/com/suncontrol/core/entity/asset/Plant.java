@@ -3,6 +3,7 @@ package com.suncontrol.core.entity.asset;
 import com.suncontrol.core.constant.common.District;
 import com.suncontrol.core.constant.common.Province;
 import com.suncontrol.core.dto.asset.PlantDto;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Plant {
     private Long id;
     private Long memberId;
@@ -39,6 +41,7 @@ public class Plant {
         this.province = dto.getProvince();
         this.azimuth = dto.getAzimuth();
         this.tilt = dto.getTilt();
+        this.isMain = dto.isMain();
     }
 
     /**

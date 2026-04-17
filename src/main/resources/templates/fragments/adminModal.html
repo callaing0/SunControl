@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="modalStyle">
+    <style>
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</th:block>
+
+<!-- 계정 생성 모달 -->
+<div th:fragment="createAccountModal" id="createAccountModal" class="fixed inset-0 z-[120] hidden items-center justify-center modal-bg">
+    <div class="bg-white rounded-[45px] shadow-2xl w-[560px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
+        <button type="button" onclick="closeModal('createAccountModal')" class="absolute top-10 right-10 text-gray-300 hover:text-gray-600 active:scale-90">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <header class="mb-10 text-center border-b border-gray-50 pb-8">
+            <h3 class="text-3xl font-[900] text-gray-800 tracking-tighter italic uppercase">계정 생성</h3>
+            <p class="text-[11px] text-gray-400 mt-2 font-black uppercase tracking-widest italic">Create New Account</p>
+        </header>
+
+        <form id="createAccountForm" class="space-y-5" onsubmit="event.preventDefault(); createAccount();">
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">아이디 *</label>
+                <input type="text" name="userId" placeholder="로그인 아이디"
+                       class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 outline-none focus:border-yellow-400 transition-all font-bold text-gray-700"
+                       required>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">이름 *</label>
+                <input type="text" name="name" placeholder="사용자 이름"
+                       class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 outline-none focus:border-yellow-400 transition-all font-bold text-gray-700"
+                       required>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">소속 *</label>
+                <input type="text" name="affiliation" placeholder="예: 본사, 대전지사"
+                       class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 outline-none focus:border-yellow-400 transition-all font-bold text-gray-700"
+                       required>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">권한 *</label>
+                <select name="role"
+                        class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 outline-none focus:border-yellow-400 transition-all font-bold text-gray-700">
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="USER">USER</option>
+                </select>
+            </div>
+
+            <button type="submit"
+                    class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-[900] text-lg shadow-xl shadow-yellow-400/20 hover:bg-yellow-500 transition-all active:scale-95 italic uppercase mt-4">
+                생성하기
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- 계정 수정 모달 -->
+<div th:fragment="accountModal" id="accountModal" class="fixed inset-0 z-[120] hidden items-center justify-center modal-bg">
+    <div class="bg-white rounded-[45px] shadow-2xl w-[560px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
+        <button type="button" onclick="closeModal('accountModal')" class="absolute top-10 right-10 text-gray-300 hover:text-gray-600 active:scale-90">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <header class="mb-10 text-center border-b border-gray-50 pb-8">
+            <h3 class="text-3xl font-[900] text-gray-800 tracking-tighter italic uppercase">계정 수정</h3>
+            <p class="text-[11px] text-gray-400 mt-2 font-black uppercase tracking-widest italic">Update Account</p>
+        </header>
+
+        <form id="editAccountForm" class="space-y-5" onsubmit="event.preventDefault(); updateAccount();">
+            <input type="hidden" id="editMemberId">
+
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">로그인 아이디</label>
+                <input type="text" id="editUserId" readonly
+                       class="w-full bg-gray-100 border-2 border-transparent rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">이름</label>
+                <input type="text" id="editName"
+                       class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 font-bold text-gray-700
+              outline-none focus:border-yellow-400 transition-all">
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">소속</label>
+                <input type="text" id="editAffiliation"
+                       class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 font-bold text-gray-700
+              outline-none focus:border-yellow-400 transition-all">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">권한</label>
+                    <select id="editRole"
+                            class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 outline-none focus:border-yellow-400 transition-all font-bold text-gray-700">
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="USER">USER</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">상태</label>
+                    <select id="editStatus"
+                            class="w-full bg-gray-50 border-2 border-transparent rounded-[25px] p-5 outline-none focus:border-yellow-400 transition-all font-bold text-gray-700">
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="LOCKED">LOCKED</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit"
+                    class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-[900] text-lg shadow-xl shadow-yellow-400/20 hover:bg-yellow-500 transition-all active:scale-95 italic uppercase mt-4">
+                수정 저장
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- 확인 모달 -->
+<div th:fragment="confirmModal" id="confirmModal" class="fixed inset-0 z-[130] hidden items-center justify-center modal-bg">
+    <div class="bg-white rounded-[45px] shadow-2xl w-[470px] p-12 relative modal-content animate-in fade-in zoom-in duration-300 text-center">
+        <div class="w-20 h-20 bg-yellow-50 rounded-[28px] flex items-center justify-center mx-auto mb-8 text-4xl">⚠️</div>
+        <h3 class="text-2xl font-[900] text-gray-800 italic uppercase mb-3 tracking-tighter" id="confirmTitle">확인</h3>
+        <p id="confirmMessage" class="text-gray-500 font-bold mb-10 leading-relaxed">정말로 진행하시겠습니까?</p>
+
+        <div class="flex gap-3">
+            <button type="button" onclick="closeModal('confirmModal')"
+                    class="flex-1 py-4 bg-gray-100 text-gray-500 font-black rounded-2xl hover:bg-gray-200 transition-all uppercase italic text-sm">
+                취소
+            </button>
+            <button type="button" id="confirmActionButton"
+                    class="flex-[1.4] py-4 bg-yellow-400 text-black font-[900] rounded-2xl shadow-lg hover:bg-yellow-500 transition-all active:scale-95 uppercase italic text-sm">
+                진행
+            </button>
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="script">
+    <script th:inline="javascript">
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.classList.remove('hidden');
+                m.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.classList.remove('flex');
+                m.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function openEditModal(member) {
+            document.getElementById("editMemberId").value = member.id;
+            document.getElementById("editUserId").value = member.userId;
+
+            // 🔥 이게 핵심 (지금 없음)
+            document.getElementById("editName").value = member.name ?? "";
+            document.getElementById("editAffiliation").value = member.affiliation ?? "";
+
+            document.getElementById("editRole").value = member.role;
+            document.getElementById("editStatus").value = member.status;
+
+            openModal('accountModal');
+        }
+
+        function updateAccount() {
+            const id = document.getElementById("editMemberId").value;
+
+            const data = {
+                name: document.getElementById("editName").value.trim(),
+                affiliation: document.getElementById("editAffiliation").value.trim(),
+                role: document.getElementById("editRole").value,
+                status: document.getElementById("editStatus").value
+            };
+
+            fetch(`/api/admin/members/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+        }
+
+        function openConfirmModal(message, onConfirm, title = '확인', buttonText = '진행') {
+            const titleEl = document.getElementById('confirmTitle');
+            const messageEl = document.getElementById('confirmMessage');
+            const actionButton = document.getElementById('confirmActionButton');
+
+            if (titleEl) titleEl.textContent = title;
+            if (messageEl) messageEl.textContent = message;
+
+            if (actionButton) {
+                actionButton.textContent = buttonText;
+                actionButton.onclick = async function () {
+                    try {
+                        await onConfirm();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                };
+            }
+
+            openModal('confirmModal');
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-bg')) {
+                closeModal(e.target.id);
+            }
+        });
+    </script>
+</th:block>
+
+</html>

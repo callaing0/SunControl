@@ -1,6 +1,8 @@
 package com.suncontrol.core.repository.asset;
 
+import com.suncontrol.core.dto.asset.MainSummaryDto;
 import com.suncontrol.core.entity.asset.Plant;
+import com.suncontrol.core.entity.view.PlantInfoView;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,4 +20,10 @@ public interface PlantRepository {
     boolean existsByIdAndMemberId(@Param("memberId") Long memberId, @Param("id") Long plantId);
 
     List<Plant> findAllByIsDeletedFalse();
+
+    List<Plant> findAllByMemberIdAndIsDeletedFalse(Long memberId);
+
+    PlantInfoView findPlantInfoViewById(Long id);
+
+    MainSummaryDto countPlantsAndSumTotalAccum();
 }

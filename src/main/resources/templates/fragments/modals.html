@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="modalStyle">
+    <style>
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-disabled {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+            pointer-events: none;
+            filter: grayscale(1);
+        }
+    </style>
+</th:block>
+
+<!-- 발전소 등록 -->
+<div th:fragment="plantModal" id="plantModal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-bg">
+    <div class="bg-white rounded-[45px] shadow-2xl w-[550px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
+        <button type="button" onclick="closeModal('plantModal')" class="absolute top-10 right-10 text-gray-300 hover:text-gray-600 transition-all active:scale-90 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <header class="mb-10 text-center border-b border-gray-50 pb-8">
+            <h3 class="text-3xl font-[900] text-gray-800 tracking-tighter italic uppercase">발전소 등록</h3>
+            <p class="text-[11px] text-gray-400 mt-2 font-black uppercase tracking-widest italic">New Solar Plant Registration</p>
+        </header>
+
+        <form class="space-y-6" id="plantForm" method="post">
+            <input type="hidden" name="latitude" id="latitude">
+            <input type="hidden" name="longitude" id="longitude">
+            <input type="hidden" name="isMain" value="0">
+
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">발전소 명 *</label>
+                <input type="text" name="name" placeholder="예: 솔라가드 대전 제1발전소" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 outline-none focus:border-yellow-400 focus:bg-white transition-all font-bold text-gray-700" required>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">
+                    주소 * <span class="ml-1 normal-case not-italic font-bold text-gray-300">카카오 주소 API 제공</span>
+                </label>
+                <div class="flex gap-3">
+                    <input type="text" id="addressDisplay" placeholder="주소를 검색해 주세요" class="flex-1 bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 outline-none font-bold text-gray-700" readonly>
+                    <input type="hidden" id="address" name="address">
+                    <button type="button" onclick="execDaumPostcode()" class="px-8 bg-gray-900 text-white font-black rounded-[25px] hover:bg-black transition-all active:scale-95 italic uppercase text-[10px]">검색</button>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">행정동 코드</label>
+                <input type="text" id="districtCodeDisplay" placeholder="자동 표시" class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 outline-none font-[900] text-center text-gray-700 italic" readonly>
+                <input type="hidden" id="districtCode" name="districtCode">
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 pt-2">
+
+                <!-- 설치 방향 -->
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">
+                        설치 방향 *
+                    </label>
+                        <input type="number"
+                               name="azimuth"
+                               placeholder="-90 ~ 90°"
+                               min="-90"
+                               max="90"
+                               class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 pr-12 text-center font-black italic outline-none focus:border-yellow-400 focus:bg-white transition-all"
+                               required>
+                </div>
+
+                <!-- 설치 각도 -->
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">
+                        설치 각도 *
+                    </label>
+                        <input type="number"
+                               name="tilt"
+                               placeholder="20 ~ 40°"
+                               min="20"
+                               max="40"
+                               class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 pr-12 text-center font-black italic text-blue-600 outline-none focus:border-yellow-400 focus:bg-white transition-all"
+                               required>
+                </div>
+
+            </div>
+
+            <button type="submit" class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-[900] text-lg shadow-xl shadow-yellow-400/20 hover:bg-yellow-500 transition-all active:scale-95 italic uppercase mt-4">
+                등록하기
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- 인버터 등록 -->
+<div th:fragment="inverterModal" id="inverterModal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-bg">
+    <div class="bg-white rounded-[45px] shadow-2xl w-[550px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
+        <button type="button" onclick="closeModal('inverterModal')" class="absolute top-10 right-10 text-gray-300 hover:text-gray-600 transition-all active:scale-90 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <header class="mb-10 text-center border-b border-gray-50 pb-8">
+            <h3 class="text-3xl font-[900] text-gray-800 tracking-tighter italic uppercase">인버터 등록</h3>
+            <p class="text-[11px] text-gray-400 mt-2 font-black uppercase tracking-widest italic">Inverter Configuration</p>
+        </header>
+
+        <form class="space-y-6" id="inverterForm" method="post">
+            <input type="hidden" name="plantId" th:value="${selectedPlant != null ? selectedPlant.id : null}">
+            <input type="hidden" name="serial" th:value="${serial}">
+
+            <!-- 발전소명 -->
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">발전소명 *</label>
+                <input type="text"
+                       th:value="${selectedPlant != null ? selectedPlant.name : ''}"
+                       placeholder="발전소를 먼저 등록하세요"
+                       readonly
+                       class="w-full bg-gray-100 border-2 border-transparent rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+            </div>
+
+            <!-- 타입 -->
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">인버터 타입 *</label>
+                <select name="type"
+                        th:disabled="${selectedPlant == null}"
+                        class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 outline-none focus:border-yellow-400 focus:bg-white transition-all font-bold text-gray-700"
+                        required>
+                    <option value="">타입을 선택하세요</option>
+                    <option th:each="type : ${myPage != null ? myPage.inverterTypes : T(java.util.Collections).emptyList()}"
+                            th:value="${type.label}"
+                            th:text="${type.label}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- 정격용량 / 변환효율 -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">정격 용량 *</label>
+                    <input type="number"
+                           step="0.001"
+                           name="ratedCapacity"
+                           placeholder="kW"
+                           class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-6 text-center font-[900] text-2xl italic outline-none focus:border-yellow-400 focus:bg-white transition-all
+                                  placeholder:text-sm placeholder:font-normal placeholder:text-gray-400"
+                           required>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">변환 효율 *</label>
+                    <input type="number"
+                           step="0.01"
+                           name="efficiency"
+                           placeholder="%"
+                           class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-6 text-center font-[900] text-2xl text-blue-600 italic outline-none focus:border-yellow-400 focus:bg-white transition-all
+                                  placeholder:text-sm placeholder:font-normal placeholder:text-gray-400"
+                           required>
+                </div>
+            </div>
+
+            <button type="submit"
+                    th:classappend="${selectedPlant == null} ? 'btn-disabled' : ''"
+                    class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-[900] text-lg shadow-xl shadow-yellow-400/20 hover:bg-yellow-500 transition-all active:scale-95 italic uppercase mt-4">
+                <span th:text="${selectedPlant == null} ? '발전소 등록 필요' : '인버터 등록하기'"></span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- 패널 등록 -->
+<div th:fragment="panelModal" id="panelModal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-bg">
+    <div class="bg-white rounded-[45px] shadow-2xl w-[700px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
+        <button type="button" onclick="closeModal('panelModal')" class="absolute top-10 right-10 text-gray-300 hover:text-gray-600 active:scale-90">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <header class="mb-10 text-center border-b border-gray-50 pb-8">
+            <h3 class="text-3xl font-[900] text-gray-800 tracking-tighter italic uppercase">패널 등록</h3>
+            <p class="text-[11px] text-gray-400 mt-2 font-black uppercase tracking-widest italic">Panel Configuration</p>
+        </header>
+
+        <form class="space-y-6" id="panelForm" method="post">
+            <input type="hidden" id="panelPlantId" th:value="${selectedPlant != null ? selectedPlant.id : ''}">
+
+            <!-- 발전소명 -->
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">발전소명 *</label>
+                <input type="text"
+                       th:value="${selectedPlant != null ? selectedPlant.name : ''}"
+                       placeholder="발전소를 먼저 선택하세요"
+                       readonly
+                       class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+            </div>
+
+            <!-- 인버터 -->
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">인버터 *</label>
+                <select id="panelInverterId"
+                        class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 font-bold text-gray-700 outline-none focus:border-yellow-400 focus:bg-white transition-all"
+                        th:disabled="${myPage == null or myPage.inverters == null or #lists.isEmpty(myPage.inverters)}"
+                        required>
+                    <option value="">인버터를 선택하세요</option>
+
+                    <option th:each="inv : ${myPage != null && myPage.inverters != null ? myPage.inverters : T(java.util.Collections).emptyList()}"
+                            th:value="${inv.id}"
+                            th:text="${inv.serial != null ? inv.serial : '인버터'}"
+                            th:attr="data-serial=${inv.serial != null ? inv.serial : ''},
+                                     data-rated-capacity=${inv.ratedCapacity != null ? inv.ratedCapacity : 0}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- 인버터 S/N / 모델명 -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">인버터 S/N</label>
+                    <input type="text"
+                           id="panelInverterSerial"
+                           placeholder="자동 입력"
+                           readonly
+                           class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">모델명 *</label>
+                    <select id="panelModelName"
+                            name="modelName"
+                            class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 font-bold text-gray-700 outline-none focus:border-yellow-400 focus:bg-white transition-all"
+                            required>
+                        <option value="">모델을 선택하세요</option>
+                        <option th:each="model : ${myPage != null ? myPage.panelModels : T(java.util.Collections).emptyList()}"
+                                th:value="${model.name}"
+                                th:text="${model.name}"
+                                th:attr="data-capacity=${model.capacity},data-efficiency=${model.efficiency}">
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 정격용량 / 출력용량 -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">정격 용량</label>
+                    <input type="text"
+                           id="panelRatedCapacity"
+                           placeholder="자동 입력"
+                           readonly
+                           class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">출력 용량</label>
+                    <input type="text"
+                           id="panelOutputCapacity"
+                           placeholder="자동 입력"
+                           readonly
+                           class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+                </div>
+            </div>
+
+            <!-- 설계용량 / 수량 -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">설계 용량</label>
+                    <input type="text"
+                           id="panelDesignCapacity"
+                           placeholder="자동 계산 후 표시"
+                           readonly
+                           class="w-full bg-gray-100 rounded-[25px] p-5 font-bold text-gray-500 cursor-not-allowed">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-black text-gray-400 ml-3 uppercase tracking-widest italic">수량 *</label>
+                    <input type="number"
+                           id="panelCount"
+                           name="count"
+                           placeholder="수량"
+                           class="w-full bg-gray-50 border-2 border-gray-50 rounded-[25px] p-5 font-black text-center text-blue-600 italic outline-none focus:border-yellow-400 focus:bg-white transition-all"
+                           min="1"
+                           value="1"
+                           required>
+                </div>
+            </div>
+
+            <p class="text-[11px] text-gray-400 font-bold px-2">
+                설계 용량 = 선택한 패널 출력 용량 × 수량
+            </p>
+
+            <button type="submit"
+                    th:classappend="${myPage == null or myPage.inverters == null or #lists.isEmpty(myPage.inverters)} ? 'btn-disabled' : ''"
+                    class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-black italic uppercase shadow-lg shadow-yellow-400/20 hover:bg-yellow-500 active:scale-95 transition-all">
+                <span th:text="${myPage == null or myPage.inverters == null or #lists.isEmpty(myPage.inverters) ? '인버터 등록 필요' : '패널 등록하기'}"></span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- 로그아웃 -->
+<div th:fragment="logoutModal" id="logoutModal" class="fixed inset-0 z-[200] hidden items-center justify-center modal-bg">
+    <div class="bg-white rounded-[40px] shadow-2xl w-[400px] p-12 relative modal-content animate-in fade-in zoom-in duration-300 text-center">
+        <div class="w-20 h-20 bg-gray-50 rounded-[30px] flex items-center justify-center mx-auto mb-8 text-4xl">📤</div>
+        <h3 class="text-2xl font-[900] text-gray-800 tracking-tighter italic uppercase mb-2">로그아웃</h3>
+        <p class="text-sm text-gray-400 font-bold mb-10 uppercase tracking-widest italic">정말로 로그아웃 하시겠습니까?</p>
+        <div class="flex gap-3">
+            <button type="button" onclick="closeModal('logoutModal')" class="flex-1 py-4 bg-gray-100 text-gray-400 font-black rounded-2xl hover:bg-gray-200 transition-all uppercase italic text-sm">아니요</button>
+            <form th:action="@{/logout}" method="post" class="flex-[2]">
+                <button type="submit" class="w-full py-4 bg-yellow-400 text-black font-[900] rounded-2xl shadow-lg hover:bg-yellow-500 transition-all active:scale-95 uppercase italic text-sm">네</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 공용 확인 모달 -->
+<div th:fragment="confirmModal" id="confirmModal" class="fixed inset-0 z-[130] hidden items-center justify-center modal-bg">
+    <div class="bg-white rounded-[45px] shadow-2xl w-[470px] p-12 relative modal-content animate-in fade-in zoom-in duration-300 text-center">
+        <div class="w-20 h-20 bg-yellow-50 rounded-[28px] flex items-center justify-center mx-auto mb-8 text-4xl">⚠️</div>
+        <h3 class="text-2xl font-[900] text-gray-800 italic uppercase mb-3 tracking-tighter" id="confirmTitle">확인</h3>
+        <p id="confirmMessage" class="text-gray-500 font-bold mb-10 leading-relaxed">정말로 진행하시겠습니까?</p>
+
+        <div class="flex gap-3">
+            <button type="button" onclick="closeModal('confirmModal')" class="flex-1 py-4 bg-gray-100 text-gray-500 font-black rounded-2xl hover:bg-gray-200 transition-all uppercase italic text-sm">
+                취소
+            </button>
+            <button type="button" id="confirmActionButton" class="flex-[1.4] py-4 bg-yellow-400 text-black font-[900] rounded-2xl shadow-lg hover:bg-yellow-500 transition-all active:scale-95 uppercase italic text-sm">
+                진행
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 비밀번호 변경 -->
+<div th:fragment="passwordModal" id="passwordModal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-bg">
+    <div class="bg-white rounded-[45px] shadow-2xl w-[500px] p-12 relative modal-content animate-in fade-in zoom-in duration-300">
+        <button type="button" onclick="closeModal('passwordModal')" class="absolute top-10 right-10 text-gray-300 hover:text-gray-600 active:scale-90">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h3 class="text-3xl font-[900] text-gray-800 text-center italic uppercase mb-8">비밀번호 변경</h3>
+        <form th:action="@{/mypage/password}" class="space-y-4" id="passwordForm" method="post">
+            <input type="password" name="currentPassword" placeholder="현재 비밀번호" class="w-full bg-gray-50 rounded-[25px] p-5 font-bold outline-none border-2 border-transparent focus:border-yellow-400 transition-all" required>
+            <input type="password" name="newPassword" placeholder="새 비밀번호" class="w-full bg-gray-50 rounded-[25px] p-5 font-bold outline-none border-2 border-transparent focus:border-yellow-400 transition-all" required>
+            <input type="password" name="confirmPassword" placeholder="새 비밀번호 확인" class="w-full bg-gray-50 rounded-[25px] p-5 font-bold outline-none border-2 border-transparent focus:border-yellow-400 transition-all" required>
+            <button type="submit" class="w-full py-5 bg-yellow-400 text-black rounded-[28px] font-black italic uppercase mt-4 shadow-lg shadow-yellow-400/20 hover:bg-yellow-500 active:scale-95 transition-all">
+                비밀번호 변경
+            </button>
+        </form>
+    </div>
+</div>
+
+<th:block th:fragment="script">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3997d3c523acf019e06829961c57b93e&libraries=services"></script>
+    <script th:inline="javascript">
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.classList.remove('hidden');
+                m.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.classList.remove('flex');
+                m.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function openConfirmModal(message, onConfirm, title = '확인', buttonText = '진행') {
+            const titleEl = document.getElementById('confirmTitle');
+            const messageEl = document.getElementById('confirmMessage');
+            const actionButton = document.getElementById('confirmActionButton');
+
+            if (titleEl) titleEl.textContent = title;
+            if (messageEl) messageEl.textContent = message;
+
+            if (actionButton) {
+                actionButton.textContent = buttonText;
+                actionButton.onclick = async function () {
+                    try {
+                        await onConfirm();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                };
+            }
+
+            openModal('confirmModal');
+        }
+
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function (data) {
+                    const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+
+                    const addressDisplayField = document.getElementById('addressDisplay');
+                    const addressField = document.getElementById('address');
+                    const districtCodeDisplayField = document.getElementById('districtCodeDisplay');
+                    const districtCodeField = document.getElementById('districtCode');
+                    const latitudeField = document.getElementById('latitude');
+                    const longitudeField = document.getElementById('longitude');
+
+                    if (addressDisplayField) addressDisplayField.value = addr || '';
+                    if (addressField) addressField.value = addr || '';
+
+                    if (districtCodeDisplayField) districtCodeDisplayField.value = data.sigunguCode || '';
+                    if (districtCodeField) districtCodeField.value = data.sigunguCode || '';
+
+                    if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.services) {
+                        const geocoder = new kakao.maps.services.Geocoder();
+
+                        geocoder.addressSearch(addr, function (results, status) {
+                            if (status === kakao.maps.services.Status.OK) {
+                                if (latitudeField) latitudeField.value = results[0].y;
+                                if (longitudeField) longitudeField.value = results[0].x;
+                                console.log('좌표:', results[0].y, results[0].x);
+                            }
+                        });
+                    }
+                }
+            }).open();
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-bg')) {
+                closeModal(e.target.id);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // 발전소 등록
+            const plantForm = document.getElementById('plantForm');
+            if (plantForm) {
+                plantForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    console.log("🔥 발전소 fetch 실행");
+
+                    const name = plantForm.querySelector('[name="name"]')?.value?.trim();
+                    const address = document.getElementById('address')?.value?.trim();
+                    const latitude = document.getElementById('latitude')?.value?.trim();
+                    const longitude = document.getElementById('longitude')?.value?.trim();
+                    const districtCode = document.getElementById('districtCode')?.value?.trim();
+                    const azimuth = plantForm.querySelector('[name="azimuth"]')?.value?.trim();
+                    const tilt = plantForm.querySelector('[name="tilt"]')?.value?.trim();
+
+                    if (!name) {
+                        alert('발전소명을 입력해 주세요.');
+                        return;
+                    }
+
+                    if (!address || !districtCode) {
+                        alert('주소 검색을 완료해 주세요.');
+                        return;
+                    }
+
+                    if (!latitude || !longitude) {
+                        alert('좌표값이 없습니다. 주소를 다시 검색해 주세요.');
+                        return;
+                    }
+
+                    const payload = {
+                        name: name,
+                        address: address,
+                        latitude: Number(latitude),
+                        longitude: Number(longitude),
+                        districtCode: districtCode,
+                        azimuth: Number(azimuth),
+                        tilt: Number(tilt)
+                    };
+
+                    try {
+                        const response = await fetch('/api/assets/plants', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok || !result.success) {
+                            alert(result.message || '발전소 등록에 실패했습니다.');
+                            return;
+                        }
+
+                        alert(result.message || '발전소가 등록되었습니다.');
+                        closeModal('plantModal');
+                        window.location.reload();
+                    } catch (error) {
+                        console.error(error);
+                        alert('발전소 등록 중 오류가 발생했습니다.');
+                    }
+                });
+            }
+
+            // 인버터 등록
+            const inverterForm = document.getElementById('inverterForm');
+            if (inverterForm) {
+                inverterForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    console.log("🔥 인버터 fetch 실행");
+
+                    const plantId = inverterForm.querySelector('[name="plantId"]')?.value?.trim();
+                    const type = inverterForm.querySelector('[name="type"]')?.value?.trim();
+                    const ratedCapacity = inverterForm.querySelector('[name="ratedCapacity"]')?.value?.trim();
+                    const efficiency = inverterForm.querySelector('[name="efficiency"]')?.value?.trim();
+                    const serial = inverterForm.querySelector('[name="serial"]')?.value?.trim();
+
+                    if (!plantId) {
+                        alert('발전소를 먼저 등록하거나 선택해 주세요.');
+                        return;
+                    }
+
+                    if (!type) {
+                        alert('인버터 타입을 선택해 주세요.');
+                        return;
+                    }
+
+                    if (!ratedCapacity) {
+                        alert('용량을 입력해 주세요.');
+                        return;
+                    }
+
+                    const payload = {
+                        plantId: Number(plantId),
+                        type: type,
+                        ratedCapacity: Number(ratedCapacity),
+                        efficiency: Number(efficiency),
+                        serial: serial
+                    };
+
+                    try {
+                        const response = await fetch('/api/assets/inverters', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok || !result.success) {
+                            alert(result.message || '인버터 등록에 실패했습니다.');
+                            return;
+                        }
+
+                        alert(result.message || '인버터가 등록되었습니다.');
+                        closeModal('inverterModal');
+                        window.location.reload();
+                    } catch (error) {
+                        console.error(error);
+                        alert('인버터 등록 중 오류가 발생했습니다.');
+                    }
+                });
+            }
+
+            const panelInverterId = document.getElementById('panelInverterId');
+            const panelInverterSerial = document.getElementById('panelInverterSerial');
+            const panelModelName = document.getElementById('panelModelName');
+            const panelRatedCapacity = document.getElementById('panelRatedCapacity');
+            const panelOutputCapacity = document.getElementById('panelOutputCapacity');
+            const panelDesignCapacity = document.getElementById('panelDesignCapacity');
+            const panelCountInput = document.getElementById('panelCount');
+
+            function updatePanelInfo() {
+                let inverterRatedCapacity = 0;
+                let panelCapacity = 0;
+
+                if (panelInverterId && panelInverterSerial) {
+                    const selectedInverter = panelInverterId.options[panelInverterId.selectedIndex];
+
+                    panelInverterSerial.value = selectedInverter ? (selectedInverter.dataset.serial || '') : '';
+                    inverterRatedCapacity = Number(selectedInverter?.dataset?.ratedCapacity || 0);
+
+                    if (panelRatedCapacity) {
+                        panelRatedCapacity.value = inverterRatedCapacity ? `${inverterRatedCapacity} kW` : '';
+                    }
+                }
+
+                if (panelModelName) {
+                    const selectedModel = panelModelName.options[panelModelName.selectedIndex];
+                    panelCapacity = Number(selectedModel?.dataset?.capacity || 0);
+
+                    if (panelOutputCapacity) {
+                        panelOutputCapacity.value = panelCapacity ? `${panelCapacity} W` : '';
+                    }
+                }
+
+                const count = Number(panelCountInput?.value || 0);
+                const designCapacity = panelCapacity * count;
+
+                if (panelDesignCapacity) {
+                    panelDesignCapacity.value = designCapacity ? `${designCapacity} W` : '';
+                }
+            }
+
+            if (panelInverterId) {
+                panelInverterId.addEventListener('change', updatePanelInfo);
+            }
+
+            if (panelModelName) {
+                panelModelName.addEventListener('change', updatePanelInfo);
+            }
+
+            if (panelCountInput) {
+                panelCountInput.addEventListener('input', updatePanelInfo);
+            }
+
+            updatePanelInfo();
+
+            // 패널 등록
+            const panelForm = document.getElementById('panelForm');
+            if (panelForm) {
+                panelForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    console.log("패널 fetch 실행");
+
+                    const plantId = document.getElementById('panelPlantId')?.value?.trim();
+                    const inverterId = document.getElementById('panelInverterId')?.value?.trim();
+                    const modelName = document.getElementById('panelModelName')?.value?.trim();
+                    const count = document.getElementById('panelCount')?.value?.trim();
+
+                    if (!plantId) {
+                        alert('발전소를 먼저 선택해 주세요.');
+                        return;
+                    }
+
+                    if (!inverterId) {
+                        alert('인버터를 선택해 주세요.');
+                        return;
+                    }
+
+                    if (!modelName) {
+                        alert('패널 모델을 선택해 주세요.');
+                        return;
+                    }
+
+                    if (!count || Number(count) < 1) {
+                        alert('패널 수량을 올바르게 입력해 주세요.');
+                        return;
+                    }
+
+                    const payload = {
+                        plantId: Number(plantId),
+                        inverterId: Number(inverterId),
+                        modelName: modelName,
+                        manufacturer: "DUMMY",
+                        count: Number(count)
+                    };
+
+                    try {
+                        const response = await fetch('/api/assets/panels', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok || !result.success) {
+                            console.log(result);
+                            alert(
+                                (result.message || '패널 등록에 실패했습니다.') + '\n' +
+                                JSON.stringify(result.data, null, 2)
+                            );
+                            return;
+                        }
+
+                        alert(result.message || '패널이 등록되었습니다.');
+                        closeModal('panelModal');
+                        window.location.reload();
+                    } catch (error) {
+                        console.error(error);
+                        alert('패널 등록 중 오류가 발생했습니다.');
+                    }
+                });
+            }
+        });
+    </script>
+</th:block>
+
+</html>

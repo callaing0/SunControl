@@ -1,93 +1,148 @@
 package com.suncontrol.domain.service;
 
-import com.suncontrol.core.repository.dashboardRepository;
+import com.suncontrol.core.repository.report.dashboardRepository;
+import com.suncontrol.domain.dto.DashboardGenerationDto;
+import com.suncontrol.domain.dto.DashboardHourlyValueDto;
+import com.suncontrol.domain.dto.DashboardInverterDto;
+import com.suncontrol.domain.dto.DashboardPlantDto;
+import com.suncontrol.domain.dto.DashboardRealtimeDto;
+import com.suncontrol.domain.dto.DashboardSunTimeDto;
 import com.suncontrol.domain.dto.dashboardSummaryDto;
-import com.suncontrol.core.dto.asset.InverterDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 대시보드 서비스 구현체
- *
- * 역할:
- * - Repository(MyBatis)에서 조회한 데이터를 화면에 맞게 가공
- * - 차트용 라벨 생성
- * - 차트 데이터 길이 보정
- */
 @Service
 @RequiredArgsConstructor
 public class dashboardServiceImpl implements dashboardService {
 
-    /**
-     * 대시보드 관련 DB 조회를 담당하는 Repository
-     */
+    private static final BigDecimal UNIT_PRICE = new BigDecimal("201");
+    private static final BigDecimal CO2_FACTOR = new BigDecimal("0.424");
+    private static final BigDecimal TREE_DIVISOR = new BigDecimal("6.6");
+
     private final dashboardRepository dashboardRepository;
 
-    /**
-     * 대시보드 상단 요약 정보 조회
-     *
-     * 처리 순서:
-     * 1. 기본 요약 정보 조회
-     * 2. 발전소 ID 확인
-     * 3. 시간별 발전량 / 일사량 조회
-     * 4. 차트용 라벨 및 데이터 보정
-     *
-     * @param memberId 로그인 사용자 ID
-     * @return dashboardSummaryDto
-     */
     @Override
-    public dashboardSummaryDto getDashboardSummary(Long memberId) {
-        // 대시보드 상단 기본 정보 조회
-        dashboardSummaryDto summary = dashboardRepository.selectDashboardSummary(memberId);
+    public dashboardSummaryDto getDashboardSummary(Long memberId, Long plantId) {
+        DashboardPlantDto plant = dashboardRepository.selectPlantById(memberId, plantId);
 
-        // 조회 결과가 없으면 null 반환
-        if (summary == null) {
+        if (plant == null) {
             return null;
         }
 
-        // 차트 조회에 필요한 발전소 ID 추출
-        Long plantId = summary.getPlantId();
+        Long targetPlantId = plant.getPlantId();
 
-        // 발전소 ID가 없으면 차트 없이 기본 요약 정보만 반환
-        if (plantId == null) {
+        // 🔥 인버터 존재 여부 체크
+        List<DashboardInverterDto> inverterList =
+                dashboardRepository.selectInvertersByPlant(memberId, targetPlantId);
+
+        boolean hasInverters = inverterList != null && !inverterList.isEmpty();
+
+        dashboardSummaryDto summary = new dashboardSummaryDto();
+
+        summary.setPlantId(targetPlantId);
+        summary.setPlantName(plant.getPlantName());
+        summary.setLocation(plant.getLocation());
+
+        // 🔥 인버터 없으면 여기서 끝
+        if (!hasInverters) {
+            summary.setCurrentPower(BigDecimal.ZERO);
+            summary.setEfficiency(BigDecimal.ZERO);
+            summary.setDailyAccumulation(BigDecimal.ZERO);
+            summary.setPredGen(BigDecimal.ZERO);
+            summary.setInsolation(BigDecimal.ZERO);
+            summary.setSunTime("--");
+            summary.setWeatherStatus("--");
+
+            summary.setUnitPrice(UNIT_PRICE);
+            summary.setTotalProfit(BigDecimal.ZERO);
+            summary.setCo2Reduction(BigDecimal.ZERO);
+            summary.setTreeCount(0);
+
+            summary.setChartLabels(List.of());
+            summary.setPowerList(List.of());
+            summary.setInsolationList(List.of());
+
             return summary;
         }
 
-        // 시간별 발전량 / 시간별 일사량 조회
-        List<BigDecimal> powerList = dashboardRepository.selectHourlyPower(plantId);
-        List<BigDecimal> insolationList = dashboardRepository.selectHourlyInsolation(plantId);
+        DashboardRealtimeDto realtime = dashboardRepository.selectPlantRealtime(targetPlantId);
+        DashboardSunTimeDto sunTime = dashboardRepository.selectTodaySunTime(plant.getDistrictCode());
+        BigDecimal temperature = dashboardRepository.selectLatestTemperature(plant.getDistrictCode());
+        BigDecimal insolation = dashboardRepository.selectTodayInsolation(targetPlantId);
+        DashboardGenerationDto generation = dashboardRepository.selectTodayGeneration(targetPlantId);
+        BigDecimal totalGeneration = dashboardRepository.selectTotalGeneration(targetPlantId);
 
-        // 차트 라벨 및 데이터 세팅
-        summary.setChartLabels(buildChartLabels());
-        summary.setPowerList(normalizeSeries(powerList, 13));
-        summary.setInsolationList(normalizeSeries(insolationList, 13));
+        summary.setPlantId(targetPlantId);
+        summary.setPlantName(plant.getPlantName());
+        summary.setLocation(plant.getLocation());
+
+        summary.setDailyAccumulation(nvl(generation != null ? generation.getDailyAccumulation() : null));
+        summary.setPredGen(nvl(generation != null ? generation.getPredGen() : null));
+
+        summary.setInsolation(nvl(insolation));
+        summary.setSunTime(formatSunTime(sunTime));
+        summary.setWeatherStatus(formatTemperature(temperature));
+
+        summary.setUnitPrice(UNIT_PRICE);
+
+        // 수익예측 = 예상 발전량 X 판매 단가
+        summary.setTotalProfit(summary.getPredGen()
+                                .multiply(UNIT_PRICE)
+                                .setScale(2, RoundingMode.HALF_UP));
+
+        // 환경기여도 = 전체 누적 발전량 기준
+        BigDecimal co2Reduction = summary.getDailyAccumulation()
+                .multiply(CO2_FACTOR)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        summary.setCo2Reduction(co2Reduction);
+        summary.setTreeCount(
+                co2Reduction.divide(TREE_DIVISOR, 0, RoundingMode.DOWN).intValue()
+        );
+
+        List<DashboardHourlyValueDto> powerRows = dashboardRepository.selectHourlyPower(targetPlantId);
+        List<DashboardHourlyValueDto> insolationRows = dashboardRepository.selectHourlyInsolation(targetPlantId);
+
+        boolean hasInsolationData = insolationRows != null && !insolationRows.isEmpty();
+
+        int startHour = 6;
+        int endHour = 18;
+
+        // 🔥 출력량 / 효율 제어
+        if (!hasInsolationData) {
+            summary.setCurrentPower(BigDecimal.ZERO);
+            summary.setEfficiency(BigDecimal.ZERO);
+        } else {
+            summary.setCurrentPower(nvl(realtime != null ? realtime.getCurrentPower() : null));
+            summary.setEfficiency(nvl(realtime != null ? realtime.getEfficiency() : null));
+        }
+
+        // 🔥 차트 제어
+        if (!hasInsolationData) {
+            summary.setChartLabels(List.of());
+            summary.setPowerList(List.of());
+            summary.setInsolationList(List.of());
+        } else {
+            summary.setChartLabels(buildChartLabels());
+            summary.setPowerList(buildHourlySeries(powerRows, startHour, endHour));
+            summary.setInsolationList(buildHourlySeries(insolationRows, startHour, endHour));
+        }
 
         return summary;
     }
 
-    /**
-     * 사용자 소유 인버터 목록 조회
-     *
-     * @param memberId 로그인 사용자 ID
-     * @return 인버터 리스트
-     */
     @Override
-    public List<InverterDto> getInverters(Long memberId) {
-        return dashboardRepository.selectInverters(memberId);
+    public List<DashboardInverterDto> getInverters(Long memberId, Long plantId) {
+        return dashboardRepository.selectInvertersByPlant(memberId, plantId);
     }
 
-    /**
-     * 차트 X축 라벨 생성
-     *
-     * 예:
-     * ["06시", "07시", ..., "18시"]
-     *
-     * @return 시간 라벨 리스트
-     */
     private List<String> buildChartLabels() {
         List<String> labels = new ArrayList<>();
         for (int hour = 6; hour <= 18; hour++) {
@@ -96,38 +151,72 @@ public class dashboardServiceImpl implements dashboardService {
         return labels;
     }
 
-    /**
-     * 차트 데이터 길이 보정
-     *
-     * 역할:
-     * - 데이터가 부족하면 0으로 채움
-     * - 데이터가 많으면 필요한 개수만큼만 사용
-     *
-     * 이유:
-     * - labels 개수와 data 개수를 맞춰 차트 깨짐 방지
-     *
-     * @param source 원본 데이터
-     * @param size 최종 맞출 길이
-     * @return 길이가 보정된 데이터 리스트
-     */
-    private List<BigDecimal> normalizeSeries(List<BigDecimal> source, int size) {
+    private List<BigDecimal> buildHourlySeries(List<DashboardHourlyValueDto> source, int startHour, int endHour) {
         List<BigDecimal> result = new ArrayList<>();
+        int currentHour = java.time.LocalTime.now().getHour();
 
-        // 원본 데이터 복사
-        if (source != null) {
-            result.addAll(source);
+        for (int hour = startHour; hour <= endHour; hour++) {
+            result.add(null);
         }
 
-        // 부족한 구간은 0으로 채움
-        while (result.size() < size) {
-            result.add(BigDecimal.ZERO);
+        if (source == null) {
+            return result;
         }
 
-        // 데이터가 많으면 필요한 개수만큼만 사용
-        if (result.size() > size) {
-            return result.subList(0, size);
+        for (DashboardHourlyValueDto row : source) {
+            if (row == null || row.getHour() == null || row.getValue() == null) {
+                continue;
+            }
+
+            int hour = row.getHour();
+
+            if (hour < startHour || hour > endHour) {
+                continue;
+            }
+
+            // 현재 시각 이후 데이터는 표시하지 않음
+            if (hour > currentHour) {
+                continue;
+            }
+
+            result.set(hour - startHour, row.getValue());
         }
 
         return result;
+    }
+
+    private BigDecimal nvl(BigDecimal value) {
+        return value == null ? BigDecimal.ZERO : value;
+    }
+
+    private String formatSunTime(DashboardSunTimeDto sunTime) {
+        if (sunTime == null) {
+            return "--";
+        }
+
+        LocalDateTime sunrise = sunTime.getSunrise();
+        LocalDateTime sunset = sunTime.getSunset();
+
+        if (sunrise == null || sunset == null) {
+            return "--";
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return sunrise.format(formatter) + " / " + sunset.format(formatter);
+    }
+
+    private String formatTemperature(BigDecimal temperature) {
+        if (temperature == null) {
+            return "--";
+        }
+
+        return temperature.setScale(1, RoundingMode.HALF_UP).toPlainString() + "°C";
+    }
+
+    public String getLastUpdateTime() {
+        LocalDateTime last = dashboardRepository.selectLastUpdateTime();
+        return last != null
+                ? last.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+                : "--:--:--";
     }
 }

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.suncontrol.core.repository.report.StationRepository">
+
+    <resultMap id="plantInfoViewMap" type="com.suncontrol.core.entity.view.PlantInfoView">
+        <result property="capacitySum" column="capacity_sum"/>
+        <result property="totalValue" column="total_value"/>
+        <result property="accumTotal" column="accum_total"/>
+        <result property="efficiency" column="efficiency"/>
+        <result property="statusCode" column="status_code"/>
+        <result property="updatedAt" column="updated_at"/>
+
+        <association property="plant" javaType="com.suncontrol.core.entity.asset.Plant">
+            <id property="id" column="id"/>
+            <result property="memberId" column="member_id"/>
+            <result property="name" column="name"/>
+            <result property="address" column="address"/>
+            <result property="latitude" column="latitude"/>
+            <result property="longitude" column="longitude"/>
+            <result property="provinceCode" column="province_code"/>
+            <result property="districtCode" column="district_code"/>
+            <result property="azimuth" column="azimuth"/>
+            <result property="tilt" column="tilt"/>
+            <result property="createdAt" column="created_at"/>
+            <result property="main" column="is_main"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="stationHourlyGenerationMap" type="com.suncontrol.domain.dto.StationHourlyGenerationDto">
+        <result property="hourLabel" column="hour_label"/>
+        <result property="totalGeneration" column="total_generation"/>
+    </resultMap>
+
+    <select id="findRegionList" resultType="string">
+        SELECT DISTINCT CONCAT(
+        SUBSTRING_INDEX(p.address, ' ', 1),
+        ' ',
+        SUBSTRING_INDEX(SUBSTRING_INDEX(p.address, ' ', 2), ' ', -1)
+        ) AS region
+        FROM plant p
+        WHERE p.is_deleted = 0
+        AND p.address IS NOT NULL
+        AND TRIM(p.address) != ''
+        ORDER BY region ASC
+    </select>
+
+    <select id="findPlantInfoViewListByRegion" resultMap="plantInfoViewMap">
+        SELECT
+        pi.id,
+        pi.member_id,
+        pi.name,
+        pi.is_main,
+        pi.address,
+        pi.latitude,
+        pi.longitude,
+        pi.province_code,
+        pi.district_code,
+        pi.azimuth,
+        pi.tilt,
+        pi.created_at,
+        pi.capacity_sum,
+        pi.total_value,
+        pi.accum_total,
+        pi.efficiency,
+        pi.status_code,
+        pi.updated_at
+        FROM plant_info_view pi
+        <where>
+            <if test="region != null and region != '' and region != 'all'">
+                AND pi.address LIKE CONCAT(#{region}, '%')
+            </if>
+        </where>
+        ORDER BY pi.created_at DESC, pi.id DESC
+    </select>
+
+    <select id="findHourlyGenerationByRegion" resultMap="stationHourlyGenerationMap">
+        SELECT
+        DATE_FORMAT(gl.base_time, '%H:00') AS hour_label,
+        COALESCE(SUM(gl.value_actual), 0) AS total_generation
+        FROM generation_log gl
+        INNER JOIN inverter i ON gl.inverter_id = i.id
+        INNER JOIN plant p ON i.plant_id = p.id
+        WHERE p.is_deleted = 0
+        AND gl.base_time >= CURDATE()
+        AND gl.base_time <![CDATA[ < ]]> DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+        <if test="region != null and region != '' and region != 'all'">
+            AND p.address LIKE CONCAT(#{region}, '%')
+        </if>
+        GROUP BY HOUR(gl.base_time), DATE_FORMAT(gl.base_time, '%H:00')
+        ORDER BY HOUR(gl.base_time)
+    </select>
+
+</mapper>

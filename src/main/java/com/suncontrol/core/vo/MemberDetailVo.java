@@ -18,9 +18,8 @@ public class MemberDetailVo extends MemberInfoVo {
     private String status;
 
     public MemberDetailVo(Member member) {
+        super(member);
         if (member == null) return;
-        super.setId(member.getId());
-        super.setName(member.getName());
         this.userId = member.getUserId();
         this.role = member.getRole();
         this.affiliation = member.getAffiliation();

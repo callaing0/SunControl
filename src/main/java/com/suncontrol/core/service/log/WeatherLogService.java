@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -33,17 +31,28 @@ public class WeatherLogService {
         log.info("{}건 저장 완료", result);
     }
 
-    public Map<District, Map<LocalDateTime, WeatherLogDto>> findAllByDistrictAndTime
-            (LocalDateTime start, LocalDateTime end) {
+    public List<WeatherLogDto> findLatest(LocalDateTime start, LocalDateTime end) {
+        List<WeatherLog> entities = findLatestLog(start, end);
         /// 결과가 없으면 빈 맵으로 반환
-        return Collections.emptyMap();
-        /// 레포지토리 결과 List<Entity> -> Map<K1, Map<K2, DTO>>
-        // todo
+        if(entities.isEmpty()) {
+            return Collections.emptyList();
+        }
+        /// 레포지토리 결과 List<Entity> -> Map<K1, Map<K2, DTO>> 는
+        /// 오케스트레이터가 받아서 처리할것
+        return entities.stream().map(WeatherLogDto::new).toList();
     }
 
     public WeatherLogDto findByDistrict(District district, LocalDateTime time) {
         /// todo : 대시보드용 기상 정보 조회용
         /// district와 time 기준 가장 가까운 과거시점의 스냅샷 1건을 반환한다.
         return null;
+    }
+
+    private List<WeatherLog>  findLatestLog(LocalDateTime start, LocalDateTime end) {
+        return repository.findLatestLogs(start, end);
+    }
+
+    public WeatherLogDto getRecentLog() {
+        return new WeatherLogDto(repository.findLatestLogOfAll());
     }
 }

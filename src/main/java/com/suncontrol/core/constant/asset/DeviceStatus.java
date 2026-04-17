@@ -18,11 +18,14 @@ public enum DeviceStatus {
     PLANT_DELETED(0, "PLANT"),
     PLANT_NORMAL(1, "PLANT"),
     PLANT_CAUTION(2, "PLANT"),
+    PLANT_END(9, "PLANT"),
     INVERTER_DELETED(10, "INVERTER"),
     INVERTER_NORMAL(11, "INVERTER"),
-    INVERTER_ERROR(12,  "INVERTER"),;
+    INVERTER_ERROR(12,  "INVERTER"),
+    INVERTER_INTERNAL_ERROR(18,  "INVERTER"),
+    INVERTER_END(19, "INVERTER");
     /// 발전소(0~9) 인버터(10~19) 등 장비의 상태값
-    private final int code;
+    private final Integer code;
     private final String category;
 
     public static List<DeviceStatus> getByCategory(String category) {
@@ -37,7 +40,7 @@ public enum DeviceStatus {
                             DeviceStatus::getCode,
                             Function.identity())));
 
-    public static DeviceStatus fromCode(int code) {
+    public static DeviceStatus fromCode(Integer code) {
         return CODE_MAP.get(code);
     }
 }
