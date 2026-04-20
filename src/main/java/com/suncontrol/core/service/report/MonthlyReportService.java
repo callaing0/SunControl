@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Collections;
@@ -85,7 +86,12 @@ public class MonthlyReportService {
         reportPdfDto.setIncidentCount(monthlyReport.getIncidentCount());
         reportPdfDto.setStoppedTime(monthlyReport.getStoppedTime()/3600);
         reportPdfDto.setPerformanceRatio(monthlyReport.getPerformanceRatio());
-        reportPdfDto.setIncreaseRate(monthlyReport.getExpectedRatio());
+        BigDecimal valueActual = monthlyReport.getValueActual();
+        BigDecimal valuePrevious = monthlyReport.getValuePrevious();
+        BigDecimal increaseRate = !valuePrevious.equals(BigDecimal.ZERO) ?
+                new BigDecimal("100.0") : valueActual.subtract(valuePrevious).divide(valuePrevious, 4, RoundingMode.HALF_EVEN).movePointRight(2);
+        log.info("increase rate: {}, monthlyReport : {}", increaseRate, monthlyReport);
+        reportPdfDto.setIncreaseRate(increaseRate);
 
         return reportPdfDto;
     }
