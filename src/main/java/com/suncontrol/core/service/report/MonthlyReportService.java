@@ -88,7 +88,7 @@ public class MonthlyReportService {
         reportPdfDto.setPerformanceRatio(monthlyReport.getPerformanceRatio());
         BigDecimal valueActual = monthlyReport.getValueActual();
         BigDecimal valuePrevious = monthlyReport.getValuePrevious();
-        BigDecimal increaseRate = !valuePrevious.equals(BigDecimal.ZERO) ?
+        BigDecimal increaseRate = valuePrevious.compareTo(BigDecimal.ZERO) == 0 ?
                 new BigDecimal("100.0") : valueActual.subtract(valuePrevious).divide(valuePrevious, 4, RoundingMode.HALF_EVEN).movePointRight(2);
         log.info("increase rate: {}, monthlyReport : {}", increaseRate, monthlyReport);
         reportPdfDto.setIncreaseRate(increaseRate);
