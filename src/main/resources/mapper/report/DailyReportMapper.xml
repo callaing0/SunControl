@@ -52,6 +52,39 @@
         WHERE base_date
         BETWEEN #{start} AND #{end}
         AND day_offset = #{dayOffset}
-        ORDER BY base_date ASC
+    </select>
+    <select id="findByPlantIdDateBetween" resultType="com.suncontrol.core.entity.report.DailyReport">
+        SELECT d.* FROM daily_report d
+        JOIN inverter i
+        ON d.inverter_id = i.id
+        WHERE i.plant_id= #{pId}
+        AND d.base_date
+        BETWEEN #{start} AND #{end}
+        AND d.day_offset = #{dayOffset}
+    </select>
+    <select id="sumValueActualByInverterIdAndBaseDateBetween" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(value_actual), 0)
+        FROM daily_report
+        WHERE inverter_id = #{inverterId}
+        AND base_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+    <select id="findDailyReportListByMonth" resultType="com.suncontrol.core.dto.report.DailyReportDto">
+        SELECT
+        inverter_id,
+        base_date,
+        value_expected,
+        value_actual,
+        value_previous,
+        performance_ratio,
+        expected_ratio,
+        capacity_factor,
+        accum_energy,
+        weather_code,
+        stopped_time,
+        incident_count
+        FROM daily_report
+        WHERE inverter_id = #{plantId}
+        AND DATE_FORMAT(base_date, '%Y-%m') = #{baseMonth}
+        ORDER BY base_date
     </select>
 </mapper>
