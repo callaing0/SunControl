@@ -246,7 +246,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
         );
         /// 비교용 전월 데이터
         Map<Long, Map<String, MonthlyReportDto>> previousMap = DataCollectorsUtil.groupToMap(
-                getMonthlyReportService().findAllByMonthBetween(start.minusMonths(1), end.minusMonths(1)),
+                getMonthlyReportService().findAllByMonthBetween(start.minusMonths(1), end),
                 MonthlyReportDto::getInverterId,
                 MonthlyReportDto::getBaseMonth
         );
@@ -274,6 +274,7 @@ public class ActualGenerationReportService extends AbstractGenerationReportServi
                     continue;
                 }
                 MonthlyReportDto previous = prevInnerMap.get(prevMonth);
+                log.info("previous : {}", previous);
                 currentReport = new MonthlyReportDto();
 
                 ReportStoppedCalcDto resultSet = new ReportStoppedCalcDto(
