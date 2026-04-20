@@ -2,9 +2,12 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
-<div layout:fragment="content" id="pdf-area">
-  <button class="bg-yellow-400  border rounded" onclick="downloadPdf()">PDF 다운로드</button>
-  <div class="max-w-[1000px] mx-auto bg-white border border-gray-200 shadow-lg">
+<div layout:fragment="content">
+  <div class="flex justify-">
+      <button class="ml-auto mt-4 mr-4 bg-[#FFC20E]/80  backdrop-blur-sm hover:bg-[#FFC20E] text-[#1a2b4b] px-5 py-2 rounded-full shadow-lg
+                    font-bold text-sm transition-all border border-white/20 active:scale-95 animate-bounce " onclick="downloadPdf()">PDF 다운로드</button>
+  </div>
+  <div class="max-w-[1000px] mx-auto bg-white border border-gray-200 shadow-lg" id="pdf-area">
 
     <div class="flex justify-between items-center p-8 border-b-2 border-gray-100">
       <div class="flex items-center gap-4">

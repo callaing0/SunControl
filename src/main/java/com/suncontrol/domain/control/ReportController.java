@@ -17,6 +17,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Optional;
 
 
 @Controller
@@ -28,17 +29,22 @@ public class ReportController {
     private final DailyReportService dailyReportService;
 
     @GetMapping
-    public String getMonthlyReport(Model model, HttpSession session){
+    public String getMonthlyReport(@RequestParam Optional<YearMonth> month, Model model, HttpSession session,Principal principal){
+        String userName = principal.getName();
+        YearMonth selectMonth = month.orElseGet(YearMonth::now);
 
         Long selectedPlantId = (Long) session.getAttribute("selectedPlantId");
 
+        LocalDate startDate = selectMonth.atDay(1);
+        LocalDate endDate = selectMonth.atEndOfMonth();
 
-        List<DailyReportDto> dailyReportDtoList = dailyReportService.findByPlantIdDateBetween(selectedPlantId,LocalDate.of(2026,4,1), LocalDate.of(2026,4,30),0);
+        List<DailyReportDto> dailyReportDtoList = dailyReportService.findByPlantIdDateBetween(selectedPlantId,startDate, endDate,0);
         model.addAttribute("dailyReportDtoList",dailyReportDtoList);
 
-        ReportDto reportDto = dailyReportService.makeMonthlyReportDto(selectedPlantId,dailyReportDtoList);
+        ReportPdfDto reportPdfDto = monthlyReportService.getPlantInfo(selectedPlantId, userName,selectMonth);
 
-        model.addAttribute("reportDto",reportDto);
+        model.addAttribute("reportDto",reportPdfDto);
+        model.addAttribute("nowMonth",selectMonth);
         return "report";
 
     }

@@ -8,7 +8,7 @@
   <div class="w-[1560px] px-2 py-2  border border-gray-200 rounded-lg ">
     <div>
       <div>
-        <input type="month" id="month" value="2026-03">
+        <input type="month" id="month" th:value="${nowMonth}">
         <button class="bg-yellow-400 border border rounded px-6 text-white">조회</button>
       </div>
     </div>
@@ -89,6 +89,14 @@
   </div>
 
   <script>
+
+
+
+    let month = document.querySelector("#month");
+    month.addEventListener('change',function (){
+      location.href="/report?month="+this.value;
+    });
+
     let view=document.getElementById("preview")
     view.addEventListener("click",function(){
       let month = document.querySelector("#month").value;
