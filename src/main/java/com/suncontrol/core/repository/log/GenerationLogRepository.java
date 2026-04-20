@@ -35,5 +35,4 @@ public interface GenerationLogRepository {
     List<GenerationLog> findAllByTimeBetween(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);
-    //todo
 }

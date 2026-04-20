@@ -18,5 +18,4 @@ public interface HourlyReportRepository {
             @Param("end") LocalDateTime end,
             @Param("dayOffset") int dayOffset
     );
-    //todo
 }

@@ -23,7 +23,7 @@ import java.util.List;
 public class dashboardServiceImpl implements dashboardService {
 
     private static final BigDecimal UNIT_PRICE = new BigDecimal("201");
-    private static final BigDecimal CO2_FACTOR = new BigDecimal("0.424");
+    private static final BigDecimal CO2_FACTOR = new BigDecimal("0.441");
     private static final BigDecimal TREE_DIVISOR = new BigDecimal("6.6");
 
     private final dashboardRepository dashboardRepository;
