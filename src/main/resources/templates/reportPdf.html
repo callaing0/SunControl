@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<div layout:fragment="content">
+  <div class="flex justify-">
+      <button class="ml-auto mt-4 mr-4 bg-[#FFC20E]/80  backdrop-blur-sm hover:bg-[#FFC20E] text-[#1a2b4b] px-5 py-2 rounded-full shadow-lg
+                    font-bold text-sm transition-all border border-white/20 active:scale-95 animate-bounce " onclick="downloadPdf()">PDF 다운로드</button>
+  </div>
+  <div class="max-w-[1000px] mx-auto bg-white border border-gray-200 shadow-lg" id="pdf-area">
+
+    <div class="flex justify-between items-center p-8 border-b-2 border-gray-100">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-yellow-400 rounded-lg flex items-center justify-center text-black text-2xl font-bold">☀</div>
+        <div>
+          <h1 class="text-[#152257] font-black text-3xl tracking-tighter">SolarGuard</h1>
+          <p class="text-gray-400 text-sm font-bold uppercase tracking-widest">태양광 발전 모니터링 시스템</p>
+        </div>
+      </div>
+      <div class="bg-[#152257] px-6 py-3 rounded-lg">
+        <p class="text-white font-bold text-xl">월간 통합 발전 리포트</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 border-b border-gray-200 text-center">
+      <div class="p-5 border-r border-gray-100">
+        <p class="text-gray-400 font-bold text-xs mb-1 uppercase">리포트 생성일시</p>
+        <p th:text="${reportPdfDto.createdDate}" class="text-[#152257] font-bold text-lg">2026-03-20 15:00:00</p>
+      </div>
+      <div class="p-5 border-r border-gray-100">
+        <p class="text-gray-400 font-bold text-xs mb-1 uppercase">분석 기간</p>
+        <p th:text="${reportPdfDto.analysisPeriod+'~'+reportPdfDto.analysisPeriod2}" class="text-[#152257] font-bold text-lg">2026-03-01 ~ 2026-03-31</p>
+      </div>
+      <div class="p-5">
+        <p class="text-gray-400 font-bold text-xs mb-1 uppercase">발전소명</p>
+        <p th:text="${reportPdfDto.plantName}" class="text-[#152257] font-bold text-lg">대전 태양광 발전소 A</p>
+      </div>
+      <div class="p-5 border-t border-r border-gray-100">
+        <p class="text-gray-400 font-bold text-xs mb-1 uppercase">주소</p>
+        <p th:text="${reportPdfDto.plantAddress}" class="text-[#152257] font-bold text-sm">대전광역시 유성구 ...</p>
+      </div>
+      <div class="p-5 border-t border-r border-gray-100">
+        <p class="text-gray-400 font-bold text-xs mb-1 uppercase">설비 용량</p>
+        <p th:text="${reportPdfDto.capacity}" class="text-[#FB8C00] font-black text-xl italic">100 kW</p>
+      </div>
+      <div class="p-5 border-t border-gray-100">
+        <p class="text-gray-400 font-bold text-xs mb-1 uppercase">담당자명</p>
+        <p th:text="${reportPdfDto.name}" class="text-[#152257] font-bold text-lg font-bold">박지연</p>
+      </div>
+    </div>
+
+    <div class="p-6">
+      <div class="flex items-center gap-3 border-b-2 border-[#152257] pb-3 mb-6">
+        <span class="bg-[#152257] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">1</span>
+        <h2 class="text-[#152257] font-bold text-xl">주요 통계 지표</h2>
+      </div>
+
+      <div class="grid grid-cols-5 gap-3">
+        <div class="bg-[#F8FAFF] border border-blue-100 rounded-2xl p-4 text-center">
+          <p class="text-blue-400 font-bold text-xs mb-2">당월 발전량</p>
+          <p th:text="${reportPdfDto.valueActual}" class="text-[#152257] font-black text-xl">122.4 kWh</p>
+          <p class="text-gray-400 text-[10px] mt-1">목표 150 kWh</p>
+        </div>
+        <div class="bg-[#F8FAFF] border border-blue-100 rounded-2xl p-4 text-center">
+          <p class="text-blue-400 font-bold text-xs mb-2">전월 대비 증감</p>
+          <p th:text="${reportPdfDto.increaseRate}" class="text-green-500 font-black text-xl">+8.3%</p>
+          <p class="text-gray-400 text-[10px] mt-1">+9.4 kWh 증가</p>
+        </div>
+        <div class="bg-[#F8FAFF] border border-blue-100 rounded-2xl p-4 text-center">
+          <p class="text-blue-400 font-bold text-xs mb-2">목표 달성률</p>
+          <p th:text="${reportPdfDto.performanceRatio}" class="text-[#FB8C00] font-black text-xl">81.6%</p>
+          <p class="text-gray-400 text-[10px] mt-1">잔여 27.6 kWh</p>
+        </div>
+        <div class="bg-[#F8FAFF] border border-blue-100 rounded-2xl p-4 text-center">
+          <p class="text-blue-400 font-bold text-xs mb-2">장애 발생</p>
+          <p th:text="${reportPdfDto.incidentCount}" class="text-red-500 font-black text-xl">2건</p>
+          <p class="text-gray-400 text-[10px] mt-1">처리중 1건</p>
+        </div>
+        <div class="bg-[#F8FAFF] border border-blue-100 rounded-2xl p-4 text-center">
+          <p class="text-blue-400 font-bold text-xs mb-2">월 가동 시간</p>
+          <p th:text="${reportPdfDto.stoppedTime}" class="text-[#FB8C00] font-black text-xl">468 h</p>
+          <p class="text-gray-400 text-[10px] mt-1">목표 600h · 78%</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 mb-8">
+      <div class="flex items-center gap-3 border-b-2 border-[#152257] pb-3 mb-4">
+        <span class="bg-[#152257] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">2</span>
+        <h2 class="text-[#152257] font-bold text-xl">당월 일별 발전량 그래픽</h2>
+      </div>
+      <div class="relative h-[260px]">
+        <canvas id="dailyGenerationChart"></canvas>
+      </div>
+      <div class="flex justify-between mt-2 px-2 text-sm">
+        <p class="text-slate-500">
+          월 평균
+          <span class="font-semibold text-slate-700" th:text="${dailyChartDto.averageValue}">0</span>
+          kWh
+        </p>
+        <p class="text-orange-600 font-semibold">
+          최대
+          <span th:text="${dailyChartDto.maxValue}">0</span>
+          kWh
+          <span class="text-slate-400 font-medium">
+                (<span th:text="${dailyChartDto.maxDay}">0</span>일)
+            </span>
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 px-6 gap-6 mb-8">
+      <div>
+        <div class="flex items-center gap-2 border-b-2 border-[#152257] pb-2 mb-4">
+          <span class="bg-[#152257] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+          <h2 class="text-[#152257] font-bold text-xl">전월 대비 증감률</h2>
+        </div>
+        <p class="text-gray-400 text-[10px] mb-2 font-bold uppercase italic">전월 대비 발전량 비교</p>
+        <div>
+          <canvas id="gaugeChart1"></canvas>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2 border-b-2 border-[#152257] pb-2 mb-4">
+          <span class="bg-[#152257] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+          <h2 class="text-[#152257] font-bold text-xl">목표 달성률</h2>
+        </div>
+        <p class="text-gray-400 text-[10px] mb-2 font-bold uppercase italic">기대 대비 달성도</p>
+        <div>
+          <canvas id="gaugeChart2"></canvas>
+        </div>
+        <div class="flex justify-between mt-3 text-center">
+          <div class="flex-1">
+            <p class="text-[#f97316] font-bold text-2xl" th:text="${#numbers.formatDecimal(performanceGaugeDto.actualValue, 1, 1)}">122.4</p>
+            <p class="text-gray-500 text-sm">달성 kWh</p>
+          </div>
+          <div class="flex-1">
+            <p class="text-red-500 font-bold text-2xl" th:text="${#numbers.formatDecimal(performanceGaugeDto.remainValue, 1, 1)}">27.6</p>
+            <p class="text-gray-500 text-sm">잔여 kWh</p>
+          </div>
+          <div class="flex-1">
+            <p class="text-slate-400 font-bold text-2xl" th:text="${#numbers.formatDecimal(performanceGaugeDto.targetValue, 1, 1)}">150</p>
+            <p class="text-gray-500 text-sm">목표 kWh</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2 border-b-2 border-[#152257] pb-2 mb-4">
+          <span class="bg-[#152257] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">5</span>
+          <h2 class="text-[#152257] font-bold text-xl">월 가동 시간</h2>
+        </div>
+        <p class="text-gray-400 text-[10px] mb-2 font-bold uppercase italic">월간 누적 가동 현황</p>
+        <div >
+          <canvas id="gaugeChart3"></canvas>
+
+        </div>
+        <div class="flex justify-between mt-3 text-center">
+          <div class="flex-1">
+            <p class="text-[#f97316] font-bold text-2xl" th:text="${runtimeGaugeDto.runHours+'h'}">468</p>
+            <p class="text-gray-500 text-sm">가동</p>
+          </div>
+          <div class="flex-1">
+            <p class="text-red-500 font-bold text-2xl" th:text="${runtimeGaugeDto.remainHours+'h'}">132</p>
+            <p class="text-gray-500 text-sm">잔여</p>
+          </div>
+          <div class="flex-1">
+            <p class="text-slate-400 font-bold text-2xl" th:text="${runtimeGaugeDto.targetHours+'h'}">600</p>
+            <p class="text-gray-500 text-sm">목표</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 mb-10">
+      <div class="flex items-center gap-3 border-b-2 border-[#152257] pb-3 mb-4">
+        <span class="bg-[#152257] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">6</span>
+        <h2 class="text-[#152257] font-bold text-xl">장애 발생 현황</h2>
+      </div>
+      <table class="w-full text-sm">
+        <thead>
+        <tr class="bg-[#152257] text-white">
+          <th class="py-3 px-4 border-r border-gray-600">발생일시</th>
+          <th class="py-3 px-4 border-r border-gray-600">인버터명</th>
+          <th class="py-3 px-4 border-r border-gray-600">장애 유형</th>
+          <th class="py-3 px-4 border-r border-gray-600">상태</th>
+          <th class="py-3 px-4">비고</th>
+        </tr>
+        </thead>
+        <tbody class="text-center font-medium">
+        <tr class="border-b border-gray-200 bg-[#F8FAFF]">
+          <td th:text="${incidentReportDto.detectTime}" class="py-4 text-gray-600">2026-03-08 09:14</td>
+          <td th:text="${incidentReportDto.InverterId}" class="font-bold text-[#152257]">INV-B3</td>
+          <td th:text="${incidentReportDto.type}">출력 저하</td>
+          <td th:text="${incidentReportDto.statusCode}" class="font-bold text-red-500">처리 중</td>
+          <td th:text="${incidentReportDto.Comments}" class="text-xs">즉시 조치 필요</td>
+        </tr>
+        <tr class="border-b border-gray-200">
+          <td class="py-4 text-gray-600">2026-03-12 14:30</td>
+          <td class="font-bold text-[#152257]">INV-C5</td>
+          <td>오염·먼지 경고</td>
+          <td class="font-bold text-red-500">처리 중</td>
+          <td class="text-xs">세척 권장</td>
+        </tr>
+        <tr class="border-b border-gray-200 bg-[#F8FAFF]">
+          <td class="py-4 text-gray-600">2026-03-15 11:00</td>
+          <td class="font-bold text-[#152257]">INV-D1</td>
+          <td>정기 점검</td>
+          <td class="font-bold text-green-500">완료</td>
+          <td class="text-xs">정상 가동 중</td>
+        </tr>
+        <tr class="border-b border-gray-200">
+          <td class="py-4 text-gray-600">2026-03-15 11:00</td>
+          <td class="font-bold text-[#152257]">INV-D2</td>
+          <td>정기 점검</td>
+          <td class="font-bold text-green-500">완료</td>
+          <td class="text-xs">정상 가동 중</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bg-gray-50 p-8 border-t border-gray-200 flex justify-between items-end">
+      <div class="space-y-1">
+        <p class="text-[#152257] font-medium text-sm">SolarGuard Monitoring System | 대전 태양광 발전소 A</p>
+        <p class="text-[#152257] text-sm font-medium">Page 1 / 1 | 본 문서는 시스템에서 자동 생성된 리포트입니다.</p>
+      </div>
+      <div class="flex gap-12 text-center">
+        <div class="w-24">
+          <div class="h-1 bg-[#152257] mb-2"></div>
+          <p class="text-[#152257] font-bold text-xs uppercase tracking-tighter">담당자 확인</p>
+        </div>
+        <div class="w-24">
+          <div class="h-1 bg-[#152257] mb-2"></div>
+          <p class="text-[#152257] font-bold text-xs uppercase tracking-tighter">관리자 승인</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script th:inline="javascript">
+    const labels = /*[[${dailyChartDto.labels}]]*/ [];
+    const values = /*[[${dailyChartDto.values}]]*/ [];
+    const avg = /*[[${dailyChartDto.averageValue}]]*/ 0;
+    const max = /*[[${dailyChartDto.maxValue}]]*/ 0;
+    const maxDay = /*[[${dailyChartDto.maxDay}]]*/ 0;
+
+    const compareIncreaseRate = /*[[${monthlyCompareChartDto.increaseRate}]]*/ 0;
+    const compareCurrentActual = /*[[${monthlyCompareChartDto.currentActual}]]*/ 0;
+    const comparePreviousActual = /*[[${monthlyCompareChartDto.previousActual}]]*/ 0;
+    const compareTargetActual = /*[[${monthlyCompareChartDto.targetActual}]]*/ 0;
+
+    const performanceActualValue = /*[[${performanceGaugeDto.actualValue}]]*/ 0;
+    const performanceRemainValue = /*[[${performanceGaugeDto.remainValue}]]*/ 0;
+    const performanceTargetValue = /*[[${performanceGaugeDto.targetValue}]]*/ 0;
+    const performanceRatio = /*[[${performanceGaugeDto.performanceRatio}]]*/ 0;
+
+    const runtimeRunHours = /*[[${runtimeGaugeDto.runHours}]]*/ 0;
+    const runtimeRemainHours = /*[[${runtimeGaugeDto.remainHours}]]*/ 0;
+    const runtimeTargetHours = /*[[${runtimeGaugeDto.targetHours}]]*/ 0;
+    const runtimeRatio = /*[[${runtimeGaugeDto.runRatio}]]*/ 0;
+
+
+    const averageLinePlugin = {
+      id: 'averageLinePlugin',
+      afterDatasetsDraw(chart, args, pluginOptions) {
+        const { ctx, chartArea, scales } = chart;
+        if (!chartArea || !scales?.y) return;
+
+        const y = scales.y.getPixelForValue(pluginOptions.value);
+
+        ctx.save();
+
+        ctx.beginPath();
+        ctx.setLineDash([6, 4]);
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = '#f59e0b';
+        ctx.moveTo(chartArea.left, y);
+        ctx.lineTo(chartArea.right, y);
+        ctx.stroke();
+
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#b45309';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(`평균 ${pluginOptions.value} kWh`, chartArea.right - 4, y - 8);
+
+        ctx.restore();
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const canvas = document.getElementById('dailyGenerationChart');
+      if (!canvas) return;
+
+      const dayLabels = Array.from({ length: labels.length }, (_, i) => String(i + 1));
+
+      const dayValueMap = new Map();
+      labels.forEach((label, index) => {
+        dayValueMap.set(String(label), Number(values[index] ?? 0));
+      });
+
+      const filledValues = dayLabels.map(day => dayValueMap.get(day) ?? 0);
+
+      const barColors = dayLabels.map(label => {
+        const day = Number(label);
+        return day === Number(maxDay) ? '#c2410c' : '#fb923c';
+      });
+
+      const borderColors = dayLabels.map(label => {
+        const day = Number(label);
+        return day === Number(maxDay) ? '#9a3412' : '#ea580c';
+      });
+
+      new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: dayLabels,
+          datasets: [
+            {
+              label: '일별 발전량',
+              data: filledValues,
+              backgroundColor: barColors,
+              borderColor: borderColors,
+              borderWidth: 1,
+              borderRadius: 8,
+              borderSkipped: false,
+              barPercentage: 0.72,
+              categoryPercentage: 0.82,
+              hoverBackgroundColor: dayLabels.map(label => {
+                const day = Number(label);
+                return day === Number(maxDay) ? '#9a3412' : '#f97316';
+              }),
+              hoverBorderColor: dayLabels.map(label => {
+                const day = Number(label);
+                return day === Number(maxDay) ? '#7c2d12' : '#c2410c';
+              }),
+              hoverBorderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 1000,
+            easing: 'easeOutCubic'
+          },
+          layout: {
+            padding: {
+              top: 18,
+              right: 8,
+              left: 8,
+              bottom: 0
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              borderColor: '#334155',
+              borderWidth: 1,
+              padding: 12,
+              cornerRadius: 10,
+              displayColors: false,
+              callbacks: {
+                title: function(items) {
+                  return items[0].label + '일';
+                },
+                label: function(context) {
+                  return '발전량 : ' + context.raw + ' kWh';
+                },
+                afterLabel: function(context) {
+                  if (Number(context.label) === Number(maxDay)) {
+                    return '이번 달 최고 발전량';
+                  }
+                  return '';
+                }
+              }
+            },
+            averageLinePlugin: {
+              value: avg
+            }
+          },
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false,
+                drawBorder: false
+              },
+              border: {
+                display: false
+              },
+              ticks: {
+                color: '#94a3b8',
+                font: {
+                  size: 11
+                },
+                callback: function(value, index) {
+                  const label = this.getLabelForValue(value);
+                  return Number(label) % 2 === 1 ? label : '';
+                }
+              }
+            },
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(148, 163, 184, 0.12)',
+                drawBorder: false
+              },
+              border: {
+                display: false
+              },
+              ticks: {
+                color: '#94a3b8',
+                font: {
+                  size: 11
+                },
+                callback: function(value) {
+                  return value + ' kWh';
+                }
+              }
+            }
+          }
+        },
+        plugins: [averageLinePlugin]
+      });
+
+      const compareCanvas = document.getElementById('gaugeChart1');
+      if (compareCanvas) {
+        new Chart(compareCanvas, {
+          type: 'doughnut',
+          data: {
+            labels: ['당월', '전월', '목표'],
+            datasets: [{
+              data: [
+                Number(compareCurrentActual),
+                Number(comparePreviousActual),
+                Number(compareTargetActual)
+              ],
+              backgroundColor: ['#f97316', '#fdba74', '#fed7aa'],
+              borderWidth: 0,
+              hoverOffset: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            cutout: '68%',
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: {
+                  boxWidth: 12,
+                  boxHeight: 12,
+                  useBorderRadius: true,
+                  borderRadius: 3,
+                  padding: 16
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `${context.label} : ${context.raw} kWh`;
+                  }
+                }
+              }
+            }
+          },
+          plugins: [{
+            id: 'centerText1',
+            afterDraw(chart) {
+              const { ctx } = chart;
+              const meta = chart.getDatasetMeta(0);
+              if (!meta || !meta.data || !meta.data.length) return;
+
+              const x = meta.data[0].x;
+              const y = meta.data[0].y;
+
+              ctx.save();
+              ctx.textAlign = 'center';
+              ctx.fillStyle = '#ea580c';
+              ctx.font = 'bold 26px sans-serif';
+              ctx.fillText(`${compareIncreaseRate > 0 ? '+' : ''}${compareIncreaseRate}`, x, y - 8);
+
+              ctx.fillStyle = '#94a3b8';
+              ctx.font = '12px sans-serif';
+              ctx.fillText('% 증가', x, y + 16);
+              ctx.restore();
+            }
+          }]
+        });
+      }
+
+
+      // 목표 달성률
+      const performanceCanvas = document.getElementById('gaugeChart2');
+      if (performanceCanvas) {
+        new Chart(performanceCanvas, {
+          type: 'doughnut',
+          data: {
+            datasets: [{
+              data: [Number(performanceActualValue), Number(performanceRemainValue)],
+              backgroundColor: ['#f97316', '#fdba74'],
+              borderWidth: 0,
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            circumference: 180,
+            rotation: 270,
+            cutout: '75%',
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `${context.raw} kWh`;
+                  }
+                }
+              }
+            }
+          },
+          plugins: [{
+            id: 'centerText2',
+            afterDraw(chart) {
+              const { ctx, chartArea } = chart;
+              const centerX = (chartArea.left + chartArea.right) / 2;
+              const centerY = chartArea.bottom - 18;
+
+              ctx.save();
+              ctx.textAlign = 'center';
+              ctx.fillStyle = '#c2410c';
+              ctx.font = 'bold 38px sans-serif';
+              ctx.fillText(`${performanceRatio}%`, centerX, centerY);
+
+              ctx.restore();
+            }
+          }]
+        });
+      }
+
+      //월가동
+      const runtimeCanvas = document.getElementById('gaugeChart3');
+      if (runtimeCanvas) {
+        new Chart(runtimeCanvas, {
+          type: 'doughnut',
+          data: {
+            datasets: [{
+              data: [Number(runtimeRunHours), Number(runtimeRemainHours)],
+              backgroundColor: ['#f97316', '#fdba74'],
+              borderWidth: 0,
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            circumference: 180,
+            rotation: 270,
+            cutout: '75%',
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `${context.raw} h`;
+                  }
+                }
+              }
+            }
+          },
+          plugins: [{
+            id: 'centerText3',
+            afterDraw(chart) {
+              const { ctx, chartArea } = chart;
+              const centerX = (chartArea.left + chartArea.right) / 2;
+              const centerY = chartArea.bottom - 18;
+
+              ctx.save();
+              ctx.textAlign = 'center';
+              ctx.fillStyle = '#c2410c';
+              ctx.font = 'bold 38px sans-serif';
+              ctx.fillText(`${runtimeRatio}%`, centerX, centerY);
+
+              ctx.restore();
+            }
+          }]
+        });
+      }
+    });
+  </script>
+  <script>
+    async function downloadPdf() {
+
+      const { jsPDF } = window.jspdf;
+
+      const element = document.getElementById('pdf-area'); // 특정 영역만 하면 더 좋음
+
+      const canvas = await html2canvas(element, {
+        scale: 2, // 해상도 ↑
+        useCORS: true
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save('report.pdf');
+    }
+  </script>
+</div>
+</html>
