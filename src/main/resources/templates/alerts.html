@@ -13,7 +13,7 @@
 
             <div class="flex gap-3">
                 <button th:if="${not #lists.isEmpty(alerts)}"
-                        th:onclick="|testPush(${alerts[0].status})|"
+                        th:onclick="testPush([[${alerts[0].status}]], [[${alerts[0].id}]], [[${alerts[0].location}]])"
                         class="bg-red-500 text-white px-6 py-2 rounded-full font-black text-xs hover:bg-black transition-all shadow-lg">
                     🚨 즉시 알림 테스트
                 </button>
@@ -39,23 +39,30 @@
             <div class="flex-1 flex flex-col relative divide-y divide-gray-50 overflow-y-auto custom-scroll">
                 <th:block th:if="${alerts != null and !#lists.isEmpty(alerts)}">
                     <div th:each="alert : ${alerts}"
-                         class="flex py-7 px-12 text-center items-center text-lg font-black text-gray-700 hover:bg-gray-50 transition-colors">
+                         class="flex py-7 px-12 text-center items-center text-lg font-black text-gray-700 hover:bg-gray-50 transition-colors"
+                         th:classappend="${alert.id == 2} ? 'bg-red-50/50' : ''">
+
                         <div class="w-24 text-base font-bold text-gray-400" th:text="${alert.id}"></div>
                         <div class="w-32 text-base font-bold text-blue-600" th:text="${alert.getInverterNumber()}"></div>
                         <div class="flex-1 text-base text-gray-800" th:text="${alert.createdAt != null ? #temporals.format(alert.createdAt, 'yyyy-MM-dd HH:mm:ss') : '--'}"></div>
                         <div class="flex-1 text-base text-gray-400" th:text="${alert.resolvedAt != null ? #temporals.format(alert.resolvedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}"></div>
-                        <div class="w-40 text-sm font-bold text-gray-600 uppercase" th:text="${alert.location}"></div>
+
+                        <div class="w-40 text-sm font-[900] uppercase tracking-tighter"
+                             th:classappend="${alert.id == 2} ? 'text-red-600' : 'text-gray-600'"
+                             th:text="${alert.id == 2 ? '서울 제 1발전소' : alert.location}"></div>
+
                         <div class="w-36 flex justify-center border-l border-gray-100 pl-4">
                             <form th:if="${alert.status != 2}" th:action="@{/alerts/{id}/status(id=${alert.id})}" method="post">
                                 <button type="submit"
                                         class="min-w-[110px] px-4 py-2 rounded-full text-[11px] font-black shadow-sm border transition-all hover:scale-105"
-                                        th:classappend="${alert.status == 0 ? 'bg-red-500 text-white' : 'bg-amber-400 text-white'}"
+                                        th:classappend="${alert.status == 0 ? 'bg-red-500 text-white border-red-600' : 'bg-amber-400 text-white border-amber-500'}"
                                         th:text="${alert.status == 0 ? '장애 발생' : '확인 중'}"></button>
                             </form>
-                            <span th:if="${alert.status == 2}" class="min-w-[110px] px-4 py-2 rounded-full text-[11px] font-black border bg-emerald-500 text-white">✅ 조치 완료</span>
+                            <span th:if="${alert.status == 2}" class="min-w-[110px] px-4 py-2 rounded-full text-[11px] font-black border border-emerald-600 bg-emerald-500 text-white">✅ 조치 완료</span>
                         </div>
                     </div>
                 </th:block>
+
                 <div th:if="${alerts == null or #lists.isEmpty(alerts)}" class="flex-1 flex items-center justify-center text-gray-300 font-bold italic text-3xl">
                     NO ALARM LOGS DETECTED
                 </div>
@@ -67,25 +74,25 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // ✅ 전역 함수 선언 - 중복 없이 딱 하나만 존재해야 합니다.
-        window.testPush = function(status) {
-            console.log("테스트 실행 - 상태:", status);
+        // [수정] 알림 파라미터 보강 (상태, ID, 위치 정보 받기)
+        window.testPush = function(status, id, location) {
+            console.log("테스트 실행 - ID:", id, "상태:", status);
 
             if (Number(status) === 2) {
                 console.warn("이미 조치 완료된 로그입니다.");
                 return;
             }
 
-            // window.showEmergencyToast가 정의되어 있는지 확인
+            // ID 2번이면 '서울 제 1발전소' 명칭 강제 적용
+            let plantName = (id == 2) ? "서울 제 1발전소" : location;
+
             if (window.showEmergencyToast && typeof window.showEmergencyToast === 'function') {
-                window.showEmergencyToast("🚨 알림 시스템 정상 가동! 다른 탭에서도 유지됩니다.");
+                window.showEmergencyToast(`🚨 [${plantName}] 신규 장애 알림이 도착했습니다! (Log ID: ${id})`);
             } else {
                 console.error("Layout의 알림 함수를 찾을 수 없습니다.");
-                alert("Layout 파일에 showEmergencyToast 함수가 정의되지 않았습니다.");
             }
         };
         /*]]>*/
     </script>
 </th:block>
-</html>>
 </html>

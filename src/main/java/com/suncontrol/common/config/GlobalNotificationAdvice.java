@@ -1,35 +1,56 @@
-package com.suncontrol.common.config;
+package com.suncontrol.common.config; // 본인 프로젝트 패키지에 맞게 수정
 
-import com.suncontrol.mapper.Repository; // 로그에 찍혔던 그 매퍼
-import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @ControllerAdvice
-@RequiredArgsConstructor
 public class GlobalNotificationAdvice {
 
-    private final Repository repository;
-
-    /**
-     * 어떤 컨트롤러가 실행되든 이 메서드가 먼저 실행되어
-     * 타임리프 화면(${globalAlerts})에 데이터를 넣어줍니다.
-     */
     @ModelAttribute
     public void addGlobalAlerts(Model model) {
-        try {
-            // ✅ DB에서 최신 알림 이력을 가져옵니다.
-            // 매퍼 XML의 select id가 'findAll'인지 꼭 확인하세요!
-            var recentAlerts = repository.findAll();
+        List<Map<String, String>> alertList = new ArrayList<>();
 
-            // 모든 탭(대시보드 등)의 HTML에서 이 데이터를 사용할 수 있게 됩니다.
-            model.addAttribute("globalAlerts", recentAlerts);
+        // ID 1: 선화동 발전소 (시리얼: 260401)
+        Map<String, String> alert1 = new HashMap<>();
+        alert1.put("id", "1");
+        alert1.put("plantName", "선화동 발전소");
+        alert1.put("content", "인버터 전압 이상 감지");
+        alert1.put("regDate", "2026-04-14 13:34");
+        alert1.put("serial", "260401");
+        alertList.add(alert1);
 
-        } catch (Exception e) {
-            model.addAttribute("globalAlerts", List.of());
-            System.err.println("🚨 전역 알림 데이터 로드 실패: " + e.getMessage());
-        }
+        // ID 2: 서울 제1발전소 (시리얼: 202604775600)
+        Map<String, String> alert2 = new HashMap<>();
+        alert2.put("id", "2");
+        alert2.put("plantName", "서울 제1발전소");
+        alert2.put("content", "테스트 장애 발생 (통신 이상)");
+        alert2.put("regDate", "2026-04-16 11:15");
+        alert2.put("serial", "202604775600");
+        alertList.add(alert2);
+
+        // ID 3: 솔라가드 대전 제2발전소 (시리얼: 202604626269)
+        Map<String, String> alert3 = new HashMap<>();
+        alert3.put("id", "3");
+        alert3.put("plantName", "솔라가드 대전 제2발전소");
+        alert3.put("content", "🚨 테스트 장애 발생");
+        alert3.put("regDate", "2026-04-16 13:09");
+        alert3.put("serial", "202604626269");
+        alertList.add(alert3);
+
+        // ID 4: 서울 제1발전소 (시리얼: 202604908107)
+        Map<String, String> alert4 = new HashMap<>();
+        alert4.put("id", "4");
+        alert4.put("plantName", "서울 제1발전소");
+        alert4.put("content", "테스트 인버터 장애 발생");
+        alert4.put("regDate", "2026-04-16 15:11");
+        alert4.put("serial", "202604908107");
+        alertList.add(alert4);
+
+        model.addAttribute("globalAlerts", alertList);
     }
 }
