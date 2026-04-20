@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PanelDto {
     /// 패널등록 Form 에서 패널 DB 저장될 정보만 추출
-    // TODO
     private Long id;
     private Long inverterId;
     private PanelModel model;

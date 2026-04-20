@@ -127,13 +127,16 @@
 
     <!-- 전월 값 -->
     <select id="selectMonthlyPrevious" resultType="java.math.BigDecimal">
-        SELECT ROUND(COALESCE(SUM(mr.value_previous), 0), 2)
+        SELECT ROUND(COALESCE(SUM(mr.value_actual), 0), 2)
         FROM monthly_report mr
                  INNER JOIN inverter i ON mr.inverter_id = i.id
                  INNER JOIN plant p ON i.plant_id = p.id
         WHERE p.id = #{plantId}
           AND p.is_deleted = 0
-          AND mr.base_month = #{month}
+          AND mr.base_month = DATE_FORMAT(
+                DATE_SUB(STR_TO_DATE(CONCAT(#{month}, '-01'), '%Y-%m-%d'), INTERVAL 1 MONTH),
+                '%Y-%m'
+                              )
     </select>
 
     <!-- 월 평균 발전량 -->
@@ -171,36 +174,40 @@
 
     <!-- 발전량 추이(월별) : 최근 12개월 -->
     <select id="selectMonthlyTrend" resultType="com.suncontrol.domain.dto.chartDto">
-        SELECT mr.base_month AS label,
-               ROUND(COALESCE(SUM(mr.value_actual), 0), 2) AS value
-        FROM monthly_report mr
-            INNER JOIN inverter i ON mr.inverter_id = i.id
-            INNER JOIN plant p ON i.plant_id = p.id
-        WHERE p.id = #{plantId}
-          AND p.is_deleted = 0
-        GROUP BY mr.base_month
-        ORDER BY mr.base_month
-            LIMIT 12
+        SELECT t.label, t.value
+        FROM (
+                 SELECT mr.base_month AS label,
+                        ROUND(COALESCE(SUM(mr.value_actual), 0), 2) AS value
+                 FROM monthly_report mr
+                     INNER JOIN inverter i ON mr.inverter_id = i.id
+                     INNER JOIN plant p ON i.plant_id = p.id
+                 WHERE p.id = #{plantId}
+                   AND p.is_deleted = 0
+                 GROUP BY mr.base_month
+                 ORDER BY mr.base_month DESC
+                     LIMIT 12
+             ) t
+        ORDER BY t.label ASC
     </select>
 
     <!-- 기상 조건별 발전 분포(월별) -->
     <select id="selectMonthlyWeather" resultType="com.suncontrol.domain.dto.chartDto">
         SELECT
             CASE wc.weather_code
-                WHEN '01' THEN '맑음'
-                WHEN '02' THEN '구름 조금'
-                WHEN '03' THEN '흐림'
-                WHEN '04' THEN '비'
-                WHEN '05' THEN '눈'
+                WHEN 1 THEN '맑음'
+                WHEN 2 THEN '구름'
+                WHEN 3 THEN '흐림'
+                WHEN 4 THEN '비'
+                WHEN 5 THEN '눈'
                 ELSE '기타'
                 END AS label,
             ROUND(COALESCE(AVG(dr.performance_ratio), 0), 2) AS value
         FROM (
-            SELECT '01' AS weather_code
-            UNION ALL SELECT '02'
-            UNION ALL SELECT '03'
-            UNION ALL SELECT '04'
-            UNION ALL SELECT '05'
+            SELECT 1 AS weather_code
+            UNION ALL SELECT 2
+            UNION ALL SELECT 3
+            UNION ALL SELECT 4
+            UNION ALL SELECT 5
             ) wc
             LEFT JOIN daily_report dr
         ON wc.weather_code = dr.weather_code

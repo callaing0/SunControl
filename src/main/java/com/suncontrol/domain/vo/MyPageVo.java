@@ -19,13 +19,13 @@ public class MyPageVo {
     // 사용자 정보
     private MemberDetailVo member;
 
-    // TODO:발전소 정보 (추후 사용)
+    // 발전소 정보 (추후 사용)
     private PlantDetailVo plant;
 
-    // TODO:인버터 정보 (추후 사용)
+    // 인버터 정보 (추후 사용)
     private List<InverterDetailVo> inverters;
 
-    // TODO:패널 정보 (추후 사용)
+    // 패널 정보 (추후 사용)
     private Map<Long, List<PanelVo>> panels;
 
     private List<InverterType> inverterTypes = InverterType.LIST;
